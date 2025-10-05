@@ -30,7 +30,7 @@ export function AppSidebar() {
       <SidebarContent className="flex h-full flex-col px-4 py-6">
         <div className="flex flex-col items-center gap-5">
           <img
-            src="cofrinio-logo.jpg"
+            src="assets/cofrinio-logo.png"
             alt="Cofrinio"
             className="h-20 w-auto"
           />
