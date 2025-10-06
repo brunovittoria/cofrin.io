@@ -20,6 +20,8 @@ const navItems = [
   { title: "Cartões", url: "/cartoes", icon: CreditCard },
 ];
 
+{/* Teste */}
+
 export function AppSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
