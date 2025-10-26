@@ -12,6 +12,7 @@ import Categorias from "./pages/Categorias";
 import Cartoes from "./pages/Cartoes";
 import NotFound from "./pages/NotFound";
 import { LoginPage } from "@/pages/Login";
+import { RegisterPage } from "@/pages/Register";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 
 const queryClient = new QueryClient();
@@ -23,7 +24,11 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <SignedOut>
-          <LoginPage />
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="*" element={<LoginPage />} />
+          </Routes>
         </SignedOut>
         <SignedIn>
           <SidebarProvider>
