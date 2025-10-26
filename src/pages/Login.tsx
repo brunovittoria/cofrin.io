@@ -4,6 +4,7 @@ import { BarChart3, Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -19,28 +20,13 @@ export function LoginPage() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row w-full min-h-screen">
-      {/* Left side - Login form */}
-      <div className="w-full md:w-1/2 p-8 flex flex-col justify-center bg-background">
-        <div className="max-w-md mx-auto w-full">
+  <main className="flex flex-col lg:flex-row w-full min-h-screen overflow-hidden">
+    {/* Left side - Login form */}
+      <section className="w-full lg:w-1/2 p-4 sm:p-8 flex flex-col justify-center bg-white">
+        <div className="max-w-lg mx-auto w-full px-4 sm:px-0 min-h-screen">
           {/* Logo */}
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-foreground flex items-center">
-              <div className="w-8 h-8 bg-gradient-primary rounded-xl flex items-center justify-center mr-3">
-                <BarChart3 className="h-5 w-5 text-primary-foreground" />
-              </div>
-              Cofrinio
-            </h1>
-          </div>
-
-          {/* Welcome Text */}
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold mb-2 text-foreground">
-              Welcome Back!
-            </h2>
-            <p className="text-muted-foreground">
-              Let's get you signed in securely.
-            </p>
+            <img src="/assets/cofrinio-logo.png" alt="Cofrinio" className="w-full h-auto" />
           </div>
 
           {/* Login Form */}
@@ -105,15 +91,12 @@ export function LoginPage() {
             </SignInButton>
 
             {/* Divider */}
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-background text-muted-foreground">
-                  Or continue with
-                </span>
-              </div>
+            <div className="flex items-center my-6">
+              <Separator className="flex-1" />
+              <span className="px-3 text-sm text-muted-foreground">
+                Or continue with
+              </span>
+              <Separator className="flex-1" />
             </div>
 
             {/* Google Login Option */}
@@ -125,7 +108,7 @@ export function LoginPage() {
                   className="w-full flex items-center justify-center"
                 >
                   <img
-                    src="/google-icon.svg"
+                    src="/assets/google-icon.svg"
                     alt="Google"
                     className="w-5 h-5"
                   />
@@ -147,10 +130,10 @@ export function LoginPage() {
             </div>
           </form>
         </div>
-      </div>
+      </section>
 
       {/* Right side - Dashboard preview */}
-      <div className="hidden md:block w-1/2 bg-muted/30 p-8">
+      <section className="hidden lg:flex lg:w-1/2 bg-muted/30 p-8">
         <div className="h-full flex flex-col justify-center items-center">
           <div className="max-w-lg w-full">
             <div className="mb-6">
@@ -179,14 +162,14 @@ export function LoginPage() {
             {/* Dashboard Image */}
             <div className="rounded-lg overflow-hidden shadow-xl">
               <img
-                src="/dashboard-login.png"
+                src="/assets/dashboard-login.png"
                 alt="Cofrinio Dashboard Preview"
                 className="w-full h-auto"
               />
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
