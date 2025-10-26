@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { GoogleLoginButton } from "@/components/GoogleLoginButton";
 
 export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -101,20 +102,7 @@ export function LoginPage() {
 
             {/* Google Login Option */}
             <div className="w-full">
-              <SignInButton mode="modal" forceRedirectUrl="/">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full flex items-center justify-center"
-                >
-                  <img
-                    src="/assets/google-icon.svg"
-                    alt="Google"
-                    className="w-5 h-5"
-                  />
-                  Google
-                </Button>
-              </SignInButton>
+              <GoogleLoginButton />
             </div>
 
             {/* Sign Up Link */}
