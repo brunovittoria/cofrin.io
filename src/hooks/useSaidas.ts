@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { DateRange } from 'react-day-picker';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -36,13 +37,27 @@ export const useSaidas = () => {
   });
 };
 
-export const useSaidasSummary = () => {
+export const useSaidasSummary = (dateRange?: DateRange) => {
   return useQuery({
-    queryKey: ['saidas-summary'],
+    queryKey: ['saidas-summary', dateRange?.from?.toISOString(), dateRange?.to?.toISOString()],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('saidas')
-        .select('valor');
+      let query = supabase.from('saidas').select('valor');
+      
+      // Filter by date range if provided
+      if (dateRange?.from && dateRange?.to) {
+        const startDate = dateRange.from.toISOString().split('T')[0];
+        const endDate = dateRange.to.toISOString().split('T')[0];
+        
+        query = query
+          .gte('data', startDate)
+          .lte('data', endDate);
+      } else if (dateRange?.from) {
+        // Only from date provided
+        const startDate = dateRange.from.toISOString().split('T')[0];
+        query = query.gte('data', startDate);
+      }
+      
+      const { data, error } = await query;
       
       if (error) throw error;
       

@@ -1,4 +1,5 @@
 ﻿import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { DateRange } from "react-day-picker";
 import { useIncomeExpenseData } from "@/hooks/useChartData";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -14,8 +15,12 @@ const renderHeader = () => (
   </header>
 );
 
-export function IncomeExpenseChart() {
-  const { data, isLoading, error } = useIncomeExpenseData();
+type IncomeExpenseChartProps = {
+  dateRange?: DateRange;
+};
+
+export function IncomeExpenseChart({ dateRange }: IncomeExpenseChartProps) {
+  const { data, isLoading, error } = useIncomeExpenseData(dateRange);
 
   if (isLoading) {
     return (
@@ -55,7 +60,7 @@ export function IncomeExpenseChart() {
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
             <XAxis
-              dataKey="month"
+              dataKey="mes"
               stroke="#94A3B8"
               fontSize={12}
               tickLine={false}

@@ -1,4 +1,5 @@
 ﻿import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area } from "recharts";
+import { DateRange } from "react-day-picker";
 import { useBalanceData } from "@/hooks/useChartData";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -14,8 +15,12 @@ const renderHeader = () => (
   </header>
 );
 
-export function BalanceChart() {
-  const { data, isLoading, error } = useBalanceData();
+type BalanceChartProps = {
+  dateRange?: DateRange;
+};
+
+export function BalanceChart({ dateRange }: BalanceChartProps) {
+  const { data, isLoading, error } = useBalanceData(dateRange);
 
   if (isLoading) {
     return (
@@ -51,7 +56,7 @@ export function BalanceChart() {
             </defs>
             <CartesianGrid strokeDasharray="4" stroke="#E5E7EB" />
             <XAxis
-              dataKey="month"
+              dataKey="dia"
               stroke="#94A3B8"
               fontSize={12}
               tickLine={false}

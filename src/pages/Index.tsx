@@ -1,4 +1,6 @@
-﻿import { TrendingUp, TrendingDown, Wallet } from "lucide-react";
+﻿import { useState } from "react";
+import { TrendingUp, TrendingDown, Wallet } from "lucide-react";
+import { DateRange } from "react-day-picker";
 import { Button } from "@/components/ui/button";
 import { FinancialCard } from "@/components/FinancialCard";
 import { IncomeExpenseChart } from "@/components/Charts/IncomeExpenseChart";
@@ -7,13 +9,22 @@ import { BalanceChart } from "@/components/Charts/BalanceChart";
 import { EntradaModal } from "@/components/EntradaModal";
 import { SaidaModal } from "@/components/SaidaModal";
 import { MyCardsSection } from "@/components/MyCardsSection";
+import { MonthPicker } from "@/components/ui/MonthPicker";
 import { useEntradasSummary } from "@/hooks/useEntradas";
 import { useSaidasSummary } from "@/hooks/useSaidas";
 import { useCartoes } from "@/hooks/useCartoes";
 
 const Index = () => {
-  const { data: entradasSummary } = useEntradasSummary();
-  const { data: saidasSummary } = useSaidasSummary();
+  // Default to current month
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    return { from: firstDay, to: lastDay };
+  });
+
+  const { data: entradasSummary } = useEntradasSummary(dateRange);
+  const { data: saidasSummary } = useSaidasSummary(dateRange);
   const { data: cartoes, isLoading: isLoadingCartoes } = useCartoes();
 
   const totalEntradas = entradasSummary?.total || 0;
@@ -33,6 +44,7 @@ const Index = () => {
               </div>
             </div>
             <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+              <MonthPicker dateRange={dateRange} onSelect={setDateRange} />
               <EntradaModal
                 trigger={
                   <Button
@@ -82,13 +94,13 @@ const Index = () => {
           </div>
 
           <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
-            <IncomeExpenseChart />
+            <IncomeExpenseChart dateRange={dateRange} />
             <MyCardsSection cartoes={cartoes || []} />
           </div>
 
           <div className="mt-8 grid gap-6 lg:grid-cols-2">
-            <CategoryChart />
-            <BalanceChart />
+            <CategoryChart dateRange={dateRange} />
+            <BalanceChart dateRange={dateRange} />
           </div>
         </section>
       </div>

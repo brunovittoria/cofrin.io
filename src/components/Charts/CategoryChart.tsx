@@ -1,4 +1,5 @@
 ﻿import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { DateRange } from "react-day-picker";
 import { useCategoryData } from "@/hooks/useChartData";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -49,8 +50,12 @@ const buildTooltip = ({ active, payload }: TooltipProps) => {
   return null;
 };
 
-export function CategoryChart() {
-  const { data, isLoading, error } = useCategoryData();
+type CategoryChartProps = {
+  dateRange?: DateRange;
+};
+
+export function CategoryChart({ dateRange }: CategoryChartProps) {
+  const { data, isLoading, error } = useCategoryData(dateRange);
 
   if (isLoading) {
     return (
