@@ -20,6 +20,8 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
+import { MonthPicker } from "@/components/ui/MonthPicker";
+import { DateRange } from "react-day-picker";
 
 const DEFAULT_CATEGORY_COLOR = "#ef4444";
 
@@ -68,8 +70,9 @@ const SummaryCard = ({
 
 export default function Saidas() {
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: saidas = [], isLoading } = useSaidas();
-  const { data: summary } = useSaidasSummary();
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const { data: saidas = [], isLoading } = useSaidas(dateRange);
+  const { data: summary } = useSaidasSummary(dateRange);
   const deleteSaida = useDeleteSaida();
 
   const filteredSaidas = saidas.filter((saida) =>
@@ -87,6 +90,7 @@ export default function Saidas() {
         </div>
       </div>
       <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+        <MonthPicker dateRange={dateRange} onSelect={setDateRange} />
         <SaidaModal
           trigger={
             <Button className="h-12 rounded-2xl bg-[#DC2626] px-6 text-sm font-semibold text-white shadow-[0px_20px_32px_-18px_rgba(220,38,38,0.45)] transition-transform hover:-translate-y-0.5 hover:bg-[#B91C1C]">

@@ -19,17 +19,28 @@ export type NovaEntrada = {
   categoria_id?: number;
 };
 
-export const useEntradas = () => {
+export const useEntradas = (dateRange?: DateRange) => {
   return useQuery({
-    queryKey: ['entradas'],
+    queryKey: ['entradas', dateRange?.from?.toISOString(), dateRange?.to?.toISOString()],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('entradas')
         .select(`
           *,
           categorias(nome, cor_hex)
         `)
         .order('data', { ascending: false });
+      
+      if (dateRange?.from && dateRange?.to) {
+        const startDate = `${dateRange.from.getFullYear()}-${String(dateRange.from.getMonth() + 1).padStart(2, '0')}-${String(dateRange.from.getDate()).padStart(2, '0')}`;
+        const endDate = `${dateRange.to.getFullYear()}-${String(dateRange.to.getMonth() + 1).padStart(2, '0')}-${String(dateRange.to.getDate()).padStart(2, '0')}`;
+        
+        query = query
+          .gte('data', startDate)
+          .lte('data', endDate);
+      }
+      
+      const { data, error } = await query;
       
       if (error) throw error;
       return data as (Entrada & { categorias?: { nome: string; cor_hex?: string } })[];
@@ -45,15 +56,15 @@ export const useEntradasSummary = (dateRange?: DateRange) => {
       
       // Filter by date range if provided
       if (dateRange?.from && dateRange?.to) {
-        const startDate = dateRange.from.toISOString().split('T')[0];
-        const endDate = dateRange.to.toISOString().split('T')[0];
+        const startDate = `${dateRange.from.getFullYear()}-${String(dateRange.from.getMonth() + 1).padStart(2, '0')}-${String(dateRange.from.getDate()).padStart(2, '0')}`;
+        const endDate = `${dateRange.to.getFullYear()}-${String(dateRange.to.getMonth() + 1).padStart(2, '0')}-${String(dateRange.to.getDate()).padStart(2, '0')}`;
         
         query = query
           .gte('data', startDate)
           .lte('data', endDate);
       } else if (dateRange?.from) {
         // Only from date provided
-        const startDate = dateRange.from.toISOString().split('T')[0];
+        const startDate = `${dateRange.from.getFullYear()}-${String(dateRange.from.getMonth() + 1).padStart(2, '0')}-${String(dateRange.from.getDate()).padStart(2, '0')}`;
         query = query.gte('data', startDate);
       }
       

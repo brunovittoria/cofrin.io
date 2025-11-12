@@ -20,6 +20,8 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import { MonthPicker } from "@/components/ui/MonthPicker";
+import { DateRange } from "react-day-picker";
 
 const DEFAULT_CATEGORY_COLOR = "#10b981";
 
@@ -67,9 +69,10 @@ const SummaryCard = ({
 );
 
 export default function Entradas() {
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: entradas = [], isLoading } = useEntradas();
-  const { data: summary } = useEntradasSummary();
+  const { data: entradas = [], isLoading } = useEntradas(dateRange);
+  const { data: summary } = useEntradasSummary(dateRange);
   const deleteEntrada = useDeleteEntrada();
 
   const filteredEntradas = entradas.filter((entrada) =>
@@ -87,6 +90,7 @@ export default function Entradas() {
         </div>
       </div>
       <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+      <MonthPicker dateRange={dateRange} onSelect={setDateRange} />
         <EntradaModal
           trigger={
             <Button className="h-12 rounded-2xl bg-[#16A34A] px-6 text-sm font-semibold text-white shadow-[0px_20px_32px_-18px_rgba(22,163,74,0.5)] transition-transform hover:-translate-y-0.5 hover:bg-[#15803D]">

@@ -2,6 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 import { DateRange } from 'react-day-picker';
 import { supabase } from '@/integrations/supabase/client';
 
+// Helper function to format date without timezone conversion
+const formatDateToLocal = (date: Date): string => {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+};
+
 export const useIncomeExpenseData = (dateRange?: DateRange) => {
   return useQuery({
     queryKey: ['chart-data', 'income-expense', dateRange?.from?.toISOString(), dateRange?.to?.toISOString()],
@@ -13,14 +18,14 @@ export const useIncomeExpenseData = (dateRange?: DateRange) => {
       
       // Filter by date range if provided
       if (dateRange?.from && dateRange?.to) {
-        const startDate = dateRange.from.toISOString().split('T')[0];
-        const endDate = dateRange.to.toISOString().split('T')[0];
+        const startDate = formatDateToLocal(dateRange.from);
+        const endDate = formatDateToLocal(dateRange.to);
         
         query = query
           .gte('mes', startDate)
           .lte('mes', endDate);
       } else if (dateRange?.from) {
-        const startDate = dateRange.from.toISOString().split('T')[0];
+        const startDate = formatDateToLocal(dateRange.from);
         query = query.gte('mes', startDate);
       }
       
@@ -44,8 +49,8 @@ export const useCategoryData = (dateRange?: DateRange) => {
       // For category data, we need to query the saidas table directly if filtering by date range
       // since views might not support filtering
       if (dateRange?.from && dateRange?.to) {
-        const startDate = dateRange.from.toISOString().split('T')[0];
-        const endDate = dateRange.to.toISOString().split('T')[0];
+        const startDate = formatDateToLocal(dateRange.from);
+        const endDate = formatDateToLocal(dateRange.to);
         
         const { data, error } = await supabase
           .from('saidas')
@@ -85,7 +90,7 @@ export const useCategoryData = (dateRange?: DateRange) => {
           .sort((a, b) => b.value - a.value);
       } else if (dateRange?.from) {
         // Only from date provided
-        const startDate = dateRange.from.toISOString().split('T')[0];
+        const startDate = formatDateToLocal(dateRange.from);
         
         const { data, error } = await supabase
           .from('saidas')
@@ -161,15 +166,15 @@ export const useBalanceData = (dateRange?: DateRange) => {
       
       // Filter by date range if provided
       if (dateRange?.from && dateRange?.to) {
-        const startDate = dateRange.from.toISOString().split('T')[0];
-        const endDate = dateRange.to.toISOString().split('T')[0];
+        const startDate = formatDateToLocal(dateRange.from);
+        const endDate = formatDateToLocal(dateRange.to);
         
         query = query
           .gte('dia', startDate)
           .lte('dia', endDate);
       } else if (dateRange?.from) {
         // Only from date provided
-        const startDate = dateRange.from.toISOString().split('T')[0];
+        const startDate = formatDateToLocal(dateRange.from);
         query = query.gte('dia', startDate);
       } else {
         // Limit to last 30 days if no filter
