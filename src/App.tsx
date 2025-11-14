@@ -14,6 +14,7 @@ import NotFound from "./pages/NotFound";
 import { LoginPage } from "@/pages/Login";
 import { RegisterPage } from "@/pages/Register";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
+import Futuros from "./pages/Futuros";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
                     <Route path="/entradas" element={<Entradas />} />
                     <Route path="/saidas" element={<Saidas />} />
                     <Route path="/categorias" element={<Categorias />} />
+                    <Route path="/futuros" element={<Futuros />} />
                     <Route path="/cartoes" element={<Cartoes />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>

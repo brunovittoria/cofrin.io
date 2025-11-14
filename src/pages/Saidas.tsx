@@ -1,8 +1,23 @@
 ﻿import { useState, type CSSProperties } from "react";
-import { type LucideIcon, Plus, Search, Filter, Edit, Trash2, TrendingDown } from "lucide-react";
+import {
+  type LucideIcon,
+  Plus,
+  Search,
+  Filter,
+  Edit,
+  Trash2,
+  TrendingDown,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { SaidaModal } from "@/components/SaidaModal";
 import { Toaster } from "@/components/ui/toaster";
@@ -20,18 +35,24 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
-import { MonthPicker } from "@/components/ui/MonthPicker";
+import { MonthPicker } from "@/components/pieces/MonthPicker";
 import { DateRange } from "react-day-picker";
 
 const DEFAULT_CATEGORY_COLOR = "#ef4444";
 
-const sanitizeHexColor = (hex: string | null | undefined, fallback: string): string => {
+const sanitizeHexColor = (
+  hex: string | null | undefined,
+  fallback: string
+): string => {
   if (!hex) return fallback;
   const normalized = hex.trim();
   return /^#([0-9a-f]{3}){1,2}$/i.test(normalized) ? normalized : fallback;
 };
 
-const buildCategoryBadgeTokens = (hex: string | null | undefined, fallback: string) => {
+const buildCategoryBadgeTokens = (
+  hex: string | null | undefined,
+  fallback: string
+) => {
   const color = sanitizeHexColor(hex, fallback);
   const style: CSSProperties = {
     background: color + "12",
@@ -61,7 +82,12 @@ const SummaryCard = ({
         <p className="text-sm font-medium text-[#6B7280]">{title}</p>
         <p className="mt-2 text-2xl font-semibold text-[#0F172A]">{value}</p>
       </div>
-      <span className={cn("flex h-12 w-12 items-center justify-center rounded-2xl", badgeClass)}>
+      <span
+        className={cn(
+          "flex h-12 w-12 items-center justify-center rounded-2xl",
+          badgeClass
+        )}
+      >
         <Icon className="h-6 w-6" />
       </span>
     </div>
@@ -75,18 +101,23 @@ export default function Saidas() {
   const { data: summary } = useSaidasSummary(dateRange);
   const deleteSaida = useDeleteSaida();
 
-  const filteredSaidas = saidas.filter((saida) =>
-    saida.descricao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    saida.categorias?.nome?.toLowerCase().includes(searchTerm.toLowerCase()),
+  const filteredSaidas = saidas.filter(
+    (saida) =>
+      saida.descricao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      saida.categorias?.nome?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const header = (
     <header className="flex flex-col gap-6 border-b border-[#E5E7EB] pb-6 lg:flex-row lg:items-center lg:justify-between">
       <div className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#94A3B8]">Saídas</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#94A3B8]">
+          Saídas
+        </p>
         <div className="space-y-1">
           <h1 className="text-3xl font-semibold text-[#0F172A]">Saídas</h1>
-          <p className="text-sm text-[#4B5563]">Controle total dos gastos e despesas da sua operação</p>
+          <p className="text-sm text-[#4B5563]">
+            Controle total dos gastos e despesas da sua operação
+          </p>
         </div>
       </div>
       <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
@@ -128,36 +159,60 @@ export default function Saidas() {
     <section className="surface-card p-6">
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
-          <h2 className="text-lg font-semibold text-[#0F172A]">Registros de Saídas</h2>
-          <p className="text-sm text-[#6B7280]">Revise despesas e monitore os gastos recorrentes</p>
+          <h2 className="text-lg font-semibold text-[#0F172A]">
+            Registros de Saídas
+          </h2>
+          <p className="text-sm text-[#6B7280]">
+            Revise despesas e monitore os gastos recorrentes
+          </p>
         </div>
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="border-b border-[#E5E7EB]">
-                <TableHead className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">Data</TableHead>
-                <TableHead className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">Descrição</TableHead>
-                <TableHead className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">Categoria</TableHead>
-                <TableHead className="text-right text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">Valor</TableHead>
-                <TableHead className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">Ações</TableHead>
+                <TableHead className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+                  Data
+                </TableHead>
+                <TableHead className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+                  Descrição
+                </TableHead>
+                <TableHead className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+                  Categoria
+                </TableHead>
+                <TableHead className="text-right text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+                  Valor
+                </TableHead>
+                <TableHead className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+                  Ações
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredSaidas.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="py-10 text-center text-sm text-[#6B7280]">
-                    {searchTerm ? "Nenhuma saída corresponde à busca." : "Nenhuma saída cadastrada ainda."}
+                  <TableCell
+                    colSpan={5}
+                    className="py-10 text-center text-sm text-[#6B7280]"
+                  >
+                    {searchTerm
+                      ? "Nenhuma saída corresponde à busca."
+                      : "Nenhuma saída cadastrada ainda."}
                   </TableCell>
                 </TableRow>
               ) : (
                 filteredSaidas.map((saida) => {
-                  const { accent: accentColor, style: badgeStyle } = buildCategoryBadgeTokens(
-                    saida.categorias?.cor_hex,
-                    DEFAULT_CATEGORY_COLOR,
-                  );
-                  const categoryName = saida.categorias?.nome || "Sem categoria";
+                  const { accent: accentColor, style: badgeStyle } =
+                    buildCategoryBadgeTokens(
+                      saida.categorias?.cor_hex,
+                      DEFAULT_CATEGORY_COLOR
+                    );
+                  const categoryName =
+                    saida.categorias?.nome || "Sem categoria";
                   return (
-                    <TableRow key={saida.id} className="border-b border-[#F1F5F9] last:border-0 hover:bg-[#FEF2F2]">
+                    <TableRow
+                      key={saida.id}
+                      className="border-b border-[#F1F5F9] last:border-0 hover:bg-[#FEF2F2]"
+                    >
                       <TableCell className="whitespace-nowrap text-sm font-semibold text-[#0F172A]">
                         {new Date(saida.data).toLocaleDateString("pt-BR")}
                       </TableCell>
@@ -173,9 +228,14 @@ export default function Saidas() {
                           <span className="flex items-center gap-2">
                             <span
                               className="h-2.5 w-2.5 rounded-full"
-                              style={{ backgroundColor: accentColor, boxShadow: "0 0 0 4px " + accentColor + "22" }}
+                              style={{
+                                backgroundColor: accentColor,
+                                boxShadow: "0 0 0 4px " + accentColor + "22",
+                              }}
                             />
-                            <span className="whitespace-nowrap">{categoryName}</span>
+                            <span className="whitespace-nowrap">
+                              {categoryName}
+                            </span>
                           </span>
                         </Badge>
                       </TableCell>
@@ -191,7 +251,9 @@ export default function Saidas() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                aria-label={`Editar ${saida.descricao || "saída"}`}
+                                aria-label={`Editar ${
+                                  saida.descricao || "saída"
+                                }`}
                                 className="h-9 w-9 rounded-xl border border-[#FB923C] bg-[#FFF7ED] p-0 text-[#EA580C] transition-colors hover:bg-[#FFEAD5]"
                               >
                                 <Edit className="h-4 w-4" />
@@ -203,7 +265,9 @@ export default function Saidas() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                aria-label={`Excluir ${saida.descricao || "saída"}`}
+                                aria-label={`Excluir ${
+                                  saida.descricao || "saída"
+                                }`}
                                 className="h-9 w-9 rounded-xl border border-[#FECACA] bg-[#FEF2F2] p-0 text-[#DC2626] transition-colors hover:bg-[#FEE2E2]"
                               >
                                 <Trash2 className="h-4 w-4" />
@@ -211,9 +275,12 @@ export default function Saidas() {
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                                <AlertDialogTitle>
+                                  Confirmar exclusão
+                                </AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Tem certeza de que deseja excluir esta saída? Esta ação não pode ser desfeita.
+                                  Tem certeza de que deseja excluir esta saída?
+                                  Esta ação não pode ser desfeita.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
@@ -222,7 +289,9 @@ export default function Saidas() {
                                   className="bg-[#DC2626] text-white hover:bg-[#B91C1C]"
                                   onClick={() => deleteSaida.mutate(saida.id)}
                                 >
-                                  {deleteSaida.isPending ? "Excluindo..." : "Excluir"}
+                                  {deleteSaida.isPending
+                                    ? "Excluindo..."
+                                    : "Excluir"}
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
@@ -268,7 +337,11 @@ export default function Saidas() {
           {header}
 
           <div className="mt-8 grid gap-6 md:grid-cols-3">
-            <SummaryCard title="Total de Saídas" value={formatCurrency(summary?.total || 0)} icon={TrendingDown} />
+            <SummaryCard
+              title="Total de Saídas"
+              value={formatCurrency(summary?.total || 0)}
+              icon={TrendingDown}
+            />
             <SummaryCard
               title="Quantidade"
               value={summary?.count || 0}
