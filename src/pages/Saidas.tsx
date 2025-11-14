@@ -35,7 +35,7 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
-import { MonthPicker } from "@/components/pieces/MonthPicker";
+import { MonthPicker } from "@/components/MonthPicker";
 import { DateRange } from "react-day-picker";
 
 const DEFAULT_CATEGORY_COLOR = "#ef4444";

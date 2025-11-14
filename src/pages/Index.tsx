@@ -9,7 +9,7 @@ import { BalanceChart } from "@/components/charts/BalanceChart";
 import { EntradaModal } from "@/components/EntradaModal";
 import { SaidaModal } from "@/components/SaidaModal";
 import { MyCardsSection } from "@/components/MyCardsSection";
-import { MonthPicker } from "@/components/pieces/MonthPicker";
+import { MonthPicker } from "@/components/MonthPicker";
 import { useEntradasSummary } from "@/hooks/useEntradas";
 import { useSaidasSummary } from "@/hooks/useSaidas";
 import { useCartoes } from "@/hooks/useCartoes";

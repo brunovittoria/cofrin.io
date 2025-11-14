@@ -39,7 +39,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { MonthPicker } from "@/components/pieces/MonthPicker";
+import { MonthPicker } from "@/components/MonthPicker";
 import { DateRange } from "react-day-picker";
 
 const DEFAULT_CATEGORY_COLOR = "#10b981";

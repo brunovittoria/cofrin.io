@@ -27,8 +27,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { formatCurrency } from "@/lib/formatters";
-import { MonthPicker } from "@/components/pieces/MonthPicker";
+import { MonthPicker } from "@/components/MonthPicker";
 import { DateRange } from "react-day-picker";
+import { LancamentoFuturoModal } from "@/components/LancamentoFuturoModal";
 
 // Dados mockados - substituir por hooks quando disponível
 const mockTransactions = [
@@ -130,10 +131,14 @@ export default function Futuros() {
           <RefreshCw className="h-4 w-4 mr-2" />
           Atualizar
         </Button>
-        <Button className="h-12 rounded-2xl bg-[#0A84FF] px-6 text-sm font-semibold text-white shadow-[0px_20px_32px_-18px_rgba(10,132,255,0.6)] transition-transform hover:-translate-y-0.5 hover:bg-[#006FDB]">
-          <Plus className="h-4 w-4 mr-2" />
-          Novo Lançamento
-        </Button>
+        <LancamentoFuturoModal
+          trigger={
+            <Button className="h-12 rounded-2xl bg-[#0A84FF] px-6 text-sm font-semibold text-white shadow-[0px_20px_32px_-18px_rgba(10,132,255,0.6)] transition-transform hover:-translate-y-0.5 hover:bg-[#006FDB]">
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Lançamento
+            </Button>
+          }
+        />
       </div>
     </header>
   );

@@ -45,6 +45,45 @@ export const registerSchema = z
     path: ["confirmPassword"],
   });
 
+// Lançamento Futuro form validation schema (input - mantém strings)
+export const lancamentoFuturoInputSchema = z.object({
+  data: z.date({
+    required_error: "Por favor, selecione uma data prevista.",
+  }),
+  tipo: z.enum(["entrada", "saida"], {
+    required_error: "Por favor, selecione o tipo de lançamento.",
+  }),
+  descricao: z
+    .string()
+    .min(1, "A descrição é obrigatória.")
+    .min(3, "A descrição deve ter pelo menos 3 caracteres.")
+    .max(200, "A descrição deve ter no máximo 200 caracteres."),
+  categoria_id: z
+    .string()
+    .min(1, "Por favor, selecione uma categoria.")
+    .refine((val) => !isNaN(parseInt(val, 10)), {
+      message: "Categoria inválida.",
+    }),
+  valor: z
+    .string()
+    .min(1, "O valor é obrigatório.")
+    .refine((val) => {
+      const num = parseFloat(val.replace(",", "."));
+      return !isNaN(num) && num > 0;
+    }, {
+      message: "O valor deve ser um número positivo.",
+    }),
+});
+
+// Schema transformado para output (com números)
+export const lancamentoFuturoSchema = lancamentoFuturoInputSchema.transform((data) => ({
+  ...data,
+  categoria_id: parseInt(data.categoria_id, 10),
+  valor: parseFloat(data.valor.replace(",", ".")),
+}));
+
 // Type inference for TypeScript
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type RegisterFormData = z.infer<typeof registerSchema>;
+export type LancamentoFuturoFormData = z.infer<typeof lancamentoFuturoInputSchema>;
+export type LancamentoFuturoOutputData = z.infer<typeof lancamentoFuturoSchema>;
