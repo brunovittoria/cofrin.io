@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DateRange } from 'react-day-picker';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { toLocalDateString } from '@/lib/formatters';
 
 export type Entrada = {
   id: number;
@@ -31,13 +32,15 @@ export const useEntradas = (dateRange?: DateRange) => {
         `)
         .order('data', { ascending: false });
       
+      // Filter by date range if provided
       if (dateRange?.from && dateRange?.to) {
-        const startDate = `${dateRange.from.getFullYear()}-${String(dateRange.from.getMonth() + 1).padStart(2, '0')}-${String(dateRange.from.getDate()).padStart(2, '0')}`;
-        const endDate = `${dateRange.to.getFullYear()}-${String(dateRange.to.getMonth() + 1).padStart(2, '0')}-${String(dateRange.to.getDate()).padStart(2, '0')}`;
-        
-        query = query
-          .gte('data', startDate)
-          .lte('data', endDate);
+        const startDate = toLocalDateString(dateRange.from);
+        const endDate = toLocalDateString(dateRange.to);
+        query = query.gte('data', startDate).lte('data', endDate);
+      } else if (dateRange?.from) {
+        // Only from date provided
+        const startDate = toLocalDateString(dateRange.from);
+        query = query.gte('data', startDate);
       }
       
       const { data, error } = await query;
@@ -56,15 +59,12 @@ export const useEntradasSummary = (dateRange?: DateRange) => {
       
       // Filter by date range if provided
       if (dateRange?.from && dateRange?.to) {
-        const startDate = `${dateRange.from.getFullYear()}-${String(dateRange.from.getMonth() + 1).padStart(2, '0')}-${String(dateRange.from.getDate()).padStart(2, '0')}`;
-        const endDate = `${dateRange.to.getFullYear()}-${String(dateRange.to.getMonth() + 1).padStart(2, '0')}-${String(dateRange.to.getDate()).padStart(2, '0')}`;
-        
-        query = query
-          .gte('data', startDate)
-          .lte('data', endDate);
+        const startDate = toLocalDateString(dateRange.from);
+        const endDate = toLocalDateString(dateRange.to);
+        query = query.gte('data', startDate).lte('data', endDate);
       } else if (dateRange?.from) {
         // Only from date provided
-        const startDate = `${dateRange.from.getFullYear()}-${String(dateRange.from.getMonth() + 1).padStart(2, '0')}-${String(dateRange.from.getDate()).padStart(2, '0')}`;
+        const startDate = toLocalDateString(dateRange.from);
         query = query.gte('data', startDate);
       }
       

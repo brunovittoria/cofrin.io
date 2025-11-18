@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useCategories } from "@/hooks/useCategories";
 import { useCreateEntrada, useUpdateEntrada, type Entrada } from "@/hooks/useEntradas";
+import { parseLocalDate, toLocalDateString } from "@/lib/formatters";
 
 interface EntradaModalProps {
   trigger?: React.ReactNode;
@@ -66,7 +67,7 @@ export function EntradaModal({ trigger, mode = "create", entrada }: EntradaModal
     }
 
     const payload = {
-      data: date.toISOString().split("T")[0],
+      data: toLocalDateString(date),
       descricao: formData.descricao || undefined,
       valor: parseFloat(formData.valor),
       categoria_id: parseInt(formData.categoria_id),
@@ -95,7 +96,7 @@ export function EntradaModal({ trigger, mode = "create", entrada }: EntradaModal
   const handleOpenChange = (next: boolean) => {
     if (next && mode === "edit" && entrada) {
       try {
-        setDate(entrada.data ? new Date(entrada.data) : undefined);
+        setDate(entrada.data ? parseLocalDate(entrada.data) : undefined);
       } catch {}
       setFormData({
         descricao: entrada.descricao || "",
