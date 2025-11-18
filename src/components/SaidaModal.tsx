@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useCategories } from "@/hooks/useCategories";
 import { useCreateSaida, useUpdateSaida, type Saida } from "@/hooks/useSaidas";
+import { parseLocalDate, toLocalDateString } from "@/lib/formatters";
 
 interface SaidaModalProps {
   trigger?: React.ReactNode;
@@ -66,7 +67,7 @@ export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps)
     }
 
     const payload = {
-      data: date.toISOString().split("T")[0],
+      data: toLocalDateString(date),
       descricao: formData.descricao || undefined,
       valor: parseFloat(formData.valor),
       categoria_id: parseInt(formData.categoria_id),
@@ -95,7 +96,7 @@ export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps)
   const handleOpenChange = (next: boolean) => {
     if (next && mode === "edit" && saida) {
       try {
-        setDate(saida.data ? new Date(saida.data) : undefined);
+        setDate(saida.data ? parseLocalDate(saida.data) : undefined);
       } catch {}
       setFormData({
         descricao: saida.descricao || "",

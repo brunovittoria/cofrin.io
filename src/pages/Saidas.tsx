@@ -37,6 +37,7 @@ import {
 import { cn } from "@/lib/utils";
 import { MonthPicker } from "@/components/MonthPicker";
 import { DateRange } from "react-day-picker";
+import { formatCurrency, formatLocalDate } from "@/lib/formatters";
 
 const DEFAULT_CATEGORY_COLOR = "#ef4444";
 
@@ -61,9 +62,6 @@ const buildCategoryBadgeTokens = (
   };
   return { accent: color, style };
 };
-
-const formatCurrency = (value: number) =>
-  "R$ " + value.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
 
 const SummaryCard = ({
   title,
@@ -214,7 +212,7 @@ export default function Saidas() {
                       className="border-b border-[#F1F5F9] last:border-0 hover:bg-[#FEF2F2]"
                     >
                       <TableCell className="whitespace-nowrap text-sm font-semibold text-[#0F172A]">
-                        {new Date(saida.data).toLocaleDateString("pt-BR")}
+                        {formatLocalDate(saida.data)}
                       </TableCell>
                       <TableCell className="max-w-[280px] text-sm text-[#4B5563]">
                         {saida.descricao}
