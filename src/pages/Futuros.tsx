@@ -2,16 +2,14 @@ import { useState } from "react";
 import {
   RefreshCw,
   Plus,
-  ArrowRight,
-  ChevronLeft,
-  ChevronRight,
-  Calendar,
   Check,
   X,
   Clock,
   TrendingUp,
   TrendingDown,
   DollarSign,
+  Edit,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,43 +22,29 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/formatters";
 import { MonthPicker } from "@/components/MonthPicker";
 import { DateRange } from "react-day-picker";
 import { LancamentoFuturoModal } from "@/components/LancamentoFuturoModal";
-
-// Dados mockados - substituir por hooks quando disponível
-const mockTransactions = [
-  {
-    id: "1",
-    date: "2025-05-10",
-    description: "IPTU Terreno (1/7)",
-    category: "IPTU",
-    status: "Pendente",
-    type: "Saída",
-    value: -69.59,
-  },
-  {
-    id: "2",
-    date: "2025-05-12",
-    description: "Salário mensal",
-    category: "Salário",
-    status: "Pendente",
-    type: "Entrada",
-    value: 12000.0,
-  },
-  {
-    id: "3",
-    date: "2025-05-15",
-    description: "Financiamento do carro parcela 1 de 4",
-    category: "Financiamento Carro",
-    status: "Pendente",
-    type: "Saída",
-    value: -1000.0,
-  },
-];
+import { Toaster } from "@/components/ui/toaster";
+import {
+  useLancamentosFuturos,
+  useLancamentosFuturosSummary,
+  useEfetivarLancamentoFuturo,
+  useDeleteLancamentoFuturo,
+} from "@/hooks/useLancamentosFuturos";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 const SummaryCard = ({
   title,
@@ -94,19 +78,21 @@ export default function Futuros() {
   const [searchTerm, setSearchTerm] = useState("");
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
-  // Calcular resumos (mockado)
-  const aReceber = 12000.0;
-  const aPagar = 1069.59;
-  const saldoPrevisto = aReceber - aPagar;
-  const efetivado = 0.0;
+  const { data: lancamentosPendentes = [], isLoading: loadingPendentes } = useLancamentosFuturos(dateRange, 'pendente');
+  const { data: lancamentosEfetivados = [], isLoading: loadingEfetivados } = useLancamentosFuturos(dateRange, 'efetivado');
+  const { data: summary } = useLancamentosFuturosSummary(dateRange);
+  const efetivarLancamento = useEfetivarLancamentoFuturo();
+  const deleteLancamento = useDeleteLancamentoFuturo();
 
-  const filteredTransactions = mockTransactions.filter(
-    (transaction) =>
-      transaction.description
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      transaction.category.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredPendentes = lancamentosPendentes.filter(
+    (lancamento) =>
+      lancamento.descricao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lancamento.categorias?.nome?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleRefresh = () => {
+    window.location.reload();
+  };
 
   const header = (
     <header className="flex flex-col gap-6 border-b border-[#E5E7EB] pb-6 lg:flex-row lg:items-center lg:justify-between">
@@ -127,6 +113,7 @@ export default function Futuros() {
         <Button
           variant="outline"
           className="h-12 rounded-2xl border-[#CBD5F5] bg-white px-6 text-sm font-semibold text-[#0F172A] shadow-[0px_20px_32px_-24px_rgba(15,23,42,0.16)] transition-transform hover:-translate-y-0.5 hover:bg-[#EEF2FF]"
+          onClick={handleRefresh}
         >
           <RefreshCw className="h-4 w-4 mr-2" />
           Atualizar
@@ -147,31 +134,31 @@ export default function Futuros() {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <SummaryCard
         title="A Receber"
-        value={formatCurrency(aReceber)}
+        value={formatCurrency(summary?.aReceber || 0)}
         icon={TrendingUp}
         color="text-[#16A34A]"
         badgeClass="bg-[#ECFDF3] text-[#16A34A]"
       />
       <SummaryCard
         title="A Pagar"
-        value={formatCurrency(aPagar)}
+        value={formatCurrency(summary?.aPagar || 0)}
         icon={TrendingDown}
         color="text-[#DC2626]"
         badgeClass="bg-[#FEF2F2] text-[#DC2626]"
       />
       <SummaryCard
         title="Saldo Previsto"
-        value={formatCurrency(saldoPrevisto)}
+        value={formatCurrency(summary?.saldoPrevisto || 0)}
         icon={DollarSign}
-        color="text-[#16A34A]"
-        badgeClass="bg-[#ECFDF3] text-[#16A34A]"
+        color={(summary?.saldoPrevisto || 0) >= 0 ? "text-[#16A34A]" : "text-[#DC2626]"}
+        badgeClass={(summary?.saldoPrevisto || 0) >= 0 ? "bg-[#ECFDF3] text-[#16A34A]" : "bg-[#FEF2F2] text-[#DC2626]"}
       />
       <SummaryCard
         title="Efetivado"
-        value={formatCurrency(efetivado)}
+        value={formatCurrency(summary?.efetivado || 0)}
         icon={Clock}
-        color="text-[#16A34A]"
-        badgeClass="bg-[#ECFDF3] text-[#16A34A]"
+        color={(summary?.efetivado || 0) >= 0 ? "text-[#16A34A]" : "text-[#DC2626]"}
+        badgeClass={(summary?.efetivado || 0) >= 0 ? "bg-[#ECFDF3] text-[#16A34A]" : "bg-[#FEF2F2] text-[#DC2626]"}
       />
     </div>
   );
@@ -222,7 +209,7 @@ export default function Futuros() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredTransactions.length === 0 ? (
+                {filteredPendentes.length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={7}
@@ -234,45 +221,45 @@ export default function Futuros() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredTransactions.map((transaction) => (
+                  filteredPendentes.map((lancamento) => (
                     <TableRow
-                      key={transaction.id}
+                      key={lancamento.id}
                       className="border-b border-[#F1F5F9] last:border-0 hover:bg-[#F8FAFC]"
                     >
                       <TableCell className="whitespace-nowrap text-sm font-semibold text-[#0F172A]">
-                        {new Date(transaction.date).toLocaleDateString("pt-BR")}
+                        {new Date(lancamento.data).toLocaleDateString("pt-BR")}
                       </TableCell>
                       <TableCell className="max-w-[280px] text-sm text-[#4B5563]">
-                        {transaction.description}
+                        {lancamento.descricao}
                       </TableCell>
                       <TableCell className="text-sm text-[#4B5563]">
-                        {transaction.category}
+                        {lancamento.categorias?.nome || "Sem categoria"}
                       </TableCell>
                       <TableCell>
                         <Badge className="bg-[#FEF3C7] text-[#92400E] hover:bg-[#FEF3C7] border-0">
-                          {transaction.status}
+                          Pendente
                         </Badge>
                       </TableCell>
                       <TableCell>
                         <span
                           className={
-                            transaction.type === "Entrada"
+                            lancamento.tipo === "entrada"
                               ? "text-[#16A34A] font-medium"
                               : "text-[#DC2626] font-medium"
                           }
                         >
-                          {transaction.type}
+                          {lancamento.tipo === "entrada" ? "Entrada" : "Saída"}
                         </span>
                       </TableCell>
                       <TableCell
                         className={`text-right font-semibold ${
-                          transaction.value >= 0
+                          lancamento.tipo === "entrada"
                             ? "text-[#16A34A]"
                             : "text-[#DC2626]"
                         }`}
                       >
-                        {transaction.value >= 0 ? "+ " : "- "}
-                        {formatCurrency(Math.abs(transaction.value))}
+                        {lancamento.tipo === "entrada" ? "+ " : "- "}
+                        {formatCurrency(lancamento.valor)}
                       </TableCell>
                       <TableCell className="text-center">
                         <div className="flex items-center justify-center gap-2">
@@ -281,17 +268,40 @@ export default function Futuros() {
                             size="icon"
                             className="h-8 w-8 text-[#16A34A] hover:text-[#15803D] hover:bg-[#ECFDF3]"
                             aria-label="Efetivar lançamento"
+                            onClick={() => efetivarLancamento.mutate(lancamento.id)}
+                            disabled={efetivarLancamento.isPending}
                           >
                             <Check className="h-4 w-4" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-[#DC2626] hover:text-[#B91C1C] hover:bg-[#FEF2F2]"
-                            aria-label="Cancelar lançamento"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-[#DC2626] hover:text-[#B91C1C] hover:bg-[#FEF2F2]"
+                                aria-label="Excluir lançamento"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Tem certeza de que deseja excluir este lançamento? Esta ação não pode ser desfeita.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction
+                                  className="bg-[#DC2626] text-white hover:bg-[#B91C1C]"
+                                  onClick={() => deleteLancamento.mutate(lancamento.id)}
+                                >
+                                  {deleteLancamento.isPending ? "Excluindo..." : "Excluir"}
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -306,15 +316,101 @@ export default function Futuros() {
           <h3 className="text-md font-semibold text-[#0F172A] mb-3">
             Lançamentos Efetivados
           </h3>
-          <div className="mt-4 bg-[#F9FAFB] p-4 rounded-2xl text-center">
-            <p className="text-sm font-medium text-[#16A34A]">
-              Nenhum Lançamento Efetivado Este Mês
-            </p>
-          </div>
+          {lancamentosEfetivados.length === 0 ? (
+            <div className="mt-4 bg-[#F9FAFB] p-4 rounded-2xl text-center">
+              <p className="text-sm font-medium text-[#16A34A]">
+                Nenhum Lançamento Efetivado Este Mês
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-b border-[#E5E7EB]">
+                    <TableHead className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+                      Data
+                    </TableHead>
+                    <TableHead className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+                      Descrição
+                    </TableHead>
+                    <TableHead className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+                      Categoria
+                    </TableHead>
+                    <TableHead className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+                      Tipo
+                    </TableHead>
+                    <TableHead className="text-right text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+                      Valor
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {lancamentosEfetivados.map((lancamento) => (
+                    <TableRow
+                      key={lancamento.id}
+                      className="border-b border-[#F1F5F9] last:border-0 hover:bg-[#F8FAFC]"
+                    >
+                      <TableCell className="whitespace-nowrap text-sm font-semibold text-[#0F172A]">
+                        {new Date(lancamento.data).toLocaleDateString("pt-BR")}
+                      </TableCell>
+                      <TableCell className="max-w-[280px] text-sm text-[#4B5563]">
+                        {lancamento.descricao}
+                      </TableCell>
+                      <TableCell className="text-sm text-[#4B5563]">
+                        {lancamento.categorias?.nome || "Sem categoria"}
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={
+                            lancamento.tipo === "entrada"
+                              ? "text-[#16A34A] font-medium"
+                              : "text-[#DC2626] font-medium"
+                          }
+                        >
+                          {lancamento.tipo === "entrada" ? "Entrada" : "Saída"}
+                        </span>
+                      </TableCell>
+                      <TableCell
+                        className={`text-right font-semibold ${
+                          lancamento.tipo === "entrada"
+                            ? "text-[#16A34A]"
+                            : "text-[#DC2626]"
+                        }`}
+                      >
+                        {lancamento.tipo === "entrada" ? "+ " : "- "}
+                        {formatCurrency(lancamento.valor)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </div>
       </div>
     </section>
   );
+
+  if (loadingPendentes || loadingEfetivados) {
+    return (
+      <div className="min-h-screen bg-[#F5F7FA] px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-8">
+          <section className="muted-card p-6 sm:p-8">
+            {header}
+            <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+              {[1, 2, 3, 4].map((item) => (
+                <Skeleton key={item} className="h-32 rounded-3xl bg-white" />
+              ))}
+            </div>
+            <div className="mt-6 space-y-6">
+              <Skeleton className="h-16 rounded-3xl bg-white" />
+              <Skeleton className="h-[360px] rounded-3xl bg-white" />
+            </div>
+          </section>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F5F7FA] px-4 py-6 sm:px-6 lg:px-8">
@@ -332,6 +428,7 @@ export default function Futuros() {
           </div>
         </section>
       </div>
+      <Toaster />
     </div>
   );
 }

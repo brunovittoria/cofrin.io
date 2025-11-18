@@ -35,8 +35,13 @@ import {
 import { Plus, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
+import { toLocalDateString } from "@/lib/formatters";
 import { useCategories } from "@/hooks/useCategories";
+import {
+  useCreateLancamentoFuturo,
+  useUpdateLancamentoFuturo,
+  type LancamentoFuturo,
+} from "@/hooks/useLancamentosFuturos";
 import {
   lancamentoFuturoInputSchema,
   type LancamentoFuturoFormData,
@@ -45,26 +50,29 @@ import {
 interface LancamentoFuturoModalProps {
   trigger?: React.ReactNode;
   mode?: "create" | "edit";
+  lancamento?: LancamentoFuturo & { categorias?: { nome: string; cor_hex?: string } };
 }
 
 export function LancamentoFuturoModal({
   trigger,
   mode = "create",
+  lancamento,
 }: LancamentoFuturoModalProps) {
   const [open, setOpen] = useState(false);
-  const { toast } = useToast();
   const { data: categoriasEntrada = [] } = useCategories("entrada");
   const { data: categoriasSaida = [] } = useCategories("saida");
+  const createLancamento = useCreateLancamentoFuturo();
+  const updateLancamento = useUpdateLancamentoFuturo();
 
   const form = useForm<LancamentoFuturoFormData>({
     resolver: zodResolver(lancamentoFuturoInputSchema),
     mode: "onChange",
     defaultValues: {
-      data: undefined,
-      tipo: undefined,
-      descricao: "",
-      categoria_id: "",
-      valor: "",
+      data: lancamento ? new Date(lancamento.data) : undefined,
+      tipo: lancamento?.tipo,
+      descricao: lancamento?.descricao || "",
+      categoria_id: lancamento?.categoria_id?.toString() || "",
+      valor: lancamento?.valor.toString() || "",
     },
   });
 
@@ -90,15 +98,32 @@ export function LancamentoFuturoModal({
     "w-auto rounded-2xl border border-[#E2E8F0] bg-white p-3 text-[#0F172A] shadow-[0_32px_54px_-30px_rgba(10,132,255,0.28)]";
 
   const handleSubmit = (data: LancamentoFuturoFormData) => {
-    // TODO: Implementar criação de lançamento futuro quando o hook estiver disponível
-    console.log("Form data:", data);
-    toast({
-      title: "Sucesso",
-      description: "Lançamento futuro criado com sucesso!",
-    });
+    const payload = {
+      data: toLocalDateString(data.data),
+      tipo: data.tipo,
+      descricao: data.descricao,
+      categoria_id: parseInt(data.categoria_id, 10),
+      valor: parseFloat(data.valor.replace(",", ".")),
+    };
 
-    setOpen(false);
-    form.reset();
+    if (mode === "edit" && lancamento) {
+      updateLancamento.mutate(
+        { id: lancamento.id, ...payload },
+        {
+          onSuccess: () => {
+            setOpen(false);
+            form.reset();
+          },
+        }
+      );
+    } else {
+      createLancamento.mutate(payload, {
+        onSuccess: () => {
+          setOpen(false);
+          form.reset();
+        },
+      });
+    }
   };
 
   const handleOpenChange = (next: boolean) => {
@@ -310,9 +335,9 @@ export function LancamentoFuturoModal({
                 type="submit"
                 variant="ghost"
                 className="brand-cta-luxe h-11 rounded-xl px-6 text-sm font-semibold tracking-wide hover:scale-[1.01]"
-                disabled={form.formState.isSubmitting}
+                disabled={form.formState.isSubmitting || createLancamento.isPending || updateLancamento.isPending}
               >
-                {form.formState.isSubmitting
+                {(form.formState.isSubmitting || createLancamento.isPending || updateLancamento.isPending)
                   ? "Salvando..."
                   : mode === "edit"
                   ? "Salvar Alterações"
