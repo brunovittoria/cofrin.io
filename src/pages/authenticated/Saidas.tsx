@@ -19,7 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { SaidaModal } from "@/components/SaidaModal";
+import { SaidaModal } from "@/components/dialogs/expenses-modal";
 import { Toaster } from "@/components/ui/toaster";
 import {
   useSaidas,

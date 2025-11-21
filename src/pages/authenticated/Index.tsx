@@ -7,7 +7,7 @@ import { IncomeExpenseChart } from "@/components/charts/IncomeExpenseChart";
 import { CategoryChart } from "@/components/charts/CategoryChart";
 import { BalanceChart } from "@/components/charts/BalanceChart";
 import { EntradaModal } from "@/components/dialogs/entry-modal";
-import { SaidaModal } from "@/components/SaidaModal";
+import { SaidaModal } from "@/components/dialogs/expenses-modal";
 import { MyCardsSection } from "@/components/MyCardsSection";
 import { MonthPicker } from "@/components/MonthPicker";
 import { useEntradasSummary } from "@/hooks/api/useEntradas";
