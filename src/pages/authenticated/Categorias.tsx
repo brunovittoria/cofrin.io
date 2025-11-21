@@ -1,9 +1,20 @@
 ﻿import { type CSSProperties } from "react";
 import { Plus, TrendingUp, TrendingDown, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CategoryModal } from "@/components/CategoryModal";
-import { useCategories, useDeleteCategoria } from "@/hooks/useCategories";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { CategoryModal } from "@/components/dialogs/category-modal";
+import {
+  useCategories,
+  useDeleteCategoria,
+  type Categoria,
+} from "@/hooks/useCategories";
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -16,7 +27,8 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 
-const formatCountLabel = (count: number) => `${count} categoria${count === 1 ? "" : "s"}`;
+const formatCountLabel = (count: number) =>
+  `${count} categoria${count === 1 ? "" : "s"}`;
 
 const normalizeHex = (hex?: string): string => {
   if (!hex) return "#0A84FF";
@@ -40,10 +52,17 @@ export default function Categorias() {
   const header = (
     <header className="flex flex-col gap-6 border-b border-[#E5E7EB] pb-6 lg:flex-row lg:items-center lg:justify-between">
       <div className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#94A3B8]">Categorias</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#94A3B8]">
+          Categorias
+        </p>
         <div className="space-y-1">
-          <h1 className="text-3xl font-semibold text-[#0F172A]">Categorias financeiras</h1>
-          <p className="text-sm text-[#4B5563]">Organize entradas e saídas em grupos inteligentes para facilitar análises.</p>
+          <h1 className="text-3xl font-semibold text-[#0F172A]">
+            Categorias financeiras
+          </h1>
+          <p className="text-sm text-[#4B5563]">
+            Organize entradas e saídas em grupos inteligentes para facilitar
+            análises.
+          </p>
         </div>
       </div>
       <CategoryModal
@@ -61,9 +80,15 @@ export default function Categorias() {
       <article className="surface-card p-6">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-sm font-medium text-[#6B7280]">Categorias de Entrada</p>
-            <p className="mt-2 text-2xl font-semibold text-[#0F172A]">{categoriasEntrada.length}</p>
-            <p className="text-xs text-[#94A3B8]">{formatCountLabel(categoriasEntrada.length)}</p>
+            <p className="text-sm font-medium text-[#6B7280]">
+              Categorias de Entrada
+            </p>
+            <p className="mt-2 text-2xl font-semibold text-[#0F172A]">
+              {categoriasEntrada.length}
+            </p>
+            <p className="text-xs text-[#94A3B8]">
+              {formatCountLabel(categoriasEntrada.length)}
+            </p>
           </div>
           <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#ECFDF3] text-[#16A34A]">
             <TrendingUp className="h-6 w-6" />
@@ -73,9 +98,15 @@ export default function Categorias() {
       <article className="surface-card p-6">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-sm font-medium text-[#6B7280]">Categorias de Saída</p>
-            <p className="mt-2 text-2xl font-semibold text-[#0F172A]">{categoriasSaida.length}</p>
-            <p className="text-xs text-[#94A3B8]">{formatCountLabel(categoriasSaida.length)}</p>
+            <p className="text-sm font-medium text-[#6B7280]">
+              Categorias de Saída
+            </p>
+            <p className="mt-2 text-2xl font-semibold text-[#0F172A]">
+              {categoriasSaida.length}
+            </p>
+            <p className="text-xs text-[#94A3B8]">
+              {formatCountLabel(categoriasSaida.length)}
+            </p>
           </div>
           <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FEF2F2] text-[#DC2626]">
             <TrendingDown className="h-6 w-6" />
@@ -88,13 +119,17 @@ export default function Categorias() {
   const renderTable = (
     tipo: "entrada" | "saida",
     title: string,
-    categories: Array<{ id: string; nome: string; descricao?: string | null; cor_hex?: string | null }>,
+    categories: Categoria[]
   ) => (
     <section className="surface-card p-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h2 className="text-lg font-semibold text-[#0F172A]">{title}</h2>
-          <p className="text-sm text-[#6B7280]">{categories.length ? "Edite ou remova categorias existentes" : "Nenhuma categoria cadastrada ainda"}</p>
+          <p className="text-sm text-[#6B7280]">
+            {categories.length
+              ? "Edite ou remova categorias existentes"
+              : "Nenhuma categoria cadastrada ainda"}
+          </p>
         </div>
         <CategoryModal
           defaultTipo={tipo}
@@ -112,28 +147,45 @@ export default function Categorias() {
         <Table>
           <TableHeader>
             <TableRow className="border-b border-[#E5E7EB]">
-              <TableHead className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">Nome</TableHead>
-              <TableHead className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">Descrição</TableHead>
-              <TableHead className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">Ações</TableHead>
+              <TableHead className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+                Nome
+              </TableHead>
+              <TableHead className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+                Descrição
+              </TableHead>
+              <TableHead className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+                Ações
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {categories.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={3} className="py-10 text-center text-sm text-[#6B7280]">
+                <TableCell
+                  colSpan={3}
+                  className="py-10 text-center text-sm text-[#6B7280]"
+                >
                   Ainda não há categorias cadastradas para este tipo.
                 </TableCell>
               </TableRow>
             ) : (
               categories.map((categoria) => (
-                <TableRow key={categoria.id} className="border-b border-[#F1F5F9] last:border-0 hover:bg-[#F8FAFC]">
+                <TableRow
+                  key={categoria.id}
+                  className="border-b border-[#F1F5F9] last:border-0 hover:bg-[#F8FAFC]"
+                >
                   <TableCell className="text-sm font-semibold text-[#0F172A]">
                     <div className="flex items-center gap-3">
-                      <span className="h-3 w-3 rounded-full" style={colorStyle(categoria.cor_hex || undefined)} />
+                      <span
+                        className="h-3 w-3 rounded-full"
+                        style={colorStyle(categoria.cor_hex || undefined)}
+                      />
                       {categoria.nome}
                     </div>
                   </TableCell>
-                  <TableCell className="text-sm text-[#4B5563]">{categoria.descricao || "Sem descrição"}</TableCell>
+                  <TableCell className="text-sm text-[#4B5563]">
+                    {categoria.descricao || "Sem descrição"}
+                  </TableCell>
                   <TableCell className="text-center">
                     <div className="flex items-center justify-center gap-2">
                       <CategoryModal
@@ -161,18 +213,25 @@ export default function Categorias() {
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                            <AlertDialogTitle>
+                              Confirmar exclusão
+                            </AlertDialogTitle>
                             <AlertDialogDescription>
-                              Tem certeza de que deseja excluir esta categoria? Esta ação não pode ser desfeita.
+                              Tem certeza de que deseja excluir esta categoria?
+                              Esta ação não pode ser desfeita.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancelar</AlertDialogCancel>
                             <AlertDialogAction
                               className="bg-[#DC2626] text-white hover:bg-[#B91C1C]"
-                              onClick={() => deleteCategoria.mutate(categoria.id)}
+                              onClick={() =>
+                                deleteCategoria.mutate(Number(categoria.id))
+                              }
                             >
-                              {deleteCategoria.isPending ? "Excluindo..." : "Excluir"}
+                              {deleteCategoria.isPending
+                                ? "Excluindo..."
+                                : "Excluir"}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

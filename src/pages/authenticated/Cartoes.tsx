@@ -8,7 +8,7 @@ import {
   useCreateCartao,
   type NovoCartao,
 } from "@/hooks/useCartoes";
-import { CardModal } from "@/components/card-modal";
+import { CardModal } from "@/components/dialogs/card-modal";
 import { cardProvidersMap } from "@/data/cardProviders";
 import { useState } from "react";
 
