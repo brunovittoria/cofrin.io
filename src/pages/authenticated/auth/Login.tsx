@@ -44,7 +44,7 @@ export function LoginPage() {
       }
     } catch (error: any) {
       console.error("Login error:", error);
-      
+
       if (error.errors && error.errors.length > 0) {
         const errorMessage = error.errors[0].message;
         toast.error(errorMessage);
@@ -57,13 +57,17 @@ export function LoginPage() {
   };
 
   return (
-  <main className="flex flex-col lg:flex-row w-full min-h-screen overflow-hidden">
-    {/* Left side - Login form */}
+    <main className="flex flex-col lg:flex-row w-full min-h-screen overflow-hidden">
+      {/* Left side - Login form */}
       <section className="w-full lg:w-1/2 p-4 sm:p-8 flex flex-col justify-center bg-white">
         <div className="max-w-lg mx-auto w-full px-4 sm:px-0 min-h-screen">
           {/* Logo */}
           <div className="mb-8">
-            <img src="/assets/cofrinio-logo.png" alt="Cofrinio" className="w-full h-auto" />
+            <img
+              src="/assets/cofrinio-logo.png"
+              alt="Cofrinio"
+              className="w-full h-auto"
+            />
           </div>
 
           {/* Login Form */}
@@ -76,7 +80,7 @@ export function LoginPage() {
                 type="email"
                 placeholder="Enter your email address"
                 {...register("email")}
-                className={`w-full ${errors.email ? 'border-red-500' : ''}`}
+                className={`w-full ${errors.email ? "border-red-500" : ""}`}
               />
               {errors.email && (
                 <p className="text-xs text-red-500">{errors.email.message}</p>
@@ -100,7 +104,9 @@ export function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Your Password"
                   {...register("password")}
-                  className={`w-full pr-10 ${errors.password ? 'border-red-500' : ''}`}
+                  className={`w-full pr-10 ${
+                    errors.password ? "border-red-500" : ""
+                  }`}
                 />
                 <button
                   type="button"
@@ -111,7 +117,9 @@ export function LoginPage() {
                 </button>
               </div>
               {errors.password && (
-                <p className="text-xs text-red-500">{errors.password.message}</p>
+                <p className="text-xs text-red-500">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
@@ -142,7 +150,7 @@ export function LoginPage() {
             <div className="text-center mt-6">
               <p className="text-sm text-muted-foreground">
                 Don't Have an Account?{" "}
-                <Link 
+                <Link
                   to="/register"
                   className="font-medium text-primary hover:text-primary/80 transition duration-200"
                 >

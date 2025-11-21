@@ -5,16 +5,16 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppSidebar } from "@/components/AppSidebar";
-import Index from "./pages/Index";
-import Entradas from "./pages/Entradas";
-import Saidas from "./pages/Saidas";
-import Categorias from "./pages/Categorias";
-import Cartoes from "./pages/Cartoes";
-import NotFound from "./pages/NotFound";
-import { LoginPage } from "@/pages/Login";
-import { RegisterPage } from "@/pages/Register";
+import Index from "./pages/authenticated/Index";
+import Entradas from "./pages/authenticated/Entradas";
+import Saidas from "./pages/authenticated/Saidas";
+import Categorias from "./pages/authenticated/Categorias";
+import Cartoes from "./pages/authenticated/Cartoes";
+import NotFound from "./pages/authenticated/NotFound";
+import { LoginPage } from "@/pages/authenticated/auth/Login";
+import { RegisterPage } from "@/pages/authenticated/auth/Register";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
-import Futuros from "./pages/Futuros";
+import Futuros from "./pages/authenticated/Futuros";
 
 const queryClient = new QueryClient();
 
