@@ -23,7 +23,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatCurrency } from "@/lib/formatters";
+import { formatCurrency, formatLocalDate } from "@/lib/formatters";
 import { MonthPicker } from "@/components/MonthPicker";
 import { DateRange } from "react-day-picker";
 import { LancamentoFuturoModal } from "@/components/LancamentoFuturoModal";
@@ -78,8 +78,10 @@ export default function Futuros() {
   const [searchTerm, setSearchTerm] = useState("");
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
-  const { data: lancamentosPendentes = [], isLoading: loadingPendentes } = useLancamentosFuturos(dateRange, 'pendente');
-  const { data: lancamentosEfetivados = [], isLoading: loadingEfetivados } = useLancamentosFuturos(dateRange, 'efetivado');
+  const { data: lancamentosPendentes = [], isLoading: loadingPendentes } =
+    useLancamentosFuturos(dateRange, "pendente");
+  const { data: lancamentosEfetivados = [], isLoading: loadingEfetivados } =
+    useLancamentosFuturos(dateRange, "efetivado");
   const { data: summary } = useLancamentosFuturosSummary(dateRange);
   const efetivarLancamento = useEfetivarLancamentoFuturo();
   const deleteLancamento = useDeleteLancamentoFuturo();
@@ -87,7 +89,9 @@ export default function Futuros() {
   const filteredPendentes = lancamentosPendentes.filter(
     (lancamento) =>
       lancamento.descricao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lancamento.categorias?.nome?.toLowerCase().includes(searchTerm.toLowerCase())
+      lancamento.categorias?.nome
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase())
   );
 
   const handleRefresh = () => {
@@ -150,15 +154,29 @@ export default function Futuros() {
         title="Saldo Previsto"
         value={formatCurrency(summary?.saldoPrevisto || 0)}
         icon={DollarSign}
-        color={(summary?.saldoPrevisto || 0) >= 0 ? "text-[#16A34A]" : "text-[#DC2626]"}
-        badgeClass={(summary?.saldoPrevisto || 0) >= 0 ? "bg-[#ECFDF3] text-[#16A34A]" : "bg-[#FEF2F2] text-[#DC2626]"}
+        color={
+          (summary?.saldoPrevisto || 0) >= 0
+            ? "text-[#16A34A]"
+            : "text-[#DC2626]"
+        }
+        badgeClass={
+          (summary?.saldoPrevisto || 0) >= 0
+            ? "bg-[#ECFDF3] text-[#16A34A]"
+            : "bg-[#FEF2F2] text-[#DC2626]"
+        }
       />
       <SummaryCard
         title="Efetivado"
         value={formatCurrency(summary?.efetivado || 0)}
         icon={Clock}
-        color={(summary?.efetivado || 0) >= 0 ? "text-[#16A34A]" : "text-[#DC2626]"}
-        badgeClass={(summary?.efetivado || 0) >= 0 ? "bg-[#ECFDF3] text-[#16A34A]" : "bg-[#FEF2F2] text-[#DC2626]"}
+        color={
+          (summary?.efetivado || 0) >= 0 ? "text-[#16A34A]" : "text-[#DC2626]"
+        }
+        badgeClass={
+          (summary?.efetivado || 0) >= 0
+            ? "bg-[#ECFDF3] text-[#16A34A]"
+            : "bg-[#FEF2F2] text-[#DC2626]"
+        }
       />
     </div>
   );
@@ -227,7 +245,7 @@ export default function Futuros() {
                       className="border-b border-[#F1F5F9] last:border-0 hover:bg-[#F8FAFC]"
                     >
                       <TableCell className="whitespace-nowrap text-sm font-semibold text-[#0F172A]">
-                        {new Date(lancamento.data).toLocaleDateString("pt-BR")}
+                        {formatLocalDate(lancamento.data)}
                       </TableCell>
                       <TableCell className="max-w-[280px] text-sm text-[#4B5563]">
                         {lancamento.descricao}
@@ -268,7 +286,9 @@ export default function Futuros() {
                             size="icon"
                             className="h-8 w-8 text-[#16A34A] hover:text-[#15803D] hover:bg-[#ECFDF3]"
                             aria-label="Efetivar lançamento"
-                            onClick={() => efetivarLancamento.mutate(lancamento.id)}
+                            onClick={() =>
+                              efetivarLancamento.mutate(lancamento.id)
+                            }
                             disabled={efetivarLancamento.isPending}
                           >
                             <Check className="h-4 w-4" />
@@ -286,18 +306,25 @@ export default function Futuros() {
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                                <AlertDialogTitle>
+                                  Confirmar exclusão
+                                </AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Tem certeza de que deseja excluir este lançamento? Esta ação não pode ser desfeita.
+                                  Tem certeza de que deseja excluir este
+                                  lançamento? Esta ação não pode ser desfeita.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
                                 <AlertDialogAction
                                   className="bg-[#DC2626] text-white hover:bg-[#B91C1C]"
-                                  onClick={() => deleteLancamento.mutate(lancamento.id)}
+                                  onClick={() =>
+                                    deleteLancamento.mutate(lancamento.id)
+                                  }
                                 >
-                                  {deleteLancamento.isPending ? "Excluindo..." : "Excluir"}
+                                  {deleteLancamento.isPending
+                                    ? "Excluindo..."
+                                    : "Excluir"}
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
@@ -351,7 +378,7 @@ export default function Futuros() {
                       className="border-b border-[#F1F5F9] last:border-0 hover:bg-[#F8FAFC]"
                     >
                       <TableCell className="whitespace-nowrap text-sm font-semibold text-[#0F172A]">
-                        {new Date(lancamento.data).toLocaleDateString("pt-BR")}
+                        {formatLocalDate(lancamento.data)}
                       </TableCell>
                       <TableCell className="max-w-[280px] text-sm text-[#4B5563]">
                         {lancamento.descricao}

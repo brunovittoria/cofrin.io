@@ -14,6 +14,7 @@ export type LancamentoFuturo = {
   categoria_id?: number;
   status: "pendente" | "efetivado";
   user_id?: string;
+  clerk_id?: string;
   created_at: string;
   updated_at?: string;
 };
@@ -128,19 +129,31 @@ export const useLancamentosFuturosSummary = (dateRange?: DateRange) => {
 export const useCreateLancamentoFuturo = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { user } = useUser();
+  const { user: clerkUser } = useUser();
 
   return useMutation({
     mutationFn: async (lancamento: NovoLancamentoFuturo) => {
-      if (!user?.id) {
+      if (!clerkUser?.id) {
         throw new Error("Usuário não autenticado");
+      }
+
+      //Buscar user_id da tabela 'usuarios' baseado no clerk_id
+      const { data: usuario, error: errorUsuario } = await supabase
+        .from("usuarios")
+        .select("id")
+        .eq("clerk_id", clerkUser.id)
+        .single();
+
+      if (errorUsuario) {
+        throw new Error("Usuário não encontrado na tabela usuarios");
       }
 
       const { data, error } = await supabase
         .from("lancamentos_futuros")
         .insert({
           ...lancamento,
-          user_id: user.id,
+          clerk_id: clerkUser.id,
+          user_id: usuario.id,
           status: lancamento.status || "pendente",
         })
         .select()
@@ -149,6 +162,7 @@ export const useCreateLancamentoFuturo = () => {
       if (error) throw error;
       return data;
     },
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["lancamentos-futuros"] });
       queryClient.invalidateQueries({
@@ -159,6 +173,7 @@ export const useCreateLancamentoFuturo = () => {
         description: "O lançamento futuro foi criado com sucesso.",
       });
     },
+
     onError: (error: Error) => {
       toast({
         title: "Erro ao criar lançamento",
