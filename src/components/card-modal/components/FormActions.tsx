@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 interface FormActionsProps {
   isSaving?: boolean;
   onCancel: () => void;
+  submitLabel?: string;
 }
 
-export const FormActions = ({ isSaving, onCancel }: FormActionsProps) => {
+export const FormActions = ({ isSaving, onCancel, submitLabel = "Salvar" }: FormActionsProps) => {
   return (
     <div className="flex justify-end gap-2">
       <Button
@@ -21,7 +22,7 @@ export const FormActions = ({ isSaving, onCancel }: FormActionsProps) => {
         className="brand-cta-luxe h-9 rounded-lg px-5 text-sm font-semibold"
         disabled={isSaving}
       >
-        {isSaving ? "Salvando..." : "Salvar"}
+        {isSaving ? "Salvando..." : submitLabel}
       </Button>
     </div>
   );
