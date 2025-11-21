@@ -1,4 +1,4 @@
-﻿import { Cartao } from "@/hooks/useCartoes";
+﻿import { Cartao } from "@/hooks/api/useCartoes";
 import { cardProvidersMap } from "@/data/cardProviders";
 
 const formatCurrency = (value: number) =>
@@ -15,21 +15,26 @@ type MyCardsSectionProps = {
 
 export const MyCardsSection = ({ cartoes = [] }: MyCardsSectionProps) => {
   // Encontrar o cartão principal, ou usar o primeiro cartão se não houver principal
-  const cartaoPrincipal = cartoes.find(cartao => cartao.is_principal) || cartoes[0];
+  const cartaoPrincipal =
+    cartoes.find((cartao) => cartao.is_principal) || cartoes[0];
 
   if (!cartaoPrincipal) {
     return (
       <section className="surface-card flex h-full flex-col p-6 sm:p-7">
         <header className="flex items-center justify-between">
           <div className="space-y-1">
-            <h2 className="text-lg font-semibold text-[#0F172A]">Meus Cartões</h2>
-            <p className="text-sm text-[#6B7280]">Cartão principal em destaque</p>
+            <h2 className="text-lg font-semibold text-[#0F172A]">
+              Meus Cartões
+            </h2>
+            <p className="text-sm text-[#6B7280]">
+              Cartão principal em destaque
+            </p>
           </div>
           <span className="inline-flex items-center rounded-full bg-[#EEF2FF] px-3 py-1 text-xs font-semibold text-[#0A84FF]">
             Total {cartoes.length}
           </span>
         </header>
-        
+
         <div className="mt-6 flex flex-1 flex-col items-center justify-center">
           <p className="text-gray-500 text-center">Nenhum cartão cadastrado</p>
         </div>
@@ -37,8 +42,13 @@ export const MyCardsSection = ({ cartoes = [] }: MyCardsSectionProps) => {
     );
   }
 
-  const progress = getProgress(cartaoPrincipal.valor_utilizado, cartaoPrincipal.limite_total);
-  const provider = cartaoPrincipal.emissor ? cardProvidersMap[cartaoPrincipal.emissor] : undefined;
+  const progress = getProgress(
+    cartaoPrincipal.valor_utilizado,
+    cartaoPrincipal.limite_total
+  );
+  const provider = cartaoPrincipal.emissor
+    ? cardProvidersMap[cartaoPrincipal.emissor]
+    : undefined;
   const imageUrl = cartaoPrincipal.imagem_url ?? provider?.imageUrl;
 
   return (
@@ -72,14 +82,23 @@ export const MyCardsSection = ({ cartoes = [] }: MyCardsSectionProps) => {
           <div className="flex items-center justify-between text-sm text-[#6B7280]">
             <span>Uso do limite</span>
             <span className="font-semibold text-[#0F172A]">
-              {formatCurrency(cartaoPrincipal.valor_utilizado)} / {formatCurrency(cartaoPrincipal.limite_total)}
+              {formatCurrency(cartaoPrincipal.valor_utilizado)} /{" "}
+              {formatCurrency(cartaoPrincipal.limite_total)}
             </span>
           </div>
           <div className="mt-3 h-2 rounded-full bg-[#E5E7EB]">
-            <div className="h-full rounded-full bg-[#0A84FF]" style={{ width: `${progress}%` }} />
+            <div
+              className="h-full rounded-full bg-[#0A84FF]"
+              style={{ width: `${progress}%` }}
+            />
           </div>
           <div className="mt-3 flex items-center justify-between text-xs text-[#6B7280]">
-            <span>Disponível: {formatCurrency(cartaoPrincipal.limite_total - cartaoPrincipal.valor_utilizado)}</span>
+            <span>
+              Disponível:{" "}
+              {formatCurrency(
+                cartaoPrincipal.limite_total - cartaoPrincipal.valor_utilizado
+              )}
+            </span>
             <span className="font-semibold text-[#0F172A]">{progress}%</span>
           </div>
         </div>
@@ -87,6 +106,3 @@ export const MyCardsSection = ({ cartoes = [] }: MyCardsSectionProps) => {
     </section>
   );
 };
-
-
-

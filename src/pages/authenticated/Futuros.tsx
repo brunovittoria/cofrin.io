@@ -26,14 +26,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency, formatLocalDate } from "@/lib/formatters";
 import { MonthPicker } from "@/components/MonthPicker";
 import { DateRange } from "react-day-picker";
-import { LancamentoFuturoModal } from "@/components/LancamentoFuturoModal";
+import { LancamentoFuturoModal } from "@/components/dialogs/launch-modal";
 import { Toaster } from "@/components/ui/toaster";
 import {
   useLancamentosFuturos,
   useLancamentosFuturosSummary,
   useEfetivarLancamentoFuturo,
   useDeleteLancamentoFuturo,
-} from "@/hooks/useLancamentosFuturos";
+} from "@/hooks/api/useLancamentosFuturos";
 import {
   AlertDialog,
   AlertDialogTrigger,

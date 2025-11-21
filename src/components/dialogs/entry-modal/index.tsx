@@ -10,8 +10,12 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { useCategories } from "@/hooks/useCategories";
-import { useCreateEntrada, useUpdateEntrada, type Entrada } from "@/hooks/useEntradas";
+import { useCategories } from "@/hooks/api/useCategories";
+import {
+  useCreateEntrada,
+  useUpdateEntrada,
+  type Entrada,
+} from "@/hooks/api/useEntradas";
 import { toLocalDateString } from "@/lib/formatters";
 import { useEntradaForm } from "@/hooks/useEntradaForm";
 import { DateField } from "./components/DateField";
@@ -27,14 +31,25 @@ interface EntradaModalProps {
   entrada?: Entrada & { categorias?: { nome: string; cor_hex?: string } };
 }
 
-export function EntradaModal({ trigger, mode = "create", entrada }: EntradaModalProps) {
+export function EntradaModal({
+  trigger,
+  mode = "create",
+  entrada,
+}: EntradaModalProps) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const { data: categorias = [] } = useCategories("entrada");
   const createEntrada = useCreateEntrada();
   const updateEntrada = useUpdateEntrada();
 
-  const { formData, date, setDate, updateField, resetForm, initializeEditMode } = useEntradaForm({
+  const {
+    formData,
+    date,
+    setDate,
+    updateField,
+    resetForm,
+    initializeEditMode,
+  } = useEntradaForm({
     mode,
     entrada,
   });
@@ -109,8 +124,8 @@ export function EntradaModal({ trigger, mode = "create", entrada }: EntradaModal
             {mode === "edit" ? "Editar Entrada" : "Nova Entrada"}
           </DialogTitle>
           <DialogDescription className="text-sm text-[#6B7280]">
-            Registre o movimento com data, categoria e valor mantendo a linguagem visual premium
-            light.
+            Registre o movimento com data, categoria e valor mantendo a
+            linguagem visual premium light.
           </DialogDescription>
         </DialogHeader>
 
@@ -133,7 +148,10 @@ export function EntradaModal({ trigger, mode = "create", entrada }: EntradaModal
             onChange={(value) => updateField("valor", value)}
           />
 
-          <TypeField value={formData.tipo} onChange={(value) => updateField("tipo", value)} />
+          <TypeField
+            value={formData.tipo}
+            onChange={(value) => updateField("tipo", value)}
+          />
 
           <FormActions
             mode={mode}
@@ -146,4 +164,3 @@ export function EntradaModal({ trigger, mode = "create", entrada }: EntradaModal
     </Dialog>
   );
 }
-

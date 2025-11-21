@@ -1,13 +1,26 @@
-﻿import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area } from "recharts";
+﻿import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Area,
+} from "recharts";
 import { DateRange } from "react-day-picker";
-import { useBalanceData } from "@/hooks/useChartData";
+import { useBalanceData } from "@/hooks/api/useChartData";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const renderHeader = () => (
   <header className="flex flex-col gap-2 border-b border-[#E5E7EB] pb-5 sm:flex-row sm:items-center sm:justify-between">
     <div>
-      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#94A3B8]">Evolucao</p>
-      <h3 className="text-lg font-semibold text-[#0F172A]">Evolucao do Saldo</h3>
+      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#94A3B8]">
+        Evolucao
+      </p>
+      <h3 className="text-lg font-semibold text-[#0F172A]">
+        Evolucao do Saldo
+      </h3>
     </div>
     <div className="inline-flex items-center gap-2 rounded-full bg-[#F3F4F6] px-3 py-1 text-xs font-medium text-[#4B5563]">
       Ano atual
@@ -47,7 +60,10 @@ export function BalanceChart({ dateRange }: BalanceChartProps) {
       {renderHeader()}
       <div className="mt-6 h-[320px]">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+          <LineChart
+            data={data}
+            margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
+          >
             <defs>
               <linearGradient id="saldo-area" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#0A84FF" stopOpacity={0.35} />
@@ -70,8 +86,14 @@ export function BalanceChart({ dateRange }: BalanceChartProps) {
               tickFormatter={(value) => "R$ " + value.toLocaleString("pt-BR")}
             />
             <Tooltip
-              cursor={{ stroke: "#0A84FF", strokeWidth: 1, strokeDasharray: "4 4" }}
-              formatter={(value: number) => "R$ " + value.toLocaleString("pt-BR")}
+              cursor={{
+                stroke: "#0A84FF",
+                strokeWidth: 1,
+                strokeDasharray: "4 4",
+              }}
+              formatter={(value: number) =>
+                "R$ " + value.toLocaleString("pt-BR")
+              }
               labelStyle={{ color: "#1F2937", fontWeight: 600 }}
               contentStyle={{
                 backgroundColor: "#FFFFFF",
@@ -80,14 +102,24 @@ export function BalanceChart({ dateRange }: BalanceChartProps) {
                 boxShadow: "0 20px 35px rgba(15, 23, 42, 0.08)",
               }}
             />
-            <Area type="monotone" dataKey="saldo" fill="url(#saldo-area)" stroke="none" />
+            <Area
+              type="monotone"
+              dataKey="saldo"
+              fill="url(#saldo-area)"
+              stroke="none"
+            />
             <Line
               type="monotone"
               dataKey="saldo"
               stroke="#0A84FF"
               strokeWidth={3}
               dot={{ r: 4, fill: "#0A84FF", stroke: "#FFFFFF", strokeWidth: 2 }}
-              activeDot={{ r: 6, stroke: "#0A84FF", strokeWidth: 2, fill: "#FFFFFF" }}
+              activeDot={{
+                r: 6,
+                stroke: "#0A84FF",
+                strokeWidth: 2,
+                fill: "#FFFFFF",
+              }}
             />
           </LineChart>
         </ResponsiveContainer>

@@ -20,13 +20,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { EntradaModal } from "@/components/dialogs/entrada-modal";
+import { EntradaModal } from "@/components/dialogs/entry-modal";
 import { Toaster } from "@/components/ui/toaster";
 import {
   useEntradas,
   useEntradasSummary,
   useDeleteEntrada,
-} from "@/hooks/useEntradas";
+} from "@/hooks/api/useEntradas";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   AlertDialog,

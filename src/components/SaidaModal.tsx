@@ -1,26 +1,51 @@
 ﻿import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Plus, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { useCategories } from "@/hooks/useCategories";
-import { useCreateSaida, useUpdateSaida, type Saida } from "@/hooks/useSaidas";
+import { useCategories } from "@/hooks/api/useCategories";
+import {
+  useCreateSaida,
+  useUpdateSaida,
+  type Saida,
+} from "@/hooks/api/useSaidas";
 import { parseLocalDate, toLocalDateString } from "@/lib/formatters";
 
 interface SaidaModalProps {
   trigger?: React.ReactNode;
   mode?: "create" | "edit";
-  saida?: (Saida & { categorias?: { nome: string; cor_hex?: string } });
+  saida?: Saida & { categorias?: { nome: string; cor_hex?: string } };
 }
 
-export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps) {
+export function SaidaModal({
+  trigger,
+  mode = "create",
+  saida,
+}: SaidaModalProps) {
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState<Date>();
   const { toast } = useToast();
@@ -37,12 +62,14 @@ export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps)
 
   const fieldWrapper =
     "group rounded-2xl border border-[#F2D7D9] bg-[rgba(252,244,244,0.92)] p-4 transition-all duration-200 hover:border-[#FECACA] hover:bg-white focus-within:border-[#DC2626] focus-within:bg-white shadow-[0_24px_48px_-30px_rgba(220,38,38,0.2)]";
-  const labelClass = "text-xs font-semibold uppercase tracking-[0.18em] text-[#6B7280]";
+  const labelClass =
+    "text-xs font-semibold uppercase tracking-[0.18em] text-[#6B7280]";
   const controlClass =
     "mt-3 h-11 rounded-xl border border-[#F1D4D6] bg-white px-4 text-sm text-[#0F172A] placeholder:text-[#9CA3AF] focus-visible:ring-[#DC2626]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-white";
   const selectContentClass =
     "border border-[#F2D7D9] bg-white text-[#0F172A] shadow-[0_28px_48px_-28px_rgba(220,38,38,0.24)] rounded-2xl";
-  const selectItemClass = "text-sm text-[#0F172A] focus:bg-[#FEE2E2] focus:text-[#0F172A]";
+  const selectItemClass =
+    "text-sm text-[#0F172A] focus:bg-[#FEE2E2] focus:text-[#0F172A]";
   const popoverClass =
     "w-auto rounded-2xl border border-[#F2D7D9] bg-white p-3 text-[#0F172A] shadow-[0_32px_54px_-30px_rgba(220,38,38,0.24)]";
 
@@ -80,7 +107,7 @@ export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps)
           onSuccess: () => {
             setOpen(false);
           },
-        },
+        }
       );
     } else {
       createSaida.mutate(payload, {
@@ -124,7 +151,8 @@ export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps)
             {mode === "edit" ? "Editar Saída" : "Nova Saída"}
           </DialogTitle>
           <DialogDescription className="text-sm text-[#6B7280]">
-            Registre despesas com o mesmo visual premium e claro aplicado no restante do sistema.
+            Registre despesas com o mesmo visual premium e claro aplicado no
+            restante do sistema.
           </DialogDescription>
         </DialogHeader>
 
@@ -140,7 +168,7 @@ export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps)
                   className={cn(
                     controlClass,
                     "flex items-center justify-between bg-white text-left font-medium",
-                    !date && "text-[#9CA3AF]",
+                    !date && "text-[#9CA3AF]"
                   )}
                 >
                   <span className="flex items-center gap-2">
@@ -149,7 +177,11 @@ export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps)
                   </span>
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className={popoverClass} align="start" sideOffset={10}>
+              <PopoverContent
+                className={popoverClass}
+                align="start"
+                sideOffset={10}
+              >
                 <Calendar
                   mode="single"
                   selected={date}
@@ -169,7 +201,9 @@ export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps)
               id="descricao"
               placeholder="Ex: Aluguel Janeiro"
               value={formData.descricao}
-              onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, descricao: e.target.value })
+              }
               required
               className={controlClass}
             />
@@ -181,7 +215,9 @@ export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps)
             </Label>
             <Select
               value={formData.categoria_id}
-              onValueChange={(value) => setFormData({ ...formData, categoria_id: value })}
+              onValueChange={(value) =>
+                setFormData({ ...formData, categoria_id: value })
+              }
               required
             >
               <SelectTrigger className={controlClass}>
@@ -189,11 +225,17 @@ export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps)
               </SelectTrigger>
               <SelectContent className={selectContentClass}>
                 {categorias.map((categoria) => (
-                  <SelectItem key={categoria.id} value={categoria.id.toString()} className={selectItemClass}>
+                  <SelectItem
+                    key={categoria.id}
+                    value={categoria.id.toString()}
+                    className={selectItemClass}
+                  >
                     <div className="flex items-center gap-2">
                       <div
                         className="h-3.5 w-3.5 rounded-full"
-                        style={{ backgroundColor: categoria.cor_hex || "#DC2626" }}
+                        style={{
+                          backgroundColor: categoria.cor_hex || "#DC2626",
+                        }}
                       />
                       {categoria.nome}
                     </div>
@@ -213,7 +255,9 @@ export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps)
               step="0.01"
               placeholder="0,00"
               value={formData.valor}
-              onChange={(e) => setFormData({ ...formData, valor: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, valor: e.target.value })
+              }
               required
               className={controlClass}
             />
@@ -225,7 +269,9 @@ export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps)
             </Label>
             <Select
               value={formData.tipo}
-              onValueChange={(value) => setFormData({ ...formData, tipo: value })}
+              onValueChange={(value) =>
+                setFormData({ ...formData, tipo: value })
+              }
               required
             >
               <SelectTrigger className={controlClass}>
@@ -255,15 +301,17 @@ export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps)
               type="submit"
               variant="ghost"
               className="brand-cta-luxe h-11 rounded-xl px-6 text-sm font-semibold tracking-wide hover:scale-[1.01]"
-              disabled={mode === "edit" ? updateSaida.isPending : createSaida.isPending}
+              disabled={
+                mode === "edit" ? updateSaida.isPending : createSaida.isPending
+              }
             >
               {mode === "edit"
                 ? updateSaida.isPending
                   ? "Salvando..."
                   : "Salvar Alterações"
                 : createSaida.isPending
-                  ? "Criando..."
-                  : "Criar Saída"}
+                ? "Criando..."
+                : "Criar Saída"}
             </Button>
           </div>
         </form>
@@ -271,4 +319,3 @@ export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps)
     </Dialog>
   );
 }
-

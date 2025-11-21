@@ -7,7 +7,7 @@ import {
   useSetCartaoPrincipal,
   useCreateCartao,
   type NovoCartao,
-} from "@/hooks/useCartoes";
+} from "@/hooks/api/useCartoes";
 import { CardModal } from "@/components/dialogs/card-modal";
 import { cardProvidersMap } from "@/data/cardProviders";
 import { useState } from "react";

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { parseLocalDate } from "@/lib/formatters";
-import type { Entrada } from "@/hooks/useEntradas";
+import type { Entrada } from "@/hooks/api/useEntradas";
 
 interface EntradaFormData {
   descricao: string;

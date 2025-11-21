@@ -1,6 +1,6 @@
 ﻿import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { DateRange } from "react-day-picker";
-import { useCategoryData } from "@/hooks/useChartData";
+import { useCategoryData } from "@/hooks/api/useChartData";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type TooltipPayload = {
@@ -20,8 +20,12 @@ type TooltipProps = {
 const renderHeader = () => (
   <header className="flex flex-col gap-2 border-b border-[#E5E7EB] pb-5 sm:flex-row sm:items-center sm:justify-between">
     <div>
-      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#94A3B8]">Distribuição</p>
-      <h3 className="text-lg font-semibold text-[#0F172A]">Gastos por Categoria</h3>
+      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#94A3B8]">
+        Distribuição
+      </p>
+      <h3 className="text-lg font-semibold text-[#0F172A]">
+        Gastos por Categoria
+      </h3>
     </div>
     <div className="inline-flex items-center gap-2 rounded-full bg-[#F3F4F6] px-3 py-1 text-xs font-medium text-[#4B5563]">
       Este mês
@@ -32,12 +36,19 @@ const renderHeader = () => (
 const buildTooltip = ({ active, payload }: TooltipProps) => {
   if (active && payload && payload.length) {
     const entry = payload[0].payload;
-    const percentage = entry.total ? ((entry.value / entry.total) * 100).toFixed(1) : "0";
+    const percentage = entry.total
+      ? ((entry.value / entry.total) * 100).toFixed(1)
+      : "0";
     return (
       <div className="rounded-xl border border-[#E5E7EB] bg-white p-4 shadow-[0px_24px_40px_-20px_rgba(15,23,42,0.12)]">
         <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: entry.fill }} />
-          <span className="text-sm font-semibold text-[#0F172A]">{entry.name}</span>
+          <span
+            className="h-2.5 w-2.5 rounded-full"
+            style={{ backgroundColor: entry.fill }}
+          />
+          <span className="text-sm font-semibold text-[#0F172A]">
+            {entry.name}
+          </span>
         </div>
         <p className="mt-2 text-lg font-semibold text-[#0F172A]">
           R$ {entry.value.toLocaleString("pt-BR")}
@@ -116,8 +127,13 @@ export function CategoryChart({ dateRange }: CategoryChartProps) {
               className="flex items-center justify-between gap-4 rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3"
             >
               <div className="flex items-center gap-3">
-                <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: entry.fill }} />
-                <span className="text-sm font-semibold text-[#0F172A]">{entry.name}</span>
+                <span
+                  className="h-2.5 w-2.5 rounded-full"
+                  style={{ backgroundColor: entry.fill }}
+                />
+                <span className="text-sm font-semibold text-[#0F172A]">
+                  {entry.name}
+                </span>
               </div>
               <div className="text-right">
                 <p className="text-sm font-semibold text-[#0F172A]">

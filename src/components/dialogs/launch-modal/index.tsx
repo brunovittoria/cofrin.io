@@ -1,0 +1,142 @@
+import { useState } from "react";
+import { Plus } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Form } from "@/components/ui/form";
+import { toLocalDateString } from "@/lib/formatters";
+import {
+  useCreateLancamentoFuturo,
+  useUpdateLancamentoFuturo,
+  type LancamentoFuturo,
+} from "@/hooks/api/useLancamentosFuturos";
+import { useLancamentoFuturoForm } from "@/hooks/useLancamentoFuturoForm";
+import type { LancamentoFuturoFormData } from "@/lib/validations";
+import { DateFormField } from "./components/DateFormField";
+import { TypeFormField } from "./components/TypeFormField";
+import { DescriptionFormField } from "./components/DescriptionFormField";
+import { CategoryFormField } from "./components/CategoryFormField";
+import { ValueFormField } from "./components/ValueFormField";
+import { FormActions } from "./components/FormActions";
+
+interface LancamentoFuturoModalProps {
+  trigger?: React.ReactNode;
+  mode?: "create" | "edit";
+  lancamento?: LancamentoFuturo & {
+    categorias?: { nome: string; cor_hex?: string };
+  };
+}
+
+export function LancamentoFuturoModal({
+  trigger,
+  mode = "create",
+  lancamento,
+}: LancamentoFuturoModalProps) {
+  const [open, setOpen] = useState(false);
+  const createLancamento = useCreateLancamentoFuturo();
+  const updateLancamento = useUpdateLancamentoFuturo();
+
+  const { form, tipo, categorias } = useLancamentoFuturoForm({
+    mode,
+    lancamento,
+    open,
+  });
+
+  const handleSubmit = (data: LancamentoFuturoFormData) => {
+    const payload = {
+      data: toLocalDateString(data.data),
+      tipo: data.tipo,
+      descricao: data.descricao,
+      categoria_id: parseInt(data.categoria_id, 10),
+      valor: parseFloat(data.valor.replace(",", ".")),
+    };
+
+    if (mode === "edit" && lancamento) {
+      updateLancamento.mutate(
+        { id: lancamento.id, ...payload },
+        {
+          onSuccess: () => {
+            setOpen(false);
+            form.reset();
+          },
+        }
+      );
+    } else {
+      createLancamento.mutate(payload, {
+        onSuccess: () => {
+          setOpen(false);
+          form.reset();
+        },
+      });
+    }
+  };
+
+  const handleOpenChange = (next: boolean) => {
+    if (!next) {
+      form.reset();
+    }
+    setOpen(next);
+  };
+
+  const defaultTrigger = (
+    <Button className="h-12 rounded-2xl bg-[#0A84FF] px-6 text-sm font-semibold text-white shadow-[0px_20px_32px_-18px_rgba(10,132,255,0.6)] transition-transform hover:-translate-y-0.5 hover:bg-[#006FDB]">
+      <Plus className="h-4 w-4 mr-2" />
+      Novo Lançamento
+    </Button>
+  );
+
+  return (
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogTrigger asChild>{trigger || defaultTrigger}</DialogTrigger>
+      <DialogContent className="sm:max-w-xl">
+        <DialogHeader className="space-y-2">
+          <DialogTitle className="text-2xl font-semibold tracking-tight text-[#0F172A]">
+            {mode === "edit"
+              ? "Editar Lançamento Futuro"
+              : "Novo Lançamento Futuro"}
+          </DialogTitle>
+          <DialogDescription className="text-sm text-[#6B7280]">
+            Registre um lançamento previsto para o futuro com data, tipo,
+            categoria e valor.
+          </DialogDescription>
+        </DialogHeader>
+
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-5"
+          >
+            <DateFormField control={form.control} />
+
+            <TypeFormField control={form.control} setValue={form.setValue} />
+
+            <DescriptionFormField control={form.control} />
+
+            <CategoryFormField
+              control={form.control}
+              categorias={categorias}
+              tipo={tipo}
+            />
+
+            <ValueFormField control={form.control} />
+
+            <FormActions
+              mode={mode}
+              isSubmitting={form.formState.isSubmitting}
+              isPending={
+                createLancamento.isPending || updateLancamento.isPending
+              }
+              onCancel={() => setOpen(false)}
+            />
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+}

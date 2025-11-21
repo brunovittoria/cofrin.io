@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Categoria } from "@/hooks/useCategories";
+import type { Categoria } from "@/hooks/api/useCategories";
 
 interface CategoryFormData {
   nome: string;
@@ -36,7 +36,11 @@ const getInitialFormState = (
   };
 };
 
-export const useCategoryForm = ({ mode, categoria, defaultTipo }: UseCategoryFormProps) => {
+export const useCategoryForm = ({
+  mode,
+  categoria,
+  defaultTipo,
+}: UseCategoryFormProps) => {
   const [formData, setFormData] = useState<CategoryFormData>(() =>
     getInitialFormState(mode, categoria, defaultTipo)
   );
@@ -82,4 +86,3 @@ export const useCategoryForm = ({ mode, categoria, defaultTipo }: UseCategoryFor
     getSubmitData,
   };
 };
-

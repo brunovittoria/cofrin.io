@@ -21,7 +21,11 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { SaidaModal } from "@/components/SaidaModal";
 import { Toaster } from "@/components/ui/toaster";
-import { useSaidas, useSaidasSummary, useDeleteSaida } from "@/hooks/useSaidas";
+import {
+  useSaidas,
+  useSaidasSummary,
+  useDeleteSaida,
+} from "@/hooks/api/useSaidas";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   AlertDialog,

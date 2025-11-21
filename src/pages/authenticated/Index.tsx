@@ -6,13 +6,13 @@ import { FinancialCard } from "@/components/FinancialCard";
 import { IncomeExpenseChart } from "@/components/charts/IncomeExpenseChart";
 import { CategoryChart } from "@/components/charts/CategoryChart";
 import { BalanceChart } from "@/components/charts/BalanceChart";
-import { EntradaModal } from "@/components/dialogs/entrada-modal";
+import { EntradaModal } from "@/components/dialogs/entry-modal";
 import { SaidaModal } from "@/components/SaidaModal";
 import { MyCardsSection } from "@/components/MyCardsSection";
 import { MonthPicker } from "@/components/MonthPicker";
-import { useEntradasSummary } from "@/hooks/useEntradas";
-import { useSaidasSummary } from "@/hooks/useSaidas";
-import { useCartoes } from "@/hooks/useCartoes";
+import { useEntradasSummary } from "@/hooks/api/useEntradas";
+import { useSaidasSummary } from "@/hooks/api/useSaidas";
+import { useCartoes } from "@/hooks/api/useCartoes";
 
 const Index = () => {
   // Default to current month

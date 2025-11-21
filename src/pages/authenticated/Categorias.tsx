@@ -14,7 +14,7 @@ import {
   useCategories,
   useDeleteCategoria,
   type Categoria,
-} from "@/hooks/useCategories";
+} from "@/hooks/api/useCategories";
 import {
   AlertDialog,
   AlertDialogTrigger,

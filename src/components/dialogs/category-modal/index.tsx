@@ -9,7 +9,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useCreateCategoria, useUpdateCategoria, type Categoria } from "@/hooks/useCategories";
+import {
+  useCreateCategoria,
+  useUpdateCategoria,
+  type Categoria,
+} from "@/hooks/api/useCategories";
 import { useCategoryForm } from "@/hooks/useCategoryForm";
 import { CategoryNameField } from "./components/CategoryNameField";
 import { CategoryDescriptionField } from "./components/CategoryDescriptionField";
@@ -34,7 +38,13 @@ export function CategoryModal({
   const createCategoria = useCreateCategoria();
   const updateCategoria = useUpdateCategoria();
 
-  const { formData, updateField, resetForm, initializeEditMode, getSubmitData } = useCategoryForm({
+  const {
+    formData,
+    updateField,
+    resetForm,
+    initializeEditMode,
+    getSubmitData,
+  } = useCategoryForm({
     mode,
     categoria,
     defaultTipo,
@@ -85,7 +95,8 @@ export function CategoryModal({
             {mode === "edit" ? "Editar Categoria" : "Nova Categoria"}
           </DialogTitle>
           <DialogDescription className="text-sm text-[#6B7280]">
-            Defina nome, tipo e cor das categorias mantendo o visual leve e sofisticado.
+            Defina nome, tipo e cor das categorias mantendo o visual leve e
+            sofisticado.
           </DialogDescription>
         </DialogHeader>
 
@@ -121,4 +132,3 @@ export function CategoryModal({
     </Dialog>
   );
 }
-
