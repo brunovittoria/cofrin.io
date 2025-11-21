@@ -6,7 +6,7 @@ import { FinancialCard } from "@/components/FinancialCard";
 import { IncomeExpenseChart } from "@/components/charts/IncomeExpenseChart";
 import { CategoryChart } from "@/components/charts/CategoryChart";
 import { BalanceChart } from "@/components/charts/BalanceChart";
-import { EntradaModal } from "@/components/EntradaModal";
+import { EntradaModal } from "@/components/dialogs/entrada-modal";
 import { SaidaModal } from "@/components/SaidaModal";
 import { MyCardsSection } from "@/components/MyCardsSection";
 import { MonthPicker } from "@/components/MonthPicker";

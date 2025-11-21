@@ -20,7 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { EntradaModal } from "@/components/EntradaModal";
+import { EntradaModal } from "@/components/dialogs/entrada-modal";
 import { Toaster } from "@/components/ui/toaster";
 import {
   useEntradas,
