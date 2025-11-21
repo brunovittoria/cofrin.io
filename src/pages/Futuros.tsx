@@ -281,6 +281,20 @@ export default function Futuros() {
                       </TableCell>
                       <TableCell className="text-center">
                         <div className="flex items-center justify-center gap-2">
+                          <LancamentoFuturoModal
+                            mode="edit"
+                            lancamento={lancamento}
+                            trigger={
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-[#0A84FF] hover:text-[#006FDB] hover:bg-[#EEF2FF]"
+                                aria-label="Editar lançamento"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            }
+                          />
                           <Button
                             variant="ghost"
                             size="icon"

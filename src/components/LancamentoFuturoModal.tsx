@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -50,7 +50,9 @@ import {
 interface LancamentoFuturoModalProps {
   trigger?: React.ReactNode;
   mode?: "create" | "edit";
-  lancamento?: LancamentoFuturo & { categorias?: { nome: string; cor_hex?: string } };
+  lancamento?: LancamentoFuturo & {
+    categorias?: { nome: string; cor_hex?: string };
+  };
 }
 
 export function LancamentoFuturoModal({
@@ -83,6 +85,19 @@ export function LancamentoFuturoModal({
       : tipo === "saida"
       ? categoriasSaida
       : [];
+
+  // Reset form when lancamento changes (for edit mode)
+  useEffect(() => {
+    if (open && mode === "edit" && lancamento) {
+      form.reset({
+        data: new Date(lancamento.data + "T00:00:00"),
+        tipo: lancamento.tipo,
+        descricao: lancamento.descricao || "",
+        categoria_id: lancamento.categoria_id?.toString() || "",
+        valor: lancamento.valor.toString(),
+      });
+    }
+  }, [open, mode, lancamento, form]);
 
   const fieldWrapper =
     "group rounded-2xl border border-[#E4E8F4] bg-[rgba(249,250,255,0.9)] p-4 transition-all duration-200 hover:border-[#C6D4FF] hover:bg-white focus-within:border-[#0A84FF] focus-within:bg-white shadow-[0_24px_48px_-30px_rgba(10,132,255,0.25)]";
@@ -335,9 +350,15 @@ export function LancamentoFuturoModal({
                 type="submit"
                 variant="ghost"
                 className="brand-cta-luxe h-11 rounded-xl px-6 text-sm font-semibold tracking-wide hover:scale-[1.01]"
-                disabled={form.formState.isSubmitting || createLancamento.isPending || updateLancamento.isPending}
+                disabled={
+                  form.formState.isSubmitting ||
+                  createLancamento.isPending ||
+                  updateLancamento.isPending
+                }
               >
-                {(form.formState.isSubmitting || createLancamento.isPending || updateLancamento.isPending)
+                {form.formState.isSubmitting ||
+                createLancamento.isPending ||
+                updateLancamento.isPending
                   ? "Salvando..."
                   : mode === "edit"
                   ? "Salvar Alterações"
