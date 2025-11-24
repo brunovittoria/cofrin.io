@@ -8,7 +8,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import Index from "./pages/authenticated/Index";
 import Entradas from "./pages/authenticated/Entradas";
 import Saidas from "./pages/authenticated/Saidas";
-import Categorias from "./pages/authenticated/Categorias";
+import Categorias from "./pages/authenticated/categorias";
 import CardsPage from "./pages/authenticated/cards";
 import NotFound from "./pages/authenticated/NotFound";
 import { LoginPage } from "@/pages/authenticated/auth/login";
