@@ -12,7 +12,7 @@ import Categorias from "./pages/authenticated/Categorias";
 import CardsPage from "./pages/authenticated/cards";
 import NotFound from "./pages/authenticated/NotFound";
 import { LoginPage } from "@/pages/authenticated/auth/login";
-import { RegisterPage } from "@/pages/authenticated/auth/Register";
+import { RegisterPage } from "@/pages/authenticated/auth/register";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import Futuros from "./pages/authenticated/Futuros";
 
