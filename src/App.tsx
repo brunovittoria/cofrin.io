@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppSidebar } from "@/components/AppSidebar";
 import Index from "./pages/authenticated/Index";
-import Entradas from "./pages/authenticated/Entradas";
+import Entradas from "./pages/authenticated/entradas";
 import Saidas from "./pages/authenticated/Saidas";
 import Categorias from "./pages/authenticated/categorias";
 import CardsPage from "./pages/authenticated/cards";
