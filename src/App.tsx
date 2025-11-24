@@ -9,7 +9,7 @@ import Index from "./pages/authenticated/Index";
 import Entradas from "./pages/authenticated/Entradas";
 import Saidas from "./pages/authenticated/Saidas";
 import Categorias from "./pages/authenticated/Categorias";
-import Cartoes from "./pages/authenticated/Cartoes";
+import CardsPage from "./pages/authenticated/cards";
 import NotFound from "./pages/authenticated/NotFound";
 import { LoginPage } from "@/pages/authenticated/auth/Login";
 import { RegisterPage } from "@/pages/authenticated/auth/Register";
@@ -46,7 +46,7 @@ const App = () => (
                     <Route path="/saidas" element={<Saidas />} />
                     <Route path="/categorias" element={<Categorias />} />
                     <Route path="/futuros" element={<Futuros />} />
-                    <Route path="/cartoes" element={<Cartoes />} />
+                    <Route path="/cartoes" element={<CardsPage />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </main>

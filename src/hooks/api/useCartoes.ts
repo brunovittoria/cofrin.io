@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { cardProvidersMap } from "@/data/cardProviders";
+import { cardProvidersMap } from "@/mocks/cardProviders";
 
 type CartaoRow = {
   id: number;
@@ -68,7 +68,8 @@ const mapCartao = (row: CartaoRow): Cartao => {
   const disponivelCalculado = parseNumeric(row.valor_disponivel);
   const disponivelBase = disponivelCalculado ?? Math.max(limite - utilizado, 0);
   const percentualCalculado = parseNumeric(row.uso_percentual);
-  const percentualBase = percentualCalculado ?? (limite > 0 ? (utilizado / limite) * 100 : 0);
+  const percentualBase =
+    percentualCalculado ?? (limite > 0 ? (utilizado / limite) * 100 : 0);
   const percentual = Math.min(percentualBase, 999);
 
   return {
@@ -196,10 +197,7 @@ export const useDeleteCartao = () => {
 
   return useMutation({
     mutationFn: async (id: number) => {
-      const { error } = await supabase
-        .from("cartoes")
-        .delete()
-        .eq("id", id);
+      const { error } = await supabase.from("cartoes").delete().eq("id", id);
 
       if (error) throw error;
       return id;
@@ -262,6 +260,3 @@ export const useSetCartaoPrincipal = () => {
     },
   });
 };
-
-
-

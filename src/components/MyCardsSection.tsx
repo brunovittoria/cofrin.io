@@ -1,5 +1,5 @@
 ﻿import { Cartao } from "@/hooks/api/useCartoes";
-import { cardProvidersMap } from "@/data/cardProviders";
+import { cardProvidersMap } from "@/mocks/cardProviders";
 
 const formatCurrency = (value: number) =>
   "R$ " + value.toLocaleString("pt-BR", { minimumFractionDigits: 2 });

@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { cardProvidersMap } from "@/data/cardProviders";
+import { cardProvidersMap } from "@/mocks/cardProviders";
 
 interface Cartao {
   id?: string;
@@ -26,7 +26,7 @@ const getInitialFormState = (mode: "add" | "edit", cartao?: Cartao) => {
   if (mode === "edit" && cartao) {
     return { ...cartao };
   }
-  
+
   return {
     nome_exibicao: "",
     apelido: "",
@@ -39,14 +39,27 @@ const getInitialFormState = (mode: "add" | "edit", cartao?: Cartao) => {
 };
 
 export const useCardForm = ({ mode, initialCartao }: UseCardFormProps) => {
-  const [formData, setFormData] = useState(() => getInitialFormState(mode, initialCartao));
+  const [formData, setFormData] = useState(() =>
+    getInitialFormState(mode, initialCartao)
+  );
 
-  const limiteNumber = useMemo(() => Number(formData.limite_total) || 0, [formData.limite_total]);
-  const utilizadoNumber = useMemo(() => Number(formData.valor_utilizado) || 0, [formData.valor_utilizado]);
-  const selectedProvider = formData.emissor ? cardProvidersMap[formData.emissor] : undefined;
+  const limiteNumber = useMemo(
+    () => Number(formData.limite_total) || 0,
+    [formData.limite_total]
+  );
+  const utilizadoNumber = useMemo(
+    () => Number(formData.valor_utilizado) || 0,
+    [formData.valor_utilizado]
+  );
+  const selectedProvider = formData.emissor
+    ? cardProvidersMap[formData.emissor]
+    : undefined;
 
   const valorDisponivel = Math.max(limiteNumber - utilizadoNumber, 0);
-  const usoPercentual = limiteNumber > 0 ? Math.min((utilizadoNumber / limiteNumber) * 100, 999) : 0;
+  const usoPercentual =
+    limiteNumber > 0
+      ? Math.min((utilizadoNumber / limiteNumber) * 100, 999)
+      : 0;
 
   const updateField = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -65,7 +78,8 @@ export const useCardForm = ({ mode, initialCartao }: UseCardFormProps) => {
       limite_total: limiteNumber,
       valor_utilizado: utilizadoNumber,
       valor_disponivel: Math.max(limiteNumber - utilizadoNumber, 0),
-      uso_percentual: limiteNumber > 0 ? (utilizadoNumber / limiteNumber) * 100 : 0,
+      uso_percentual:
+        limiteNumber > 0 ? (utilizadoNumber / limiteNumber) * 100 : 0,
       emissor: formData.emissor || null,
     };
 
@@ -95,4 +109,3 @@ export const useCardForm = ({ mode, initialCartao }: UseCardFormProps) => {
     resetForm,
   };
 };
-
