@@ -14,7 +14,7 @@ import NotFound from "./pages/authenticated/NotFound";
 import { LoginPage } from "@/pages/authenticated/auth/login";
 import { RegisterPage } from "@/pages/authenticated/auth/register";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
-import Futuros from "./pages/authenticated/Futuros";
+import Futuros from "./pages/authenticated/futuros";
 
 const queryClient = new QueryClient();
 
