@@ -5,7 +5,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppSidebar } from "@/components/AppSidebar";
-import Index from "./pages/authenticated/Index";
+import DashboardPage from "./pages/authenticated/Index";
 import Entradas from "./pages/authenticated/entradas";
 import Saidas from "./pages/authenticated/Saidas";
 import Categorias from "./pages/authenticated/categorias";
@@ -41,7 +41,7 @@ const App = () => (
                 </header>
                 <main className="flex-1 overflow-auto">
                   <Routes>
-                    <Route path="/" element={<Index />} />
+                    <Route path="/" element={<DashboardPage />} />
                     <Route path="/entradas" element={<Entradas />} />
                     <Route path="/saidas" element={<Saidas />} />
                     <Route path="/categorias" element={<Categorias />} />

@@ -14,7 +14,7 @@ import { useEntradasSummary } from "@/hooks/api/useEntradas";
 import { useSaidasSummary } from "@/hooks/api/useSaidas";
 import { useCartoes } from "@/hooks/api/useCartoes";
 
-const Index = () => {
+const DashboardPage = () => {
   // Default to current month
   const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
     const now = new Date();
@@ -118,4 +118,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default DashboardPage;
