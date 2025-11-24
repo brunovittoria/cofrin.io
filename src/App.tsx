@@ -11,7 +11,7 @@ import Saidas from "./pages/authenticated/Saidas";
 import Categorias from "./pages/authenticated/Categorias";
 import CardsPage from "./pages/authenticated/cards";
 import NotFound from "./pages/authenticated/NotFound";
-import { LoginPage } from "@/pages/authenticated/auth/Login";
+import { LoginPage } from "@/pages/authenticated/auth/login";
 import { RegisterPage } from "@/pages/authenticated/auth/Register";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import Futuros from "./pages/authenticated/Futuros";
