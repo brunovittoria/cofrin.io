@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppSidebar } from "@/components/AppSidebar";
 import DashboardPage from "./pages/authenticated/Index";
 import Entradas from "./pages/authenticated/entradas";
-import Saidas from "./pages/authenticated/Saidas";
+import Saidas from "./pages/authenticated/saidas";
 import Categorias from "./pages/authenticated/categorias";
 import CardsPage from "./pages/authenticated/cards";
 import NotFound from "./pages/authenticated/NotFound";
