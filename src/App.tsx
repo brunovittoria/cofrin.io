@@ -5,7 +5,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppSidebar } from "@/components/AppSidebar";
-import DashboardPage from "./pages/authenticated/Index";
+import DashboardPage from "./pages/authenticated/index";
 import Entradas from "./pages/authenticated/entradas";
 import Saidas from "./pages/authenticated/saidas";
 import Categorias from "./pages/authenticated/categorias";
@@ -15,7 +15,6 @@ import { LoginPage } from "@/pages/authenticated/auth/login";
 import { RegisterPage } from "@/pages/authenticated/auth/register";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import Futuros from "./pages/authenticated/futuros";
-import { ThemeProvider } from "@/providers/ThemeProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 
 const queryClient = new QueryClient();

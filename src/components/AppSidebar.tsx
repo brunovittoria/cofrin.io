@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useTheme } from "@/providers/ThemeProvider";
+import { Switch } from "@/components/ui/switch";
 
 const navItems = [
   { title: "Dashboard", url: "/", icon: BarChart3 },
@@ -37,7 +37,6 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
   const isCollapsed = state === "collapsed";
-  const { theme, toggleTheme } = useTheme();
   const { theme, toggleTheme } = useTheme();
 
   return (
@@ -93,7 +92,7 @@ export function AppSidebar() {
                         )}
                         <span
                           className={cn(
-                            "pointer-events-none absolute bottom-1 left-4 right-4 block h-[2px] origin-left scale-x-0 rounded-full bg-gradient-to-r from-transparent via-primary/80 to-transparent opacity-0 transition-transform transition-opacity duration-300 ease-out",
+                            "pointer-events-none absolute bottom-1 left-4 right-4 block h-[2px] origin-left scale-x-0 rounded-full bg-gradient-to-r from-transparent via-primary/80 to-transparent opacity-0 transition-all duration-300 ease-out",
                             "group-hover:scale-x-100 group-hover:opacity-100",
                             isCollapsed && "hidden",
                             isActive && "scale-x-100 opacity-100"
@@ -109,24 +108,27 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <div className="mt-10 space-y-4">
-          <button
-            onClick={toggleTheme}
-            className={cn(
-              "group flex w-full items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground shadow-[0_8px_24px_-18px_rgba(15,23,42,0.22)] transition-all",
-              "hover:-translate-y-[2px] hover:border-primary/30 hover:bg-accent hover:text-foreground"
-            )}
-          >
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-foreground transition-colors">
-              {theme === "dark" ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
+          <div className="flex w-full items-center justify-between rounded-2xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground shadow-[0_8px_24px_-18px_rgba(15,23,42,0.22)] transition-all">
+            <div className="flex items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-foreground transition-colors">
+                {theme === "light" ? (
+                  <Sun className="h-4 w-4" />
+                ) : (
+                  <Moon className="h-4 w-4" />
+                )}
+              </span>
+              {!isCollapsed && (
+                <span>{theme === "light" ? "Modo Claro" : "Modo Escuro"}</span>
               )}
-            </span>
+            </div>
             {!isCollapsed && (
-              <span>{theme === "dark" ? "Modo Claro" : "Modo Escuro"}</span>
+              <Switch
+                checked={theme === "dark"}
+                onCheckedChange={toggleTheme}
+                className="data-[state=checked]:bg-primary"
+              />
             )}
-          </button>
+          </div>
 
           <NavLink
             to="/entradas"
