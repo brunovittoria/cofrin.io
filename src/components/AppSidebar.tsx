@@ -6,6 +6,8 @@ import {
   CreditCard,
   PlusCircle,
   CalendarClock,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { matchPath, NavLink, useLocation } from "react-router-dom";
 import {
@@ -19,6 +21,8 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/providers/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 
 const navItems = [
   { title: "Dashboard", url: "/", icon: BarChart3 },
@@ -33,9 +37,11 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
   const isCollapsed = state === "collapsed";
+  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
 
   return (
-    <Sidebar className="border-r border-[#E2E8F0] bg-[#F3F6FB]">
+    <Sidebar className="border-r border-border bg-sidebar">
       <SidebarContent className="flex h-full flex-col px-4 py-6">
         <div className="flex flex-col items-center gap-5">
           <img
@@ -43,7 +49,7 @@ export function AppSidebar() {
             alt="Cofrinio"
             className="h-20 w-auto"
           />
-          <div className="h-[1.5px] w-full max-w-[220px] rounded-full bg-[#C2CCE4] shadow-[0_1px_0_rgba(255,255,255,0.7)]" />
+          <div className="h-[1.5px] w-full max-w-[220px] rounded-full bg-border" />
         </div>
 
         <SidebarGroup className="mt-6 flex-1">
@@ -61,10 +67,10 @@ export function AppSidebar() {
                       asChild
                       isActive={isActive}
                       className={cn(
-                        "group relative flex items-center gap-3 rounded-2xl border border-transparent bg-white px-3.5 py-3 text-sm font-medium text-[#475569] shadow-[0_8px_24px_-20px_rgba(15,23,42,0.3)] transition-all",
-                        "hover:-translate-y-[2px] hover:border-[#D7DEED] hover:bg-white hover:text-[#0F172A]",
+                        "group relative flex items-center gap-3 rounded-2xl border border-transparent bg-card px-3.5 py-3 text-sm font-medium text-muted-foreground shadow-[0_8px_24px_-20px_rgba(15,23,42,0.3)] transition-all",
+                        "hover:-translate-y-[2px] hover:border-border hover:bg-card hover:text-foreground",
                         isActive &&
-                          "border-[#C7D2FE] bg-[#EEF2FF] text-[#0A64F5] shadow-[0_12px_28px_-18px_rgba(10,132,255,0.35)]"
+                          "border-primary/30 bg-accent text-primary shadow-[0_12px_28px_-18px_rgba(10,132,255,0.35)]"
                       )}
                     >
                       <NavLink
@@ -74,10 +80,10 @@ export function AppSidebar() {
                       >
                         <span
                           className={cn(
-                            "flex h-9 w-9 items-center justify-center rounded-xl bg-[#E2E8F0] text-[#64748B] transition-colors",
-                            "group-hover:bg-[#DBEAFE] group-hover:text-[#0A64F5]",
+                            "flex h-9 w-9 items-center justify-center rounded-xl bg-muted text-muted-foreground transition-colors",
+                            "group-hover:bg-accent group-hover:text-primary",
                             isCollapsed && "h-8 w-8",
-                            isActive && "bg-[#DBEAFE] text-[#0A64F5]"
+                            isActive && "bg-accent text-primary"
                           )}
                         >
                           <item.icon className="h-4 w-4" />
@@ -87,7 +93,7 @@ export function AppSidebar() {
                         )}
                         <span
                           className={cn(
-                            "pointer-events-none absolute bottom-1 left-4 right-4 block h-[2px] origin-left scale-x-0 rounded-full bg-[linear-gradient(90deg,rgba(10,100,245,0),rgba(10,100,245,0.8),rgba(10,100,245,0))] opacity-0 transition-transform transition-opacity duration-300 ease-out",
+                            "pointer-events-none absolute bottom-1 left-4 right-4 block h-[2px] origin-left scale-x-0 rounded-full bg-gradient-to-r from-transparent via-primary/80 to-transparent opacity-0 transition-transform transition-opacity duration-300 ease-out",
                             "group-hover:scale-x-100 group-hover:opacity-100",
                             isCollapsed && "hidden",
                             isActive && "scale-x-100 opacity-100"
@@ -103,40 +109,59 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <div className="mt-10 space-y-4">
+          <button
+            onClick={toggleTheme}
+            className={cn(
+              "group flex w-full items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground shadow-[0_8px_24px_-18px_rgba(15,23,42,0.22)] transition-all",
+              "hover:-translate-y-[2px] hover:border-primary/30 hover:bg-accent hover:text-foreground"
+            )}
+          >
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-foreground transition-colors">
+              {theme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </span>
+            {!isCollapsed && (
+              <span>{theme === "dark" ? "Modo Claro" : "Modo Escuro"}</span>
+            )}
+          </button>
+
           <NavLink
             to="/entradas"
             className={cn(
-              "group flex items-center gap-3 rounded-2xl border border-[#D7DEED] bg-white px-4 py-3 text-sm font-semibold text-[#0F172A] shadow-[0_8px_24px_-18px_rgba(15,23,42,0.22)] transition-all",
-              "hover:-translate-y-[2px] hover:border-[#C7D2FE] hover:bg-[#EEF2FF] hover:text-[#0A64F5]"
+              "group flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground shadow-[0_8px_24px_-18px_rgba(15,23,42,0.22)] transition-all",
+              "hover:-translate-y-[2px] hover:border-primary/30 hover:bg-accent hover:text-primary"
             )}
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEF2FF] text-[#0A64F5]">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-primary">
               <PlusCircle className="h-4 w-4" />
             </span>
             {!isCollapsed && <span>Nova transação</span>}
           </NavLink>
 
-          <div className="rounded-2xl border border-[#D7DEED] bg-white px-4 py-3 text-sm shadow-[0_8px_24px_-20px_rgba(15,23,42,0.22)]">
+          <div className="rounded-2xl border border-border bg-card px-4 py-3 text-sm shadow-[0_8px_24px_-20px_rgba(15,23,42,0.22)]">
             {!isCollapsed ? (
               <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs uppercase tracking-[0.24em] text-[#94A3B8]">
+                <div className="flex items-center justify-between text-xs uppercase tracking-[0.24em] text-muted-foreground">
                   <span>Status</span>
                   <span>Operacional</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="h-2.5 w-2.5 rounded-full bg-[#16A34A] shadow-[0_0_0_4px_rgba(22,163,74,0.18)]" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-success shadow-[0_0_0_4px_rgba(22,163,74,0.18)]" />
                   <div>
-                    <p className="text-sm font-semibold text-[#0F172A]">
+                    <p className="text-sm font-semibold text-foreground">
                       100% uptime
                     </p>
-                    <p className="text-xs text-[#64748B]">
+                    <p className="text-xs text-muted-foreground">
                       Último check às 09:24
                     </p>
                   </div>
                 </div>
               </div>
             ) : (
-              <span className="flex h-2.5 w-2.5 rounded-full bg-[#16A34A] shadow-[0_0_0_4px_rgba(22,163,74,0.18)]" />
+              <span className="flex h-2.5 w-2.5 rounded-full bg-success shadow-[0_0_0_4px_rgba(22,163,74,0.18)]" />
             )}
           </div>
         </div>

@@ -18,16 +18,16 @@ type TooltipProps = {
 };
 
 const renderHeader = () => (
-  <header className="flex flex-col gap-2 border-b border-[#E5E7EB] pb-5 sm:flex-row sm:items-center sm:justify-between">
+  <header className="flex flex-col gap-2 border-b border-border pb-5 sm:flex-row sm:items-center sm:justify-between">
     <div>
-      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#94A3B8]">
+      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         Distribuição
       </p>
-      <h3 className="text-lg font-semibold text-[#0F172A]">
+      <h3 className="text-lg font-semibold text-foreground">
         Gastos por Categoria
       </h3>
     </div>
-    <div className="inline-flex items-center gap-2 rounded-full bg-[#F3F4F6] px-3 py-1 text-xs font-medium text-[#4B5563]">
+    <div className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
       Este mês
     </div>
   </header>
@@ -40,20 +40,20 @@ const buildTooltip = ({ active, payload }: TooltipProps) => {
       ? ((entry.value / entry.total) * 100).toFixed(1)
       : "0";
     return (
-      <div className="rounded-xl border border-[#E5E7EB] bg-white p-4 shadow-[0px_24px_40px_-20px_rgba(15,23,42,0.12)]">
+      <div className="rounded-xl border border-border bg-card p-4 shadow-[0px_24px_40px_-20px_rgba(15,23,42,0.12)]">
         <div className="flex items-center gap-2">
           <span
             className="h-2.5 w-2.5 rounded-full"
             style={{ backgroundColor: entry.fill }}
           />
-          <span className="text-sm font-semibold text-[#0F172A]">
+          <span className="text-sm font-semibold text-foreground">
             {entry.name}
           </span>
         </div>
-        <p className="mt-2 text-lg font-semibold text-[#0F172A]">
+        <p className="mt-2 text-lg font-semibold text-foreground">
           R$ {entry.value.toLocaleString("pt-BR")}
         </p>
-        <p className="text-xs text-[#6B7280]">{percentage}% do total</p>
+        <p className="text-xs text-muted-foreground">{percentage}% do total</p>
       </div>
     );
   }
@@ -70,18 +70,18 @@ export function CategoryChart({ dateRange }: CategoryChartProps) {
 
   if (isLoading) {
     return (
-      <section className="surface-card p-6 sm:p-7">
+      <section className="rounded-3xl border border-border bg-card p-6 shadow-sm transition-colors sm:p-7">
         {renderHeader()}
-        <Skeleton className="mt-6 h-[300px] w-full bg-[#F1F5F9]" />
+        <Skeleton className="mt-6 h-[300px] w-full bg-muted" />
       </section>
     );
   }
 
   if (error || !data || data.length === 0) {
     return (
-      <section className="surface-card p-6 sm:p-7">
+      <section className="rounded-3xl border border-border bg-card p-6 shadow-sm transition-colors sm:p-7">
         {renderHeader()}
-        <div className="flex h-[300px] items-center justify-center text-sm font-medium text-[#9CA3AF]">
+        <div className="flex h-[300px] items-center justify-center text-sm font-medium text-muted-foreground">
           {error ? "Erro ao carregar dados" : "Nenhum dado disponível"}
         </div>
       </section>

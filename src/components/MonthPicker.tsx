@@ -53,7 +53,7 @@ export const MonthPicker = ({ dateRange, onSelect, className }: MonthPickerProps
           variant="outline"
           data-empty={!dateRange?.from}
           className={cn(
-            "h-12 w-[320px] justify-start rounded-2xl border-[#CBD5F5] bg-white px-6 text-left font-normal text-[#0F172A] shadow-[0px_20px_32px_-24px_rgba(15,23,42,0.16)] transition-transform hover:-translate-y-0.5 hover:bg-[#EEF2FF] data-[empty=true]:text-[#94A3B8]",
+            "h-12 w-[320px] justify-start rounded-2xl border-border bg-card px-6 text-left font-normal text-foreground shadow-[0px_20px_32px_-24px_rgba(15,23,42,0.16)] transition-transform hover:-translate-y-0.5 hover:bg-accent data-[empty=true]:text-muted-foreground",
             className
           )}
         >
@@ -71,12 +71,12 @@ export const MonthPicker = ({ dateRange, onSelect, className }: MonthPickerProps
             numberOfMonths={2}
           />
           {dateRange?.from && (
-            <div className="border-t border-[#E5E7EB] p-3">
+            <div className="border-t border-border p-3">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleClear}
-                className="w-full rounded-xl border-[#CBD5F5] bg-white text-sm font-medium text-[#0F172A] hover:bg-[#EEF2FF]"
+                className="w-full rounded-xl border-border bg-card text-sm font-medium text-foreground hover:bg-accent"
               >
                 <X className="mr-2 h-4 w-4" />
                 Limpar seleção

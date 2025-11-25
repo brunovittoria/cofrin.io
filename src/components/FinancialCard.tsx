@@ -14,16 +14,16 @@ interface FinancialCardProps {
 
 const variantStyles: Record<FinancialCardProps["variant"], { container: string; icon: string }> = {
   success: {
-    container: "bg-[#ECFDF3] text-[#16A34A]",
-    icon: "text-[#16A34A]",
+    container: "bg-success/10 text-success dark:bg-success/20",
+    icon: "text-success",
   },
   danger: {
-    container: "bg-[#FEF2F2] text-[#DC2626]",
-    icon: "text-[#DC2626]",
+    container: "bg-destructive/10 text-destructive dark:bg-destructive/20",
+    icon: "text-destructive",
   },
   info: {
-    container: "bg-[#EEF2FF] text-[#0A84FF]",
-    icon: "text-[#0A84FF]",
+    container: "bg-info/10 text-info dark:bg-info/20",
+    icon: "text-info",
   },
 };
 
@@ -31,14 +31,19 @@ export function FinancialCard({ title, value, icon: Icon, variant, trend }: Fina
   const styles = variantStyles[variant];
 
   return (
-    <article className="surface-card p-6">
+    <article className="rounded-3xl border border-border bg-card p-6 shadow-sm transition-colors">
       <div className="flex items-start justify-between gap-6">
         <div className="space-y-4">
-          <p className="kpi-label">{title}</p>
+          <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">{title}</p>
           <div className="space-y-3">
-            <p className="kpi-value">{value}</p>
+            <p className="text-3xl font-semibold text-foreground">{value}</p>
             {trend && (
-              <span className={cn(trend.isPositive ? "positive-pill" : "negative-pill")}
+              <span className={cn(
+                "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold",
+                trend.isPositive 
+                  ? "bg-success/10 text-success dark:bg-success/20" 
+                  : "bg-destructive/10 text-destructive dark:bg-destructive/20"
+              )}
               >
                 {trend.isPositive ? "+" : "-"}
                 {trend.value.replace(/^[-+]/, "")}
@@ -46,7 +51,7 @@ export function FinancialCard({ title, value, icon: Icon, variant, trend }: Fina
             )}
           </div>
         </div>
-        <div className={cn("flex h-14 w-14 items-center justify-center rounded-3xl border border-[#E5E7EB]", styles.container)}>
+        <div className={cn("flex h-14 w-14 items-center justify-center rounded-3xl border border-border", styles.container)}>
           <Icon className={cn("h-6 w-6", styles.icon)} />
         </div>
       </div>

@@ -13,16 +13,16 @@ import { useBalanceData } from "@/hooks/api/useChartData";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const renderHeader = () => (
-  <header className="flex flex-col gap-2 border-b border-[#E5E7EB] pb-5 sm:flex-row sm:items-center sm:justify-between">
+  <header className="flex flex-col gap-2 border-b border-border pb-5 sm:flex-row sm:items-center sm:justify-between">
     <div>
-      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#94A3B8]">
+      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         Evolucao
       </p>
-      <h3 className="text-lg font-semibold text-[#0F172A]">
+      <h3 className="text-lg font-semibold text-foreground">
         Evolucao do Saldo
       </h3>
     </div>
-    <div className="inline-flex items-center gap-2 rounded-full bg-[#F3F4F6] px-3 py-1 text-xs font-medium text-[#4B5563]">
+    <div className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
       Ano atual
     </div>
   </header>
@@ -37,18 +37,18 @@ export function BalanceChart({ dateRange }: BalanceChartProps) {
 
   if (isLoading) {
     return (
-      <section className="surface-card p-6 sm:p-7">
+      <section className="rounded-3xl border border-border bg-card p-6 shadow-sm transition-colors sm:p-7">
         {renderHeader()}
-        <Skeleton className="mt-6 h-[320px] w-full bg-[#F1F5F9]" />
+        <Skeleton className="mt-6 h-[320px] w-full bg-muted" />
       </section>
     );
   }
 
   if (error || !data) {
     return (
-      <section className="surface-card p-6 sm:p-7">
+      <section className="rounded-3xl border border-border bg-card p-6 shadow-sm transition-colors sm:p-7">
         {renderHeader()}
-        <div className="flex h-[320px] items-center justify-center text-sm font-medium text-[#9CA3AF]">
+        <div className="flex h-[320px] items-center justify-center text-sm font-medium text-muted-foreground">
           {error ? "Erro ao carregar dados" : "Nenhum dado disponivel"}
         </div>
       </section>

@@ -32,19 +32,19 @@ const DashboardPage = () => {
   const saldoAtual = totalEntradas - totalSaidas;
 
   return (
-    <div className="min-h-screen bg-[#F5F7FA] px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-[1280px] flex-col gap-8">
-        <section className="muted-card p-6 sm:p-8">
-          <header className="flex flex-col gap-6 border-b border-[#E5E7EB] pb-6 lg:flex-row lg:items-center lg:justify-between">
+        <section className="rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
+          <header className="flex flex-col gap-6 border-b border-border pb-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#94A3B8]">
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
                 Visão Geral
               </p>
               <div className="space-y-1">
-                <h1 className="text-3xl font-semibold text-[#0F172A]">
+                <h1 className="text-3xl font-semibold text-foreground">
                   Dashboard Financeira
                 </h1>
-                <p className="text-sm text-[#4B5563]">
+                <p className="text-sm text-muted-foreground">
                   Visão completa e organizada das suas finanças
                 </p>
               </div>
@@ -63,7 +63,7 @@ const DashboardPage = () => {
                 trigger={
                   <Button
                     variant="outline"
-                    className="h-12 rounded-2xl border-[#CBD5F5] bg-white px-6 text-sm font-semibold text-[#0F172A] shadow-[0px_20px_32px_-24px_rgba(15,23,42,0.16)] transition-transform hover:-translate-y-0.5 hover:bg-[#EEF2FF]"
+                    className="h-12 rounded-2xl border-border bg-card px-6 text-sm font-semibold text-foreground shadow-[0px_20px_32px_-24px_rgba(15,23,42,0.16)] transition-transform hover:-translate-y-0.5 hover:bg-accent"
                   >
                     + Nova Saída
                     <TrendingDown className="h-4 w-4" />

@@ -59,3 +59,57 @@
   transform: none;
   cursor: not-allowed;
 }
+
+/* Dark Mode Variables */
+.dark {
+  --background: 222 47% 11%;
+  --foreground: 210 40% 98%;
+  --card: 224 71% 4%;
+  --card-foreground: 210 40% 98%;
+  --popover: 224 71% 4%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 217 91% 60%;
+  --primary-foreground: 222 47% 11%;
+  --secondary: 222 47% 18%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 223 47% 16%;
+  --muted-foreground: 215 20% 65%;
+  --accent: 223 47% 16%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62% 50%;
+  --destructive-foreground: 210 40% 98%;
+  --success: 142 76% 45%;
+  --success-foreground: 210 40% 98%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 222 47% 11%;
+  --info: 217 91% 60%;
+  --info-foreground: 210 40% 98%;
+  --danger: 0 62% 50%;
+  --danger-foreground: 210 40% 98%;
+  --border: 217 33% 24%;
+  --input: 217 33% 24%;
+  --ring: 217 91% 60%;
+  --sidebar-background: 222 47% 11%;
+  --sidebar-foreground: 210 40% 98%;
+  --sidebar-primary: 217 91% 60%;
+  --sidebar-primary-foreground: 222 47% 11%;
+  --sidebar-accent: 223 47% 16%;
+  --sidebar-accent-foreground: 210 40% 98%;
+  --sidebar-border: 217 33% 24%;
+  --sidebar-ring: 217 91% 60%;
+}
+
+.dark body {
+  background-color: hsl(222 47% 11%);
+  color: hsl(210 40% 98%);
+}
+
+.dark .surface-card {
+  background-color: hsl(224 71% 4%);
+  border-color: hsl(217 33% 24%);
+}
+
+.dark .muted-card {
+  background-color: hsl(222 47% 13%);
+  border-color: hsl(217 33% 24%);
+}

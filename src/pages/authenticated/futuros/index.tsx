@@ -28,9 +28,9 @@ export default function Futuros() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F7FA] px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-[1280px] flex-col gap-8">
-        <section className="muted-card p-6 sm:p-8">
+        <section className="rounded-3xl border border-border bg-card p-6 shadow-sm transition-colors sm:p-8">
           <PageHeader onRefresh={handleRefresh} />
           <MonthPicker
             dateRange={dateRange}
@@ -44,7 +44,7 @@ export default function Futuros() {
               saldoPrevisto={summary?.saldoPrevisto || 0}
               efetivado={summary?.efetivado || 0}
             />
-            <section className="surface-card p-6">
+            <section className="rounded-3xl border border-border bg-card p-6 shadow-sm transition-colors">
               <div className="flex flex-col gap-4">
                 <TableSectionHeader
                   title="Lista de Lançamentos Futuros"
