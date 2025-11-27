@@ -10,6 +10,8 @@ import { EntradaModal } from "@/components/dialogs/entry-modal";
 import { SaidaModal } from "@/components/dialogs/expenses-modal";
 import { MyCardsSection } from "@/components/MyCardsSection";
 import { MonthPicker } from "@/components/MonthPicker";
+import { PageSkeleton } from "@/components/PageSkeleton";
+import { RefreshButton } from "@/components/RefreshButton";
 import { useEntradasSummary } from "@/hooks/api/useEntradas";
 import { useSaidasSummary } from "@/hooks/api/useSaidas";
 import { useCartoes } from "@/hooks/api/useCartoes";
@@ -22,14 +24,42 @@ const DashboardPage = () => {
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     return { from: firstDay, to: lastDay };
   });
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const { data: entradasSummary } = useEntradasSummary(dateRange);
-  const { data: saidasSummary } = useSaidasSummary(dateRange);
-  const { data: cartoes, isLoading: isLoadingCartoes } = useCartoes();
+  const {
+    data: entradasSummary,
+    isLoading: isLoadingEntradas,
+    refetch: refetchEntradas,
+  } = useEntradasSummary(dateRange);
+
+  const {
+    data: saidasSummary,
+    isLoading: isLoadingSaidas,
+    refetch: refetchSaidas,
+  } = useSaidasSummary(dateRange);
+
+  const {
+    data: cartoes,
+    isLoading: isLoadingCartoes,
+    refetch: refetchCartoes,
+  } = useCartoes();
 
   const totalEntradas = entradasSummary?.total || 0;
   const totalSaidas = saidasSummary?.total || 0;
   const saldoAtual = totalEntradas - totalSaidas;
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await Promise.all([refetchEntradas(), refetchSaidas(), refetchCartoes()]);
+    setIsRefreshing(false);
+  };
+
+  const isLoading =
+    isLoadingEntradas || isLoadingSaidas || isLoadingCartoes || isRefreshing;
+
+  if (isLoading) {
+    return <PageSkeleton hasCards cardCount={3} hasChart hasTable={false} />;
+  }
 
   return (
     <div className="min-h-screen bg-background px-4 py-6 sm:px-6 lg:px-8">
@@ -50,6 +80,10 @@ const DashboardPage = () => {
               </div>
             </div>
             <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+              <RefreshButton
+                onRefresh={handleRefresh}
+                isLoading={isRefreshing}
+              />
               <MonthPicker dateRange={dateRange} onSelect={setDateRange} />
               <EntradaModal
                 trigger={

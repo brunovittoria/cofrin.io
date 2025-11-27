@@ -9,9 +9,10 @@ import {
 export const useEntradasPage = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isRefreshing, setIsRefreshing] = useState(false);
   
-  const { data: entradas = [], isLoading } = useEntradas(dateRange);
-  const { data: summary } = useEntradasSummary(dateRange);
+  const { data: entradas = [], isLoading, refetch: refetchEntradas } = useEntradas(dateRange);
+  const { data: summary, refetch: refetchSummary } = useEntradasSummary(dateRange);
   const deleteEntrada = useDeleteEntrada();
 
   const filteredEntradas = entradas.filter(
@@ -19,6 +20,12 @@ export const useEntradasPage = () => {
       entrada.descricao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entrada.categorias?.nome?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await Promise.all([refetchEntradas(), refetchSummary()]);
+    setIsRefreshing(false);
+  };
 
   return {
     dateRange,
@@ -29,7 +36,8 @@ export const useEntradasPage = () => {
     filteredEntradas,
     summary,
     deleteEntrada,
-    isLoading,
+    isLoading: isLoading || isRefreshing,
+    handleRefresh,
   };
 };
 

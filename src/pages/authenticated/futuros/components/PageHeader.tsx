@@ -1,6 +1,7 @@
-import { RefreshCw, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LancamentoFuturoModal } from "@/components/dialogs/launch-modal";
+import { RefreshButton } from "@/components/RefreshButton";
 
 interface PageHeaderProps {
   onRefresh: () => void;
@@ -23,14 +24,7 @@ export const PageHeader = ({ onRefresh }: PageHeaderProps) => {
         </div>
       </div>
       <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
-        <Button
-          variant="outline"
-          className="h-12 rounded-2xl border-[#CBD5F5] bg-white px-6 text-sm font-semibold text-[#0F172A] shadow-[0px_20px_32px_-24px_rgba(15,23,42,0.16)] transition-transform hover:-translate-y-0.5 hover:bg-[#EEF2FF]"
-          onClick={onRefresh}
-        >
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Atualizar
-        </Button>
+        <RefreshButton onRefresh={onRefresh} />
         <LancamentoFuturoModal
           trigger={
             <Button className="h-12 rounded-2xl bg-[#0A84FF] px-6 text-sm font-semibold text-white shadow-[0px_20px_32px_-18px_rgba(10,132,255,0.6)] transition-transform hover:-translate-y-0.5 hover:bg-[#006FDB]">

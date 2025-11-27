@@ -16,6 +16,7 @@ export default function Entradas() {
     summary,
     deleteEntrada,
     isLoading,
+    handleRefresh,
   } = useEntradasPage();
 
   if (isLoading) {
@@ -28,7 +29,11 @@ export default function Entradas() {
     <div className="min-h-screen bg-background px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-[1280px] flex-col gap-8">
         <section className="rounded-3xl border border-border bg-card p-6 shadow-sm transition-colors sm:p-8">
-          <PageHeader dateRange={dateRange} onDateRangeChange={setDateRange} />
+          <PageHeader 
+            dateRange={dateRange} 
+            onDateRangeChange={setDateRange}
+            onRefresh={handleRefresh}
+          />
 
           <div className="mt-8 grid gap-6 md:grid-cols-3">
             <SummaryCards

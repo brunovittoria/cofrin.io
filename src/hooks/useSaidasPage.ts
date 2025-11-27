@@ -9,9 +9,10 @@ import {
 export const useSaidasPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const { data: saidas = [], isLoading } = useSaidas(dateRange);
-  const { data: summary } = useSaidasSummary(dateRange);
+  const { data: saidas = [], isLoading, refetch: refetchSaidas } = useSaidas(dateRange);
+  const { data: summary, refetch: refetchSummary } = useSaidasSummary(dateRange);
   const deleteSaida = useDeleteSaida();
 
   const filteredSaidas = saidas.filter(
@@ -19,6 +20,12 @@ export const useSaidasPage = () => {
       saida.descricao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       saida.categorias?.nome?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await Promise.all([refetchSaidas(), refetchSummary()]);
+    setIsRefreshing(false);
+  };
 
   return {
     searchTerm,
@@ -29,7 +36,8 @@ export const useSaidasPage = () => {
     filteredSaidas,
     summary,
     deleteSaida,
-    isLoading,
+    isLoading: isLoading || isRefreshing,
+    handleRefresh,
   };
 };
 

@@ -2,14 +2,20 @@ import { Plus, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EntradaModal } from "@/components/dialogs/entry-modal";
 import { MonthPicker } from "@/components/MonthPicker";
+import { RefreshButton } from "@/components/RefreshButton";
 import { DateRange } from "react-day-picker";
 
 interface PageHeaderProps {
   dateRange: DateRange | undefined;
   onDateRangeChange: (range: DateRange | undefined) => void;
+  onRefresh: () => void;
 }
 
-export const PageHeader = ({ dateRange, onDateRangeChange }: PageHeaderProps) => {
+export const PageHeader = ({ 
+  dateRange, 
+  onDateRangeChange,
+  onRefresh 
+}: PageHeaderProps) => {
   return (
     <header className="flex flex-col gap-6 border-b border-[#E5E7EB] pb-6 lg:flex-row lg:items-center lg:justify-between">
       <div className="space-y-2">
@@ -24,6 +30,7 @@ export const PageHeader = ({ dateRange, onDateRangeChange }: PageHeaderProps) =>
         </div>
       </div>
       <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+        <RefreshButton onRefresh={onRefresh} />
         <MonthPicker dateRange={dateRange} onSelect={onDateRangeChange} />
         <EntradaModal
           trigger={

@@ -10,12 +10,23 @@ import {
 export const useFuturosPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const { data: lancamentosPendentes = [], isLoading: loadingPendentes } =
-    useLancamentosFuturos(dateRange, "pendente");
-  const { data: lancamentosEfetivados = [], isLoading: loadingEfetivados } =
-    useLancamentosFuturos(dateRange, "efetivado");
-  const { data: summary } = useLancamentosFuturosSummary(dateRange);
+  const {
+    data: lancamentosPendentes = [],
+    isLoading: loadingPendentes,
+    refetch: refetchPendentes,
+  } = useLancamentosFuturos(dateRange, "pendente");
+
+  const {
+    data: lancamentosEfetivados = [],
+    isLoading: loadingEfetivados,
+    refetch: refetchEfetivados,
+  } = useLancamentosFuturos(dateRange, "efetivado");
+
+  const { data: summary, refetch: refetchSummary } =
+    useLancamentosFuturosSummary(dateRange);
+
   const efetivarLancamento = useEfetivarLancamentoFuturo();
   const deleteLancamento = useDeleteLancamentoFuturo();
 
@@ -27,8 +38,14 @@ export const useFuturosPage = () => {
         .includes(searchTerm.toLowerCase())
   );
 
-  const handleRefresh = () => {
-    window.location.reload();
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await Promise.all([
+      refetchPendentes(),
+      refetchEfetivados(),
+      refetchSummary(),
+    ]);
+    setIsRefreshing(false);
   };
 
   return {
@@ -42,9 +59,8 @@ export const useFuturosPage = () => {
     summary,
     efetivarLancamento,
     deleteLancamento,
-    loadingPendentes,
-    loadingEfetivados,
+    loadingPendentes: loadingPendentes || isRefreshing,
+    loadingEfetivados: loadingEfetivados || isRefreshing,
     handleRefresh,
   };
 };
-
