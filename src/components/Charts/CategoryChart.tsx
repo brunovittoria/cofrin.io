@@ -1,7 +1,10 @@
 ﻿import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { DateRange } from "react-day-picker";
+import { Button } from "@/components/ui/button";
 import { useCategoryData } from "@/hooks/api/useChartData";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ExternalLink } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 type TooltipPayload = {
   payload: {
@@ -63,11 +66,15 @@ const buildTooltip = ({ active, payload }: TooltipProps) => {
 
 type CategoryChartProps = {
   dateRange?: DateRange;
+  type?: "saidas" | "entradas";
 };
 
-export function CategoryChart({ dateRange }: CategoryChartProps) {
+export function CategoryChart({
+  dateRange,
+  type = "saidas",
+}: CategoryChartProps) {
   const { data, isLoading, error } = useCategoryData(dateRange);
-
+  const navigate = useNavigate();
   if (isLoading) {
     return (
       <section className="rounded-3xl border border-border bg-card p-6 shadow-sm transition-colors sm:p-7">
@@ -76,6 +83,8 @@ export function CategoryChart({ dateRange }: CategoryChartProps) {
       </section>
     );
   }
+
+  console.log("data: ", data);
 
   if (error || !data || data.length === 0) {
     return (
@@ -90,6 +99,7 @@ export function CategoryChart({ dateRange }: CategoryChartProps) {
 
   const totalValue = data.reduce((sum, item) => sum + item.value, 0);
   const dataWithTotal = data.map((item) => ({ ...item, total: totalValue }));
+  console.log("dataWithTotal: ", dataWithTotal);
 
   return (
     <section className="surface-card p-6 sm:p-7">
@@ -135,13 +145,26 @@ export function CategoryChart({ dateRange }: CategoryChartProps) {
                   {entry.name}
                 </span>
               </div>
-              <div className="text-right">
-                <p className="text-sm font-semibold text-[#0F172A]">
-                  R$ {entry.value.toLocaleString("pt-BR")}
-                </p>
-                <p className="text-xs text-[#6B7280]">
-                  {((entry.value / totalValue) * 100).toFixed(1)}%
-                </p>
+              <div className="flex items-center gap-3">
+                <div className="text-right">
+                  <p className="text-sm font-semibold text-[#0F172A]">
+                    R$ {entry.value.toLocaleString("pt-BR")}
+                  </p>
+                  <p className="text-xs text-[#6B7280]">
+                    {((entry.value / totalValue) * 100).toFixed(1)}%
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    navigate(
+                      `/${type}?categoria=${encodeURIComponent(entry.name)}`
+                    );
+                  }}
+                >
+                  <ExternalLink size={16} />
+                </Button>
               </div>
             </div>
           ))}

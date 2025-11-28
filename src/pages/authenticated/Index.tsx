@@ -143,7 +143,7 @@ const DashboardPage = () => {
           </div>
 
           <div className="mt-8 grid gap-6 lg:grid-cols-2">
-            <CategoryChart dateRange={dateRange} />
+            <CategoryChart dateRange={dateRange} type="saidas" />
             <BalanceChart dateRange={dateRange} />
           </div>
         </section>
