@@ -46,8 +46,8 @@ const App = () => (
                     <Routes>
                       <Route path="/" element={<DashboardPage />} />
                       <Route path="/transacoes" element={<Transactions />} />
-                      <Route path="/entradas" element={<Entradas />} />
-                      <Route path="/saidas" element={<Saidas />} />
+                      {/* <Route path="/entradas" element={<Entradas />} />
+                      <Route path="/saidas" element={<Saidas />} /> */}
                       <Route path="/categorias" element={<Categorias />} />
                       <Route path="/futuros" element={<Futuros />} />
                       <Route path="/cartoes" element={<CardsPage />} />

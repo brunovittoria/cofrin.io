@@ -28,8 +28,8 @@ import { Switch } from "@/components/ui/switch";
 const navItems = [
   { title: "Dashboard", url: "/", icon: BarChart3 },
   { title: "Transações", url: "/transacoes", icon: ArrowLeftRight },
-  { title: "Entradas", url: "/entradas", icon: TrendingUp },
-  { title: "Saídas", url: "/saidas", icon: TrendingDown },
+  // { title: "Entradas", url: "/entradas", icon: TrendingUp },
+  // { title: "Saídas", url: "/saidas", icon: TrendingDown },
   { title: "Categorias", url: "/categorias", icon: Tag },
   { title: "Futuros", url: "/futuros", icon: CalendarClock },
   { title: "Cartões", url: "/cartoes", icon: CreditCard },
