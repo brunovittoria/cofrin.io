@@ -8,6 +8,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import DashboardPage from "./pages/authenticated/index";
 import Entradas from "./pages/authenticated/entradas";
 import Saidas from "./pages/authenticated/saidas";
+import Transactions from "./pages/authenticated/transactions";
 import Categorias from "./pages/authenticated/categorias";
 import CardsPage from "./pages/authenticated/cards";
 import NotFound from "./pages/authenticated/NotFound";
@@ -44,6 +45,7 @@ const App = () => (
                   <main className="flex-1 overflow-auto">
                     <Routes>
                       <Route path="/" element={<DashboardPage />} />
+                      <Route path="/transacoes" element={<Transactions />} />
                       <Route path="/entradas" element={<Entradas />} />
                       <Route path="/saidas" element={<Saidas />} />
                       <Route path="/categorias" element={<Categorias />} />

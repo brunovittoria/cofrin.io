@@ -8,6 +8,7 @@ import {
   CalendarClock,
   Moon,
   Sun,
+  ArrowLeftRight,
 } from "lucide-react";
 import { matchPath, NavLink, useLocation } from "react-router-dom";
 import {
@@ -26,6 +27,7 @@ import { Switch } from "@/components/ui/switch";
 
 const navItems = [
   { title: "Dashboard", url: "/", icon: BarChart3 },
+  { title: "Transações", url: "/transacoes", icon: ArrowLeftRight },
   { title: "Entradas", url: "/entradas", icon: TrendingUp },
   { title: "Saídas", url: "/saidas", icon: TrendingDown },
   { title: "Categorias", url: "/categorias", icon: Tag },
@@ -131,7 +133,7 @@ export function AppSidebar() {
           </div>
 
           <NavLink
-            to="/entradas"
+            to="/transacoes"
             className={cn(
               "group flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground shadow-[0_8px_24px_-18px_rgba(15,23,42,0.22)] transition-all",
               "hover:-translate-y-[2px] hover:border-primary/30 hover:bg-accent hover:text-primary"
