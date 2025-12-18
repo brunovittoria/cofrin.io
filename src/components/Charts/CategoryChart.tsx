@@ -159,7 +159,7 @@ export function CategoryChart({
                   size="sm"
                   onClick={() => {
                     navigate(
-                      `/${type}?categoria=${encodeURIComponent(entry.name)}`
+                      `/transacoes?categoria=${encodeURIComponent(entry.name)}`
                     );
                   }}
                 >
