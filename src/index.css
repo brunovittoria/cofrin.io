@@ -113,3 +113,26 @@
   background-color: hsl(222 47% 13%);
   border-color: hsl(217 33% 24%);
 }
+
+/* Testimonials Scroll Animation */
+@keyframes scroll-up {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.testimonial-scroll {
+  animation: scroll-up linear infinite;
+}
+
+/* Landing Page Utilities */
+.text-balance {
+  text-wrap: balance;
+}
+
+.text-pretty {
+  text-wrap: pretty;
+}

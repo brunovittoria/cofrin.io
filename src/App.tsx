@@ -17,6 +17,7 @@ import { RegisterPage } from "@/pages/authenticated/auth/register";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import Futuros from "./pages/authenticated/futuros";
 import { ThemeProvider } from "@/providers/ThemeProvider";
+import LandingPage from "./pages/landing";
 
 const queryClient = new QueryClient();
 
@@ -27,11 +28,14 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <SignedOut>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="*" element={<LoginPage />} />
-          </Routes>
+          <ThemeProvider>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="*" element={<LandingPage />} />
+            </Routes>
+          </ThemeProvider>
         </SignedOut>
         <SignedIn>
           <ThemeProvider>
