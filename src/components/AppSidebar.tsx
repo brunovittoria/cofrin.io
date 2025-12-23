@@ -24,6 +24,8 @@ import {
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Switch } from "@/components/ui/switch";
+import { useClerk } from "@clerk/clerk-react";
+import { LogOut } from "lucide-react";
 
 const navItems = [
   { title: "Dashboard", url: "/", icon: BarChart3 },
@@ -36,6 +38,7 @@ const navItems = [
 ];
 
 export function AppSidebar() {
+  const { signOut } = useClerk();
   const { state } = useSidebar();
   const location = useLocation();
   const isCollapsed = state === "collapsed";
@@ -144,6 +147,20 @@ export function AppSidebar() {
             </span>
             {!isCollapsed && <span>Nova transação</span>}
           </NavLink>
+
+          <button
+            onClick={() => signOut({ redirectUrl: "/login" })}
+            className={cn(
+              "group flex w-full items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground shadow-[0_8px_24px_-18px_rgba(15,23,42,0.22)] transition-all",
+              "hover:-translate-y-[2px] hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
+            )}
+          >
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-destructive/10 text-destructive">
+              <LogOut className="h-4 w-4" />
+            </span>
+            {!isCollapsed && <span>Sair</span>}
+          </button>
+
 
           <div className="rounded-2xl border border-border bg-card px-4 py-3 text-sm shadow-[0_8px_24px_-20px_rgba(15,23,42,0.22)]">
             {!isCollapsed ? (
