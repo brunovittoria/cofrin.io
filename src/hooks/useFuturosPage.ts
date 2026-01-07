@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { DateRange } from "react-day-picker";
 import {
   useLancamentosFuturos,
@@ -11,6 +11,9 @@ export const useFuturosPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [currentPagePendentes, setCurrentPagePendentes] = useState(1);
+  const [currentPageEfetivados, setCurrentPageEfetivados] = useState(1);
+  const pageSize = 5;
 
   const {
     data: lancamentosPendentes = [],
@@ -30,13 +33,44 @@ export const useFuturosPage = () => {
   const efetivarLancamento = useEfetivarLancamentoFuturo();
   const deleteLancamento = useDeleteLancamentoFuturo();
 
-  const filteredPendentes = lancamentosPendentes.filter(
-    (lancamento) =>
-      lancamento.descricao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lancamento.categorias?.nome
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase())
-  );
+  const filteredPendentes = useMemo(() => {
+    return lancamentosPendentes.filter(
+      (lancamento) =>
+        lancamento.descricao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        lancamento.categorias?.nome
+          ?.toLowerCase()
+          .includes(searchTerm.toLowerCase())
+    );
+  }, [lancamentosPendentes, searchTerm]);
+
+  const totalPagesPendentes = useMemo(() => {
+    return Math.ceil(filteredPendentes.length / pageSize);
+  }, [filteredPendentes.length, pageSize]);
+
+  const paginatedPendentes = useMemo(() => {
+    const startIndex = (currentPagePendentes - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return filteredPendentes.slice(startIndex, endIndex);
+  }, [filteredPendentes, currentPagePendentes, pageSize]);
+
+  const totalPagesEfetivados = useMemo(() => {
+    return Math.ceil(lancamentosEfetivados.length / pageSize);
+  }, [lancamentosEfetivados.length, pageSize]);
+
+  const paginatedEfetivados = useMemo(() => {
+    const startIndex = (currentPageEfetivados - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return lancamentosEfetivados.slice(startIndex, endIndex);
+  }, [lancamentosEfetivados, currentPageEfetivados, pageSize]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPagePendentes(1);
+  }, [searchTerm, dateRange]);
+
+  useEffect(() => {
+    setCurrentPageEfetivados(1);
+  }, [dateRange]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -55,12 +89,20 @@ export const useFuturosPage = () => {
     setDateRange,
     lancamentosPendentes,
     filteredPendentes,
+    paginatedPendentes,
     lancamentosEfetivados,
+    paginatedEfetivados,
     summary,
     efetivarLancamento,
     deleteLancamento,
     loadingPendentes: loadingPendentes || isRefreshing,
     loadingEfetivados: loadingEfetivados || isRefreshing,
     handleRefresh,
+    currentPagePendentes,
+    setCurrentPagePendentes,
+    totalPagesPendentes,
+    currentPageEfetivados,
+    setCurrentPageEfetivados,
+    totalPagesEfetivados,
   };
 };

@@ -7,20 +7,27 @@ import { PendingLaunchesTable } from "./components/PendingLaunchesTable";
 import { CompletedLaunchesTable } from "./components/CompletedLaunchesTable";
 import { LoadingSkeleton } from "./components/LoadingSkeleton";
 import { TableSectionHeader } from "./components/TableSectionHeader";
+import { PaginationButton } from "@/components/PaginationButton";
 
 export default function Futuros() {
   const {
     searchTerm,
     dateRange,
     setDateRange,
-    filteredPendentes,
-    lancamentosEfetivados,
+    paginatedPendentes,
+    paginatedEfetivados,
     summary,
     efetivarLancamento,
     deleteLancamento,
     loadingPendentes,
     loadingEfetivados,
     handleRefresh,
+    currentPagePendentes,
+    setCurrentPagePendentes,
+    totalPagesPendentes,
+    currentPageEfetivados,
+    setCurrentPageEfetivados,
+    totalPagesEfetivados,
   } = useFuturosPage();
 
   if (loadingPendentes || loadingEfetivados) {
@@ -50,15 +57,37 @@ export default function Futuros() {
                   title="Lista de Lançamentos Futuros"
                   description="Gerenciamento de todos os lançamentos previstos"
                 />
-                <PendingLaunchesTable
-                  launches={filteredPendentes}
-                  searchTerm={searchTerm}
-                  onEfetivar={efetivarLancamento.mutate}
-                  onDelete={deleteLancamento.mutate}
-                  isPendingEfetivar={efetivarLancamento.isPending}
-                  isPendingDelete={deleteLancamento.isPending}
-                />
-                <CompletedLaunchesTable launches={lancamentosEfetivados} />
+                <div>
+                  <PendingLaunchesTable
+                    launches={paginatedPendentes}
+                    searchTerm={searchTerm}
+                    onEfetivar={efetivarLancamento.mutate}
+                    onDelete={deleteLancamento.mutate}
+                    isPendingEfetivar={efetivarLancamento.isPending}
+                    isPendingDelete={deleteLancamento.isPending}
+                  />
+                  {totalPagesPendentes > 1 && (
+                    <div className="mt-4">
+                      <PaginationButton
+                        currentPage={currentPagePendentes}
+                        totalPages={totalPagesPendentes}
+                        onPageChange={setCurrentPagePendentes}
+                      />
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <CompletedLaunchesTable launches={paginatedEfetivados} />
+                  {totalPagesEfetivados > 1 && (
+                    <div className="mt-4">
+                      <PaginationButton
+                        currentPage={currentPageEfetivados}
+                        totalPages={totalPagesEfetivados}
+                        onPageChange={setCurrentPageEfetivados}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             </section>
           </div>

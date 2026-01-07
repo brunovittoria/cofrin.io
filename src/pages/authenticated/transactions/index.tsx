@@ -7,6 +7,8 @@ import { TransactionTable } from "./components/TransactionTable";
 import { LoadingSkeleton } from "./components/LoadingSkeleton";
 import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
+import { Pagination } from "@/components/ui/pagination";
+import { PaginationButton } from "@/components/PaginationButton";
 
 export default function Transactions() {
   const [searchParams] = useSearchParams();
@@ -24,6 +26,10 @@ export default function Transactions() {
     deleteSaida,
     isLoading,
     handleRefresh,
+    paginatedTransactions,
+    totalPages,
+    currentPage,
+    setCurrentPage,
   } = useTransactionsPage();
 
   useEffect(() => {
@@ -32,6 +38,11 @@ export default function Transactions() {
       setSearchTerm(categoria);
     }
   }, [searchParams, setSearchTerm]);
+
+  useEffect(() => {
+    // Reset to page 1 when filters change
+    setCurrentPage(1);
+  }, [searchTerm, activeFilter, dateRange, setCurrentPage]);
 
   if (isLoading) {
     return (
@@ -67,12 +78,19 @@ export default function Transactions() {
               onFilterChange={setActiveFilter}
             />
             <TransactionTable
-              transactions={filteredTransactions}
+              transactions={paginatedTransactions}
               searchTerm={searchTerm}
               onDelete={handleDelete}
               isPending={deleteEntrada.isPending || deleteSaida.isPending}
             />
           </div>
+
+
+          {totalPages > 1 && (
+            <div className="mt-4">
+              <PaginationButton currentPage={currentPage} totalPages={totalPages} onPageChange={(page) => setCurrentPage(page)} />
+            </div>
+          )}
         </section>
       </div>
       <Toaster />

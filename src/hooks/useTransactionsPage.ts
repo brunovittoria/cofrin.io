@@ -30,6 +30,8 @@ export const useTransactionsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState<TransactionType>("all");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
 
   // Fetch entradas (income)
   const {
@@ -108,6 +110,16 @@ export const useTransactionsPage = () => {
     });
   }, [transactions, searchTerm, activeFilter]);
 
+  const totalPages = useMemo(() => {
+    return Math.ceil(filteredTransactions.length / pageSize);
+  }, [filteredTransactions.length, pageSize]);
+
+  const paginatedTransactions = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return filteredTransactions.slice(startIndex, endIndex);
+  }, [filteredTransactions, currentPage, pageSize]);
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await Promise.all([
@@ -136,12 +148,15 @@ export const useTransactionsPage = () => {
     setActiveFilter,
     transactions,
     filteredTransactions,
+    paginatedTransactions,
     metrics,
     handleDelete,
     deleteEntrada,
     deleteSaida,
     isLoading: isLoadingEntradas || isLoadingSaidas || isRefreshing,
     handleRefresh,
+    currentPage,
+    setCurrentPage,
+    totalPages,
   };
 };
-

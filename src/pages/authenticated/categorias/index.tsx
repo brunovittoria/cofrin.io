@@ -3,14 +3,23 @@ import { PageHeader } from "./components/PageHeader";
 import { SummaryCards } from "./components/SummaryCards";
 import { CategoryTable } from "./components/CategoryTable";
 import { PageSkeleton } from "@/components/PageSkeleton";
+import { PaginationButton } from "@/components/PaginationButton";
 
 export default function Categorias() {
   const { 
     categoriasEntrada, 
-    categoriasSaida, 
+    categoriasSaida,
+    paginatedCategoriasEntrada,
+    paginatedCategoriasSaida,
     deleteCategoria,
     isLoading,
-    handleRefresh 
+    handleRefresh,
+    currentPageEntrada,
+    setCurrentPageEntrada,
+    totalPagesEntrada,
+    currentPageSaida,
+    setCurrentPageSaida,
+    totalPagesSaida,
   } = useCategoriasPage();
 
   if (isLoading) {
@@ -27,20 +36,42 @@ export default function Categorias() {
               entradaCount={categoriasEntrada.length}
               saidaCount={categoriasSaida.length}
             />
-            <CategoryTable
-              tipo="entrada"
-              title="Categorias de Entrada"
-              categories={categoriasEntrada}
-              onDelete={deleteCategoria.mutate}
-              isPending={deleteCategoria.isPending}
-            />
-            <CategoryTable
-              tipo="saida"
-              title="Categorias de Saída"
-              categories={categoriasSaida}
-              onDelete={deleteCategoria.mutate}
-              isPending={deleteCategoria.isPending}
-            />
+            <div>
+              <CategoryTable
+                tipo="entrada"
+                title="Categorias de Entrada"
+                categories={paginatedCategoriasEntrada}
+                onDelete={deleteCategoria.mutate}
+                isPending={deleteCategoria.isPending}
+              />
+              {totalPagesEntrada > 1 && (
+                <div className="mt-4">
+                  <PaginationButton
+                    currentPage={currentPageEntrada}
+                    totalPages={totalPagesEntrada}
+                    onPageChange={setCurrentPageEntrada}
+                  />
+                </div>
+              )}
+            </div>
+            <div>
+              <CategoryTable
+                tipo="saida"
+                title="Categorias de Saída"
+                categories={paginatedCategoriasSaida}
+                onDelete={deleteCategoria.mutate}
+                isPending={deleteCategoria.isPending}
+              />
+              {totalPagesSaida > 1 && (
+                <div className="mt-4">
+                  <PaginationButton
+                    currentPage={currentPageSaida}
+                    totalPages={totalPagesSaida}
+                    onPageChange={setCurrentPageSaida}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </section>
       </div>
