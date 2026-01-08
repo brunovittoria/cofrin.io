@@ -1,6 +1,16 @@
 import { TrendingUp, TrendingDown, Wallet } from "lucide-react";
+import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/formatters";
+import { useEntradasSummaryPreviousMonth } from "@/hooks/api/useEntradas";
+import { useSaidasSummaryPreviousMonth } from "@/hooks/api/useSaidas";
+import { calculatePercentageChange } from "@/lib/trendUtils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface TransactionMetricsProps {
   totalIncome: number;
@@ -8,6 +18,7 @@ interface TransactionMetricsProps {
   balance: number;
   incomeCount: number;
   expenseCount: number;
+  dateRange?: DateRange;
 }
 
 interface MetricCardProps {
@@ -17,6 +28,11 @@ interface MetricCardProps {
   badgeClass: string;
   iconClass: string;
   subtitle?: string;
+  trend?: {
+    value: string;
+    isPositive: boolean;
+    tooltipText?: string;
+  };
 }
 
 const MetricCard = ({
@@ -26,15 +42,40 @@ const MetricCard = ({
   badgeClass,
   iconClass,
   subtitle,
+  trend,
 }: MetricCardProps) => (
   <article className="surface-card p-6">
     <div className="flex items-start justify-between gap-4">
       <div className="flex flex-col gap-2">
         <p className="text-sm font-medium text-[#6B7280]">{title}</p>
         <p className="text-2xl font-semibold text-[#0F172A]">{value}</p>
-        {subtitle && (
-          <p className="text-xs text-[#9CA3AF]">{subtitle}</p>
-        )}
+        <div className="flex flex-col gap-1">
+          {subtitle && (
+            <p className="text-xs text-[#9CA3AF]">{subtitle}</p>
+          )}
+          {trend && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className={cn(
+                    "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold cursor-help w-fit",
+                    trend.isPositive 
+                      ? "bg-[#ECFDF3] text-[#16A34A]" 
+                      : "bg-[#FEF2F2] text-[#DC2626]"
+                  )}
+                  >
+                    {trend.value}
+                  </span>
+                </TooltipTrigger>
+                {trend.tooltipText && (
+                  <TooltipContent>
+                    <p className="text-sm">{trend.tooltipText}</p>
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
+          )}
+        </div>
       </div>
       <span
         className={cn(

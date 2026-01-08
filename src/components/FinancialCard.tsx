@@ -1,5 +1,11 @@
 ﻿import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface FinancialCardProps {
   title: string;
@@ -9,6 +15,7 @@ interface FinancialCardProps {
   trend?: {
     value: string;
     isPositive: boolean;
+    tooltipText?: string;
   };
 }
 
@@ -38,16 +45,26 @@ export function FinancialCard({ title, value, icon: Icon, variant, trend }: Fina
           <div className="space-y-3">
             <p className="text-3xl font-semibold text-foreground">{value}</p>
             {trend && (
-              <span className={cn(
-                "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold",
-                trend.isPositive 
-                  ? "bg-success/10 text-success dark:bg-success/20" 
-                  : "bg-destructive/10 text-destructive dark:bg-destructive/20"
-              )}
-              >
-                {trend.isPositive ? "+" : "-"}
-                {trend.value.replace(/^[-+]/, "")}
-              </span>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className={cn(
+                      "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold cursor-help",
+                      trend.isPositive 
+                        ? "bg-success/10 text-success dark:bg-success/20" 
+                        : "bg-destructive/10 text-destructive dark:bg-destructive/20"
+                    )}
+                    >
+                      {trend.value}
+                    </span>
+                  </TooltipTrigger>
+                  {trend.tooltipText && (
+                    <TooltipContent>
+                      <p className="text-sm">{trend.tooltipText}</p>
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </TooltipProvider>
             )}
           </div>
         </div>

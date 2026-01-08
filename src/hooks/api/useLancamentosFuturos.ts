@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { toLocalDateString } from "@/lib/formatters";
 import { useUser } from "@clerk/clerk-react";
+import { getPreviousMonthRange } from "@/lib/trendUtils";
 
 export type LancamentoFuturo = {
   id: number;
@@ -123,6 +124,55 @@ export const useLancamentosFuturosSummary = (dateRange?: DateRange) => {
 
       return { aReceber, aPagar, saldoPrevisto, efetivado };
     },
+  });
+};
+
+export const useLancamentosFuturosSummaryPreviousMonth = (dateRange?: DateRange) => {
+  const previousMonthRange = getPreviousMonthRange(dateRange);
+  
+  return useQuery({
+    queryKey: [
+      "lancamentos-futuros-summary-previous",
+      previousMonthRange?.from?.toISOString(),
+      previousMonthRange?.to?.toISOString(),
+    ],
+    queryFn: async () => {
+      if (!previousMonthRange?.from || !previousMonthRange?.to) {
+        return { aReceber: 0, aPagar: 0, saldoPrevisto: 0, efetivado: 0 };
+      }
+
+      const startDate = toLocalDateString(previousMonthRange.from);
+      const endDate = toLocalDateString(previousMonthRange.to);
+      
+      const { data, error } = await supabase
+        .from("lancamentos_futuros")
+        .select("valor, tipo, status")
+        .gte("data", startDate)
+        .lte("data", endDate);
+      
+      if (error) throw error;
+      
+      // Calcular totais
+      const aReceber = data
+        .filter((item) => item.tipo === "entrada" && item.status === "pendente")
+        .reduce((sum, item) => sum + Number(item.valor), 0);
+
+      const aPagar = data
+        .filter((item) => item.tipo === "saida" && item.status === "pendente")
+        .reduce((sum, item) => sum + Number(item.valor), 0);
+
+      const efetivado = data
+        .filter((item) => item.status === "efetivado")
+        .reduce((sum, item) => {
+          const valor = Number(item.valor);
+          return sum + (item.tipo === "entrada" ? valor : -valor);
+        }, 0);
+
+      const saldoPrevisto = aReceber - aPagar;
+
+      return { aReceber, aPagar, saldoPrevisto, efetivado };
+    },
+    enabled: !!previousMonthRange?.from && !!previousMonthRange?.to,
   });
 };
 

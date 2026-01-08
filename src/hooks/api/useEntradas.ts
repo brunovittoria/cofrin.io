@@ -3,6 +3,7 @@ import { DateRange } from 'react-day-picker';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { toLocalDateString } from '@/lib/formatters';
+import { getPreviousMonthRange } from '@/lib/trendUtils';
 
 export type Entrada = {
   id: number;
@@ -78,6 +79,37 @@ export const useEntradasSummary = (dateRange?: DateRange) => {
       
       return { total, count, average };
     },
+  });
+};
+
+export const useEntradasSummaryPreviousMonth = (dateRange?: DateRange) => {
+  const previousMonthRange = getPreviousMonthRange(dateRange);
+  
+  return useQuery({
+    queryKey: ['entradas-summary-previous', previousMonthRange?.from?.toISOString(), previousMonthRange?.to?.toISOString()],
+    queryFn: async () => {
+      if (!previousMonthRange?.from || !previousMonthRange?.to) {
+        return { total: 0, count: 0, average: 0 };
+      }
+
+      const startDate = toLocalDateString(previousMonthRange.from);
+      const endDate = toLocalDateString(previousMonthRange.to);
+      
+      const { data, error } = await supabase
+        .from('entradas')
+        .select('valor')
+        .gte('data', startDate)
+        .lte('data', endDate);
+      
+      if (error) throw error;
+      
+      const total = data.reduce((sum, entrada) => sum + Number(entrada.valor), 0);
+      const count = data.length;
+      const average = count > 0 ? total / count : 0;
+      
+      return { total, count, average };
+    },
+    enabled: !!previousMonthRange?.from && !!previousMonthRange?.to,
   });
 };
 

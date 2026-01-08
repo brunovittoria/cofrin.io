@@ -12,10 +12,12 @@ import { MyCardsSection } from "@/components/MyCardsSection";
 import { MonthPicker } from "@/components/MonthPicker";
 import { PageSkeleton } from "@/components/PageSkeleton";
 import { RefreshButton } from "@/components/RefreshButton";
-import { useEntradasSummary } from "@/hooks/api/useEntradas";
-import { useSaidasSummary } from "@/hooks/api/useSaidas";
+import { useEntradasSummary, useEntradasSummaryPreviousMonth } from "@/hooks/api/useEntradas";
+import { useSaidasSummary, useSaidasSummaryPreviousMonth } from "@/hooks/api/useSaidas";
 import { useCartoes } from "@/hooks/api/useCartoes";
-import { useLancamentosFuturosSummary } from "@/hooks/api/useLancamentosFuturos";
+import { useLancamentosFuturosSummary, useLancamentosFuturosSummaryPreviousMonth } from "@/hooks/api/useLancamentosFuturos";
+import { calculatePercentageChange } from "@/lib/trendUtils";
+import { formatCurrency } from "@/lib/formatters";
 
 const DashboardPage = () => {
   // Default to current month
@@ -51,9 +53,35 @@ const DashboardPage = () => {
     refetch: refetchCartoes,
   } = useCartoes();
 
+  // Previous month data
+  const { data: entradasSummaryPrevious } = useEntradasSummaryPreviousMonth(dateRange);
+  const { data: saidasSummaryPrevious } = useSaidasSummaryPreviousMonth(dateRange);
+  const { data: futurosSummaryPrevious } = useLancamentosFuturosSummaryPreviousMonth(dateRange);
+
   const totalEntradas = entradasSummary?.total || 0;
   const totalSaidas = saidasSummary?.total || 0;
   const saldoAtual = totalEntradas - totalSaidas;
+
+  // Calculate previous month values
+  const totalEntradasPrevious = entradasSummaryPrevious?.total || 0;
+  const totalSaidasPrevious = saidasSummaryPrevious?.total || 0;
+  const saldoAtualPrevious = totalEntradasPrevious - totalSaidasPrevious;
+  const aReceberPrevious = futurosSummaryPrevious?.aReceber || 0;
+  const aPagarPrevious = futurosSummaryPrevious?.aPagar || 0;
+
+  // Calculate trends
+  const entradasTrend = calculatePercentageChange(totalEntradas, totalEntradasPrevious);
+  const saidasTrend = calculatePercentageChange(totalSaidas, totalSaidasPrevious);
+  const saldoTrend = calculatePercentageChange(saldoAtual, saldoAtualPrevious);
+  const aReceberTrend = calculatePercentageChange(futurosSummary?.aReceber || 0, aReceberPrevious);
+  const aPagarTrend = calculatePercentageChange(futurosSummary?.aPagar || 0, aPagarPrevious);
+
+  // Create tooltip texts
+  const entradasTooltip = `Comparado ao mês anterior: ${formatCurrency(totalEntradasPrevious)} → ${formatCurrency(totalEntradas)} (variação de ${entradasTrend.value})`;
+  const saidasTooltip = `Comparado ao mês anterior: ${formatCurrency(totalSaidasPrevious)} → ${formatCurrency(totalSaidas)} (variação de ${saidasTrend.value})`;
+  const saldoTooltip = `Comparado ao mês anterior: ${formatCurrency(saldoAtualPrevious)} → ${formatCurrency(saldoAtual)} (variação de ${saldoTrend.value})`;
+  const aReceberTooltip = `Comparado ao mês anterior: ${formatCurrency(aReceberPrevious)} → ${formatCurrency(futurosSummary?.aReceber || 0)} (variação de ${aReceberTrend.value})`;
+  const aPagarTooltip = `Comparado ao mês anterior: ${formatCurrency(aPagarPrevious)} → ${formatCurrency(futurosSummary?.aPagar || 0)} (variação de ${aPagarTrend.value})`;
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -117,48 +145,58 @@ const DashboardPage = () => {
           <div className="flex mt-8 gap-6">
             <FinancialCard
               title="Total de Entradas"
-              value={`R$ ${totalEntradas.toLocaleString("pt-BR", {
-                minimumFractionDigits: 2,
-              })}`}
+              value={formatCurrency(totalEntradas)}
               icon={TrendingUp}
               variant="success"
-              trend={{ value: "12,5%", isPositive: true }}
+              trend={entradasSummaryPrevious ? {
+                value: entradasTrend.value,
+                isPositive: entradasTrend.isPositive,
+                tooltipText: entradasTooltip,
+              } : undefined}
             />
             <FinancialCard
               title="Total de Saídas"
-              value={`R$ ${totalSaidas.toLocaleString("pt-BR", {
-                minimumFractionDigits: 2,
-              })}`}
+              value={formatCurrency(totalSaidas)}
               icon={TrendingDown}
               variant="danger"
-              trend={{ value: "3,2%", isPositive: false }}
+              trend={saidasSummaryPrevious ? {
+                value: saidasTrend.value,
+                isPositive: saidasTrend.isPositive,
+                tooltipText: saidasTooltip,
+              } : undefined}
             />
             <FinancialCard
               title="Saldo Atual"
-              value={`R$ ${saldoAtual.toLocaleString("pt-BR", {
-                minimumFractionDigits: 2,
-              })}`}
+              value={formatCurrency(saldoAtual)}
               icon={Wallet}
               variant="info"
-              trend={{ value: "15,8%", isPositive: saldoAtual >= 0 }}
+              trend={entradasSummaryPrevious && saidasSummaryPrevious ? {
+                value: saldoTrend.value,
+                isPositive: saldoTrend.isPositive,
+                tooltipText: saldoTooltip,
+              } : undefined}
             />
             <FinancialCard
               title="A Receber (previsto)"
-              value={`R$ ${futurosSummary?.aReceber?.toLocaleString("pt-BR", {
-                minimumFractionDigits: 2,
-              })}`}
+              value={formatCurrency(futurosSummary?.aReceber || 0)}
               icon={TrendingUp}
               variant="info"
-              trend={{ value: "15,8%", isPositive: futurosSummary?.aReceber >= 0 }}
+              trend={futurosSummaryPrevious ? {
+                value: aReceberTrend.value,
+                isPositive: aReceberTrend.isPositive,
+                tooltipText: aReceberTooltip,
+              } : undefined}
             />
             <FinancialCard
               title="A Pagar (previsto)"
-              value={`R$ ${futurosSummary?.aPagar?.toLocaleString("pt-BR", {
-                minimumFractionDigits: 2,
-              })}`}
+              value={formatCurrency(futurosSummary?.aPagar || 0)}
               icon={TrendingDown}
               variant="danger"
-              trend={{ value: "15,8%", isPositive: futurosSummary?.aPagar >= 0 }}
+              trend={futurosSummaryPrevious ? {
+                value: aPagarTrend.value,
+                isPositive: aPagarTrend.isPositive,
+                tooltipText: aPagarTooltip,
+              } : undefined}
             />
           </div>
 
