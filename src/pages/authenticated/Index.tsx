@@ -15,6 +15,7 @@ import { RefreshButton } from "@/components/RefreshButton";
 import { useEntradasSummary } from "@/hooks/api/useEntradas";
 import { useSaidasSummary } from "@/hooks/api/useSaidas";
 import { useCartoes } from "@/hooks/api/useCartoes";
+import { useLancamentosFuturosSummary } from "@/hooks/api/useLancamentosFuturos";
 
 const DashboardPage = () => {
   // Default to current month
@@ -25,6 +26,12 @@ const DashboardPage = () => {
     return { from: firstDay, to: lastDay };
   });
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const {
+    data: futurosSummary,
+    isLoading: isLoadingFuturos,
+    refetch: refetchFuturos,
+  } = useLancamentosFuturosSummary(dateRange);
 
   const {
     data: entradasSummary,
@@ -107,7 +114,7 @@ const DashboardPage = () => {
             </div>
           </header>
 
-          <div className="mt-8 grid gap-6 md:grid-cols-3">
+          <div className="flex mt-8 gap-6">
             <FinancialCard
               title="Total de Entradas"
               value={`R$ ${totalEntradas.toLocaleString("pt-BR", {
@@ -134,6 +141,24 @@ const DashboardPage = () => {
               icon={Wallet}
               variant="info"
               trend={{ value: "15,8%", isPositive: saldoAtual >= 0 }}
+            />
+            <FinancialCard
+              title="A Receber (previsto)"
+              value={`R$ ${futurosSummary?.aReceber?.toLocaleString("pt-BR", {
+                minimumFractionDigits: 2,
+              })}`}
+              icon={TrendingUp}
+              variant="info"
+              trend={{ value: "15,8%", isPositive: futurosSummary?.aReceber >= 0 }}
+            />
+            <FinancialCard
+              title="A Pagar (previsto)"
+              value={`R$ ${futurosSummary?.aPagar?.toLocaleString("pt-BR", {
+                minimumFractionDigits: 2,
+              })}`}
+              icon={TrendingDown}
+              variant="danger"
+              trend={{ value: "15,8%", isPositive: futurosSummary?.aPagar >= 0 }}
             />
           </div>
 
