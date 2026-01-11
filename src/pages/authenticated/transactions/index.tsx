@@ -67,6 +67,7 @@ export default function Transactions() {
               balance={metrics.balance}
               incomeCount={metrics.incomeCount}
               expenseCount={metrics.expenseCount}
+              dateRange={dateRange}
             />
           </div>
 

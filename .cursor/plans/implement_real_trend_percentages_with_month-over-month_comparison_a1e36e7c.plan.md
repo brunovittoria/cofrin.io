@@ -22,13 +22,13 @@ todos:
       - update-financial-card
   - id: update-transaction-metrics
     content: Update TransactionMetrics component to calculate and display real trend percentages
-    status: in_progress
+    status: completed
     dependencies:
       - create-trend-utils
       - add-previous-month-hooks
   - id: update-transactions-page
     content: Pass dateRange prop to TransactionMetrics component
-    status: pending
+    status: completed
     dependencies:
       - update-transaction-metrics
 ---

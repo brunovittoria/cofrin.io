@@ -1,4 +1,4 @@
-import { TrendingUp, TrendingDown, Wallet } from "lucide-react";
+import { TrendingUp, TrendingDown, Wallet, Info } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/formatters";
@@ -49,33 +49,36 @@ const MetricCard = ({
       <div className="flex flex-col gap-2">
         <p className="text-sm font-medium text-[#6B7280]">{title}</p>
         <p className="text-2xl font-semibold text-[#0F172A]">{value}</p>
-        <div className="flex flex-col gap-1">
-          {subtitle && (
-            <p className="text-xs text-[#9CA3AF]">{subtitle}</p>
-          )}
-          {trend && (
+        {subtitle && (
+          <p className="text-xs text-[#9CA3AF]">{subtitle}</p>
+        )}
+        {trend && trend.tooltipText && (
+          <div className="flex items-center gap-2">
+            <span
+              className={cn(
+                "text-sm font-medium",
+                trend.isPositive ? "text-[#16A34A]" : "text-[#DC2626]"
+              )}
+            >
+              {trend.value}
+            </span>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className={cn(
-                    "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold cursor-help w-fit",
-                    trend.isPositive 
-                      ? "bg-[#ECFDF3] text-[#16A34A]" 
-                      : "bg-[#FEF2F2] text-[#DC2626]"
-                  )}
+                  <button
+                    type="button"
+                    className="inline-flex h-5 w-5 items-center justify-center rounded-md hover:bg-accent transition-colors"
                   >
-                    {trend.value}
-                  </span>
+                    <Info size={14} className="text-[#9CA3AF]" />
+                  </button>
                 </TooltipTrigger>
-                {trend.tooltipText && (
-                  <TooltipContent>
-                    <p className="text-sm">{trend.tooltipText}</p>
-                  </TooltipContent>
-                )}
+                <TooltipContent side="top" className="max-w-xs">
+                  <p className="text-sm">{trend.tooltipText}</p>
+                </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          )}
-        </div>
+          </div>
+        )}
       </div>
       <span
         className={cn(
@@ -95,8 +98,28 @@ export const TransactionMetrics = ({
   balance,
   incomeCount,
   expenseCount,
+  dateRange,
 }: TransactionMetricsProps) => {
   const isPositiveBalance = balance >= 0;
+
+  // Fetch previous month data
+  const { data: entradasSummaryPrevious } = useEntradasSummaryPreviousMonth(dateRange);
+  const { data: saidasSummaryPrevious } = useSaidasSummaryPreviousMonth(dateRange);
+
+  // Calculate previous month values
+  const totalIncomePrevious = entradasSummaryPrevious?.total || 0;
+  const totalExpensesPrevious = saidasSummaryPrevious?.total || 0;
+  const balancePrevious = totalIncomePrevious - totalExpensesPrevious;
+
+  // Calculate trends
+  const incomeTrend = calculatePercentageChange(totalIncome, totalIncomePrevious);
+  const expensesTrend = calculatePercentageChange(totalExpenses, totalExpensesPrevious);
+  const balanceTrend = calculatePercentageChange(balance, balancePrevious);
+
+  // Create tooltip texts
+  const incomeTooltip = `Comparado ao mês anterior: ${formatCurrency(totalIncomePrevious)} → ${formatCurrency(totalIncome)} (variação de ${incomeTrend.value})`;
+  const expensesTooltip = `Comparado ao mês anterior: ${formatCurrency(totalExpensesPrevious)} → ${formatCurrency(totalExpenses)} (variação de ${expensesTrend.value})`;
+  const balanceTooltip = `Comparado ao mês anterior: ${formatCurrency(balancePrevious)} → ${formatCurrency(balance)} (variação de ${balanceTrend.value})`;
 
   return (
     <div className="grid gap-6 md:grid-cols-3">
@@ -107,6 +130,11 @@ export const TransactionMetrics = ({
         badgeClass="bg-[#ECFDF3]"
         iconClass="text-[#16A34A]"
         subtitle={`${incomeCount} ${incomeCount === 1 ? "registro" : "registros"}`}
+        trend={{
+          value: incomeTrend.value,
+          isPositive: incomeTrend.isPositive,
+          tooltipText: incomeTooltip,
+        }}
       />
       <MetricCard
         title="Total de Saídas"
@@ -115,6 +143,11 @@ export const TransactionMetrics = ({
         badgeClass="bg-[#FEF2F2]"
         iconClass="text-[#DC2626]"
         subtitle={`${expenseCount} ${expenseCount === 1 ? "registro" : "registros"}`}
+        trend={{
+          value: expensesTrend.value,
+          isPositive: expensesTrend.isPositive,
+          tooltipText: expensesTooltip,
+        }}
       />
       <MetricCard
         title="Saldo Líquido"
@@ -123,6 +156,11 @@ export const TransactionMetrics = ({
         badgeClass={isPositiveBalance ? "bg-[#ECFDF3]" : "bg-[#FEF2F2]"}
         iconClass={isPositiveBalance ? "text-[#16A34A]" : "text-[#DC2626]"}
         subtitle="Saldo atual disponível"
+        trend={{
+          value: balanceTrend.value,
+          isPositive: balanceTrend.isPositive,
+          tooltipText: balanceTooltip,
+        }}
       />
     </div>
   );

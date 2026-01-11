@@ -3,9 +3,9 @@ import { TrendingUp, TrendingDown, Wallet } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { Button } from "@/components/ui/button";
 import { FinancialCard } from "@/components/FinancialCard";
-import { IncomeExpenseChart } from "@/components/charts/IncomeExpenseChart";
-import { CategoryChart } from "@/components/charts/CategoryChart";
-import { BalanceChart } from "@/components/charts/BalanceChart";
+import { IncomeExpenseChart } from "@/components/Charts/IncomeExpenseChart";
+import { CategoryChart } from "@/components/Charts/CategoryChart";
+import { BalanceChart } from "@/components/Charts/BalanceChart";
 import { EntradaModal } from "@/components/dialogs/entry-modal";
 import { SaidaModal } from "@/components/dialogs/expenses-modal";
 import { MyCardsSection } from "@/components/MyCardsSection";
@@ -148,55 +148,55 @@ const DashboardPage = () => {
               value={formatCurrency(totalEntradas)}
               icon={TrendingUp}
               variant="success"
-              trend={entradasSummaryPrevious ? {
+              trend={{
                 value: entradasTrend.value,
                 isPositive: entradasTrend.isPositive,
                 tooltipText: entradasTooltip,
-              } : undefined}
+              }}
             />
             <FinancialCard
               title="Total de Saídas"
               value={formatCurrency(totalSaidas)}
               icon={TrendingDown}
               variant="danger"
-              trend={saidasSummaryPrevious ? {
+              trend={{
                 value: saidasTrend.value,
                 isPositive: saidasTrend.isPositive,
                 tooltipText: saidasTooltip,
-              } : undefined}
+              }}
             />
             <FinancialCard
               title="Saldo Atual"
               value={formatCurrency(saldoAtual)}
               icon={Wallet}
               variant="info"
-              trend={entradasSummaryPrevious && saidasSummaryPrevious ? {
+              trend={{
                 value: saldoTrend.value,
                 isPositive: saldoTrend.isPositive,
                 tooltipText: saldoTooltip,
-              } : undefined}
+              }}
             />
             <FinancialCard
               title="A Receber (previsto)"
               value={formatCurrency(futurosSummary?.aReceber || 0)}
               icon={TrendingUp}
               variant="info"
-              trend={futurosSummaryPrevious ? {
+              trend={{
                 value: aReceberTrend.value,
                 isPositive: aReceberTrend.isPositive,
                 tooltipText: aReceberTooltip,
-              } : undefined}
+              }}
             />
             <FinancialCard
               title="A Pagar (previsto)"
               value={formatCurrency(futurosSummary?.aPagar || 0)}
               icon={TrendingDown}
               variant="danger"
-              trend={futurosSummaryPrevious ? {
+              trend={{
                 value: aPagarTrend.value,
                 isPositive: aPagarTrend.isPositive,
                 tooltipText: aPagarTooltip,
-              } : undefined}
+              }}
             />
           </div>
 

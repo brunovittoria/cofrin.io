@@ -1,4 +1,4 @@
-﻿import { LucideIcon } from "lucide-react";
+﻿import { Info, LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -44,27 +44,32 @@ export function FinancialCard({ title, value, icon: Icon, variant, trend }: Fina
           <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">{title}</p>
           <div className="space-y-3">
             <p className="text-3xl font-semibold text-foreground">{value}</p>
-            {trend && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className={cn(
-                      "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold cursor-help",
-                      trend.isPositive 
-                        ? "bg-success/10 text-success dark:bg-success/20" 
-                        : "bg-destructive/10 text-destructive dark:bg-destructive/20"
-                    )}
+            {trend && trend.tooltipText && (
+              <div className="flex items-center gap-2">
+                <span
+                  className={cn(
+                    "text-sm font-medium",
+                    trend.isPositive ? "text-[#16A34A]" : "text-[#DC2626]"
+                  )}
+                >
+                  {trend.value}
+                </span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      className="inline-flex h-5 w-5 items-center justify-center rounded-md hover:bg-accent transition-colors"
                     >
-                      {trend.value}
-                    </span>
-                  </TooltipTrigger>
-                  {trend.tooltipText && (
-                    <TooltipContent>
+                      <Info size={14} className="text-[#9CA3AF]" />
+                    </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs">
                       <p className="text-sm">{trend.tooltipText}</p>
                     </TooltipContent>
-                  )}
-                </Tooltip>
-              </TooltipProvider>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
             )}
           </div>
         </div>
