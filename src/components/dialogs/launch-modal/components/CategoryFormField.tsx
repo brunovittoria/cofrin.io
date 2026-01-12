@@ -1,3 +1,4 @@
+import { Plus } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -12,6 +13,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { CategoryModal } from "@/components/dialogs/category-modal";
 import type { Control } from "react-hook-form";
 import type { FutureLaunchFormData } from "@/lib/validations";
 import type { Category } from "@/hooks/api/useCategories";
@@ -33,6 +36,28 @@ interface CategoryFormFieldProps {
 
 export const CategoryFormField = ({ control, categories, tipo }: CategoryFormFieldProps) => {
   if (!tipo) return null;
+
+  if (categories.length === 0) {
+    return (
+      <div className={fieldWrapper}>
+        <FormLabel className={labelClass}>Categoria</FormLabel>
+        <div className="mt-3 flex flex-col items-center gap-3 py-4 text-center">
+          <p className="text-sm text-[#6B7280]">
+            Nenhuma categoria disponível para este tipo.
+          </p>
+          <CategoryModal
+            defaultType={tipo}
+            trigger={
+              <Button type="button" variant="outline" size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Criar Categoria
+              </Button>
+            }
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <FormField
