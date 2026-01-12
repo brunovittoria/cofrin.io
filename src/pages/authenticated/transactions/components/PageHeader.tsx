@@ -1,8 +1,8 @@
 import { DateRange } from "react-day-picker";
 import { RefreshButton } from "@/components/RefreshButton";
 import { MonthPicker } from "@/components/MonthPicker";
-import { EntradaModal } from "@/components/dialogs/entry-modal";
-import { SaidaModal } from "@/components/dialogs/expenses-modal";
+import { IncomeModal } from "@/components/dialogs/entry-modal";
+import { ExpenseModal } from "@/components/dialogs/expenses-modal";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -49,7 +49,7 @@ export const PageHeader = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            <EntradaModal
+            <IncomeModal
               mode="create"
               trigger={
                 <DropdownMenuItem
@@ -61,7 +61,7 @@ export const PageHeader = ({
                 </DropdownMenuItem>
               }
             />
-            <SaidaModal
+            <ExpenseModal
               mode="create"
               trigger={
                 <DropdownMenuItem
@@ -79,4 +79,3 @@ export const PageHeader = ({
     </header>
   );
 };
-

@@ -11,9 +11,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useCategories } from "@/hooks/api/useCategories";
-import { useCreateSaida, useUpdateSaida, type Saida } from "@/hooks/api/useSaidas";
+import { useCreateExpense, useUpdateExpense, type Expense } from "@/hooks/api/useExpenses";
 import { toLocalDateString } from "@/lib/formatters";
-import { useSaidaForm } from "@/hooks/useSaidaForm";
+import { useExpenseForm } from "@/hooks/useExpenseForm";
 import { DateField } from "./components/DateField";
 import { DescriptionField } from "./components/DescriptionField";
 import { CategoryField } from "./components/CategoryField";
@@ -21,22 +21,22 @@ import { ValueField } from "./components/ValueField";
 import { TypeField } from "./components/TypeField";
 import { FormActions } from "./components/FormActions";
 
-interface SaidaModalProps {
+interface ExpenseModalProps {
   trigger?: React.ReactNode;
   mode?: "create" | "edit";
-  saida?: Saida & { categorias?: { nome: string; cor_hex?: string } };
+  expense?: Expense & { categorias?: { nome: string; cor_hex?: string } };
 }
 
-export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps) {
+export function ExpenseModal({ trigger, mode = "create", expense }: ExpenseModalProps) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
-  const { data: categorias = [] } = useCategories("saida");
-  const createSaida = useCreateSaida();
-  const updateSaida = useUpdateSaida();
+  const { data: categories = [] } = useCategories("saida");
+  const createExpense = useCreateExpense();
+  const updateExpense = useUpdateExpense();
 
-  const { formData, date, setDate, updateField, resetForm, initializeEditMode } = useSaidaForm({
+  const { formData, date, setDate, updateField, resetForm, initializeEditMode } = useExpenseForm({
     mode,
-    saida,
+    expense,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -67,9 +67,9 @@ export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps)
       categoria_id: parseInt(formData.categoria_id),
     };
 
-    if (mode === "edit" && saida?.id) {
-      updateSaida.mutate(
-        { id: saida.id, ...payload },
+    if (mode === "edit" && expense?.id) {
+      updateExpense.mutate(
+        { id: expense.id, ...payload },
         {
           onSuccess: () => {
             setOpen(false);
@@ -77,7 +77,7 @@ export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps)
         }
       );
     } else {
-      createSaida.mutate(payload, {
+      createExpense.mutate(payload, {
         onSuccess: () => {
           setOpen(false);
           resetForm();
@@ -124,7 +124,7 @@ export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps)
           <CategoryField
             value={formData.categoria_id}
             onChange={(value) => updateField("categoria_id", value)}
-            categorias={categorias}
+            categories={categories}
           />
 
           <ValueField
@@ -136,8 +136,8 @@ export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps)
 
           <FormActions
             mode={mode}
-            isCreating={createSaida.isPending}
-            isUpdating={updateSaida.isPending}
+            isCreating={createExpense.isPending}
+            isUpdating={updateExpense.isPending}
             onCancel={() => setOpen(false)}
           />
         </form>
@@ -145,4 +145,3 @@ export function SaidaModal({ trigger, mode = "create", saida }: SaidaModalProps)
     </Dialog>
   );
 }
-

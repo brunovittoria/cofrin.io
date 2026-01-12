@@ -29,12 +29,10 @@ import { LogOut } from "lucide-react";
 
 const navItems = [
   { title: "Dashboard", url: "/", icon: BarChart3 },
-  { title: "Transações", url: "/transacoes", icon: ArrowLeftRight },
-  // { title: "Entradas", url: "/entradas", icon: TrendingUp },
-  // { title: "Saídas", url: "/saidas", icon: TrendingDown },
-  { title: "Categorias", url: "/categorias", icon: Tag },
-  { title: "Futuros", url: "/futuros", icon: CalendarClock },
-  { title: "Cartões", url: "/cartoes", icon: CreditCard },
+  { title: "Transações", url: "/transactions", icon: ArrowLeftRight },
+  { title: "Categorias", url: "/categories", icon: Tag },
+  { title: "Futuros", url: "/future-launches", icon: CalendarClock },
+  { title: "Cartões", url: "/cards", icon: CreditCard },
 ];
 
 export function AppSidebar() {
@@ -136,7 +134,7 @@ export function AppSidebar() {
           </div>
 
           <NavLink
-            to="/transacoes"
+            to="/transactions"
             className={cn(
               "group flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground shadow-[0_8px_24px_-18px_rgba(15,23,42,0.22)] transition-all",
               "hover:-translate-y-[2px] hover:border-primary/30 hover:bg-accent hover:text-primary"

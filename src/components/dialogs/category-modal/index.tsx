@@ -10,9 +10,9 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
-  useCreateCategoria,
-  useUpdateCategoria,
-  type Categoria,
+  useCreateCategory,
+  useUpdateCategory,
+  type Category,
 } from "@/hooks/api/useCategories";
 import { useCategoryForm } from "@/hooks/useCategoryForm";
 import { CategoryNameField } from "./components/CategoryNameField";
@@ -23,20 +23,20 @@ import { FormActions } from "./components/FormActions";
 
 interface CategoryModalProps {
   trigger?: React.ReactNode;
-  defaultTipo?: string;
+  defaultType?: string;
   mode?: "create" | "edit";
-  categoria?: Categoria;
+  category?: Category;
 }
 
 export function CategoryModal({
   trigger,
-  defaultTipo,
+  defaultType,
   mode = "create",
-  categoria,
+  category,
 }: CategoryModalProps) {
   const [open, setOpen] = useState(false);
-  const createCategoria = useCreateCategoria();
-  const updateCategoria = useUpdateCategoria();
+  const createCategory = useCreateCategory();
+  const updateCategory = useUpdateCategory();
 
   const {
     formData,
@@ -46,8 +46,8 @@ export function CategoryModal({
     getSubmitData,
   } = useCategoryForm({
     mode,
-    categoria,
-    defaultTipo,
+    category,
+    defaultType,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -56,7 +56,7 @@ export function CategoryModal({
     const submitData = getSubmitData();
 
     if (mode === "edit") {
-      updateCategoria.mutate(submitData, {
+      updateCategory.mutate(submitData, {
         onSuccess: () => {
           setOpen(false);
         },
@@ -64,7 +64,7 @@ export function CategoryModal({
       return;
     }
 
-    createCategoria.mutate(submitData, {
+    createCategory.mutate(submitData, {
       onSuccess: () => {
         setOpen(false);
         resetForm();
@@ -123,8 +123,8 @@ export function CategoryModal({
 
           <FormActions
             mode={mode}
-            isCreating={createCategoria.isPending}
-            isUpdating={updateCategoria.isPending}
+            isCreating={createCategory.isPending}
+            isUpdating={updateCategory.isPending}
             onCancel={() => setOpen(false)}
           />
         </form>

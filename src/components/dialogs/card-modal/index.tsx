@@ -16,7 +16,7 @@ import { CardNumberLimitFields } from "./components/CardNumberLimitFields";
 import { CardUsageFields } from "./components/CardUsageFields";
 import { FormActions } from "./components/FormActions";
 
-interface Cartao {
+interface Card {
   id?: string;
   nome_exibicao: string;
   apelido?: string;
@@ -37,8 +37,8 @@ interface CardModalProps {
   trigger?: ReactNode;
   open?: boolean;
   setOpen?: (open: boolean) => void;
-  cartao?: Cartao;
-  onSave: (data: Cartao) => void;
+  card?: Card;
+  onSave: (data: Card) => void;
   isSaving?: boolean;
 }
 
@@ -47,7 +47,7 @@ export function CardModal({
   trigger,
   open: controlledOpen,
   setOpen: controlledSetOpen,
-  cartao,
+  card,
   onSave,
   isSaving,
 }: CardModalProps) {
@@ -60,11 +60,11 @@ export function CardModal({
     formData,
     updateField,
     selectedProvider,
-    valorDisponivel,
-    usoPercentual,
+    availableValue,
+    usagePercentage,
     getSubmitData,
     resetForm,
-  } = useCardForm({ mode, initialCartao: cartao });
+  } = useCardForm({ mode, initialCard: card });
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -153,8 +153,8 @@ export function CardModal({
               }
               providerImageUrl={selectedProvider?.imageUrl}
               providerName={selectedProvider?.name}
-              valorDisponivel={valorDisponivel}
-              usoPercentual={usoPercentual}
+              availableValue={availableValue}
+              usagePercentage={usagePercentage}
             />
 
             <FormActions

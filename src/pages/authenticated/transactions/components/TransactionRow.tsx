@@ -2,8 +2,8 @@ import { Edit, ArrowUpCircle, ArrowDownCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { EntradaModal } from "@/components/dialogs/entry-modal";
-import { SaidaModal } from "@/components/dialogs/expenses-modal";
+import { IncomeModal } from "@/components/dialogs/entry-modal";
+import { ExpenseModal } from "@/components/dialogs/expenses-modal";
 import { DeleteTransactionDialog } from "./DeleteTransactionDialog";
 import { formatCurrency, formatLocalDate } from "@/lib/formatters";
 import {
@@ -87,9 +87,9 @@ export const TransactionRow = ({
       <TableCell className="text-center">
         <div className="flex items-center justify-center gap-2">
           {isIncome ? (
-            <EntradaModal
+            <IncomeModal
               mode="edit"
-              entrada={transaction}
+              income={transaction}
               trigger={
                 <Button
                   variant="ghost"
@@ -102,9 +102,9 @@ export const TransactionRow = ({
               }
             />
           ) : (
-            <SaidaModal
+            <ExpenseModal
               mode="edit"
-              saida={transaction}
+              expense={transaction}
               trigger={
                 <Button
                   variant="ghost"
@@ -129,4 +129,3 @@ export const TransactionRow = ({
     </TableRow>
   );
 };
-

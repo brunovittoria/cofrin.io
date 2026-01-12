@@ -2,8 +2,8 @@ import { TrendingUp, TrendingDown, Wallet, Info } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/formatters";
-import { useEntradasSummaryPreviousMonth } from "@/hooks/api/useEntradas";
-import { useSaidasSummaryPreviousMonth } from "@/hooks/api/useSaidas";
+import { useIncomesSummaryPreviousMonth } from "@/hooks/api/useIncomes";
+import { useExpensesSummaryPreviousMonth } from "@/hooks/api/useExpenses";
 import { calculatePercentageChange } from "@/lib/trendUtils";
 import {
   Tooltip,
@@ -103,12 +103,12 @@ export const TransactionMetrics = ({
   const isPositiveBalance = balance >= 0;
 
   // Fetch previous month data
-  const { data: entradasSummaryPrevious } = useEntradasSummaryPreviousMonth(dateRange);
-  const { data: saidasSummaryPrevious } = useSaidasSummaryPreviousMonth(dateRange);
+  const { data: incomesSummaryPrevious } = useIncomesSummaryPreviousMonth(dateRange);
+  const { data: expensesSummaryPrevious } = useExpensesSummaryPreviousMonth(dateRange);
 
   // Calculate previous month values
-  const totalIncomePrevious = entradasSummaryPrevious?.total || 0;
-  const totalExpensesPrevious = saidasSummaryPrevious?.total || 0;
+  const totalIncomePrevious = incomesSummaryPrevious?.total || 0;
+  const totalExpensesPrevious = expensesSummaryPrevious?.total || 0;
   const balancePrevious = totalIncomePrevious - totalExpensesPrevious;
 
   // Calculate trends

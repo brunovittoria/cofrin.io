@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-export type Categoria = {
+export type Category = {
   id: number;
   nome: string;
   descricao?: string;
@@ -11,7 +11,7 @@ export type Categoria = {
   created_at: string;
 };
 
-export type NovaCategoria = {
+export type NewCategory = {
   nome: string;
   descricao?: string;
   tipo: string;
@@ -20,7 +20,7 @@ export type NovaCategoria = {
 
 export const useCategories = (tipo?: string) => {
   return useQuery({
-    queryKey: ['categorias', tipo],
+    queryKey: ['categories', tipo],
     queryFn: async () => {
       let query = supabase.from('categorias').select('*');
       
@@ -31,20 +31,20 @@ export const useCategories = (tipo?: string) => {
       const { data, error } = await query.order('nome');
       
       if (error) throw error;
-      return data as Categoria[];
+      return data as Category[];
     },
   });
 };
 
-export const useCreateCategoria = () => {
+export const useCreateCategory = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (categoria: NovaCategoria) => {
+    mutationFn: async (category: NewCategory) => {
       const { data, error } = await supabase
         .from('categorias')
-        .insert(categoria)
+        .insert(category)
         .select()
         .single();
       
@@ -52,7 +52,7 @@ export const useCreateCategoria = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categorias'] });
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
       toast({
         title: "Categoria criada",
         description: "A categoria foi criada com sucesso.",
@@ -68,12 +68,12 @@ export const useCreateCategoria = () => {
   });
 };
 
-export const useUpdateCategoria = () => {
+export const useUpdateCategory = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<Categoria> & { id: number }) => {
+    mutationFn: async ({ id, ...updates }: Partial<Category> & { id: number }) => {
       const { data, error } = await supabase
         .from('categorias')
         .update(updates)
@@ -85,7 +85,7 @@ export const useUpdateCategoria = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categorias'] });
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
       toast({
         title: "Categoria atualizada",
         description: "A categoria foi atualizada com sucesso.",
@@ -101,7 +101,7 @@ export const useUpdateCategoria = () => {
   });
 };
 
-export const useDeleteCategoria = () => {
+export const useDeleteCategory = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -115,7 +115,7 @@ export const useDeleteCategoria = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categorias'] });
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
       toast({
         title: "Categoria excluída",
         description: "A categoria foi excluída com sucesso.",

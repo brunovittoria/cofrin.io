@@ -7,13 +7,13 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppSidebar } from "@/components/AppSidebar";
 import DashboardPage from "./pages/authenticated/Index";
 import Transactions from "./pages/authenticated/transactions";
-import Categorias from "./pages/authenticated/categorias";
+import Categories from "./pages/authenticated/categories";
 import CardsPage from "./pages/authenticated/cards";
 import NotFound from "./pages/authenticated/NotFound";
 import { LoginPage } from "@/pages/authenticated/auth/login";
 import { RegisterPage } from "@/pages/authenticated/auth/register";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
-import Futuros from "./pages/authenticated/futuros";
+import FutureLaunches from "./pages/authenticated/future-launches";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import LandingPage from "./pages/landing";
 
@@ -47,12 +47,10 @@ const App = () => (
                   <main className="flex-1 overflow-auto">
                     <Routes>
                       <Route path="/" element={<DashboardPage />} />
-                      <Route path="/transacoes" element={<Transactions />} />
-                      {/* <Route path="/entradas" element={<Entradas />} />
-                      <Route path="/saidas" element={<Saidas />} /> */}
-                      <Route path="/categorias" element={<Categorias />} />
-                      <Route path="/futuros" element={<Futuros />} />
-                      <Route path="/cartoes" element={<CardsPage />} />
+                      <Route path="/transactions" element={<Transactions />} />
+                      <Route path="/categories" element={<Categories />} />
+                      <Route path="/future-launches" element={<FutureLaunches />} />
+                      <Route path="/cards" element={<CardsPage />} />
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </main>

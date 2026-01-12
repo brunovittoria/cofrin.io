@@ -1,5 +1,5 @@
 import { CardModal } from "@/components/dialogs/card-modal";
-import { useCartoesPage } from "@/hooks/useCartoesPage";
+import { useCardsPage } from "@/hooks/useCardsPage";
 import { PageHeader } from "./components/PageHeader";
 import { CardsGrid } from "./components/CardsGrid";
 import { LoadingSkeleton } from "./components/LoadingSkeleton";
@@ -14,17 +14,17 @@ const CardsPage = () => {
     setAddModalOpen,
     editModalOpen,
     setEditModalOpen,
-    selectedCartao,
-    handleCreateCartao,
-    handleEditCartao,
+    selectedCard,
+    handleCreateCard,
+    handleEditCard,
     openEditModal,
-    handleDeleteCartao,
-    handleSetPrincipal,
+    handleDeleteCard,
+    handleSetPrimary,
     isPendingDelete,
-    isPendingSetPrincipal,
+    isPendingSetPrimary,
     isPendingCreate,
     isPendingUpdate,
-  } = useCartoesPage();
+  } = useCardsPage();
 
   return (
     <div className="min-h-screen bg-background px-4 py-6 sm:px-6 lg:px-8">
@@ -42,10 +42,10 @@ const CardsPage = () => {
               cards={cardsToDisplay}
               emptySlots={emptySlots}
               onEdit={openEditModal}
-              onDelete={handleDeleteCartao}
-              onSetPrincipal={handleSetPrincipal}
+              onDelete={handleDeleteCard}
+              onSetPrincipal={handleSetPrimary}
               isPendingDelete={isPendingDelete}
-              isPendingSetPrincipal={isPendingSetPrincipal}
+              isPendingSetPrimary={isPendingSetPrimary}
             />
           )}
         </section>
@@ -55,20 +55,20 @@ const CardsPage = () => {
         mode="add"
         open={addModalOpen}
         setOpen={setAddModalOpen}
-        onSave={handleCreateCartao}
+        onSave={handleCreateCard}
         isSaving={isPendingCreate}
       />
 
-      {selectedCartao && (
+      {selectedCard && (
         <CardModal
           mode="edit"
           open={editModalOpen}
           setOpen={setEditModalOpen}
-          cartao={{
-            ...selectedCartao,
-            id: String(selectedCartao.id),
+          card={{
+            ...selectedCard,
+            id: String(selectedCard.id),
           }}
-          onSave={handleEditCartao}
+          onSave={handleEditCard}
           isSaving={isPendingUpdate}
         />
       )}

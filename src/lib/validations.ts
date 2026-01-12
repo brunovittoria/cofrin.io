@@ -45,8 +45,8 @@ export const registerSchema = z
     path: ["confirmPassword"],
   });
 
-// Lançamento Futuro form validation schema (input - mantém strings)
-export const lancamentoFuturoInputSchema = z.object({
+// Future Launch form validation schema (input - keeps strings)
+export const futureLaunchInputSchema = z.object({
   data: z.date({
     required_error: "Por favor, selecione uma data prevista.",
   }),
@@ -75,8 +75,8 @@ export const lancamentoFuturoInputSchema = z.object({
     }),
 });
 
-// Schema transformado para output (com números)
-export const lancamentoFuturoSchema = lancamentoFuturoInputSchema.transform((data) => ({
+// Transformed schema for output (with numbers)
+export const futureLaunchSchema = futureLaunchInputSchema.transform((data) => ({
   ...data,
   categoria_id: parseInt(data.categoria_id, 10),
   valor: parseFloat(data.valor.replace(",", ".")),
@@ -85,5 +85,5 @@ export const lancamentoFuturoSchema = lancamentoFuturoInputSchema.transform((dat
 // Type inference for TypeScript
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type RegisterFormData = z.infer<typeof registerSchema>;
-export type LancamentoFuturoFormData = z.infer<typeof lancamentoFuturoInputSchema>;
-export type LancamentoFuturoOutputData = z.infer<typeof lancamentoFuturoSchema>;
+export type FutureLaunchFormData = z.infer<typeof futureLaunchInputSchema>;
+export type FutureLaunchOutputData = z.infer<typeof futureLaunchSchema>;

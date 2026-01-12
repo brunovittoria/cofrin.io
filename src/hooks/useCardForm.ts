@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { cardProvidersMap } from "@/mocks/cardProviders";
 
-interface Cartao {
+interface Card {
   id?: string;
   nome_exibicao: string;
   apelido?: string;
@@ -19,12 +19,12 @@ interface Cartao {
 
 interface UseCardFormProps {
   mode: "add" | "edit";
-  initialCartao?: Cartao;
+  initialCard?: Card;
 }
 
-const getInitialFormState = (mode: "add" | "edit", cartao?: Cartao) => {
-  if (mode === "edit" && cartao) {
-    return { ...cartao };
+const getInitialFormState = (mode: "add" | "edit", card?: Card) => {
+  if (mode === "edit" && card) {
+    return { ...card };
   }
 
   return {
@@ -38,16 +38,16 @@ const getInitialFormState = (mode: "add" | "edit", cartao?: Cartao) => {
   };
 };
 
-export const useCardForm = ({ mode, initialCartao }: UseCardFormProps) => {
+export const useCardForm = ({ mode, initialCard }: UseCardFormProps) => {
   const [formData, setFormData] = useState(() =>
-    getInitialFormState(mode, initialCartao)
+    getInitialFormState(mode, initialCard)
   );
 
-  const limiteNumber = useMemo(
+  const limitNumber = useMemo(
     () => Number(formData.limite_total) || 0,
     [formData.limite_total]
   );
-  const utilizadoNumber = useMemo(
+  const usedNumber = useMemo(
     () => Number(formData.valor_utilizado) || 0,
     [formData.valor_utilizado]
   );
@@ -55,10 +55,10 @@ export const useCardForm = ({ mode, initialCartao }: UseCardFormProps) => {
     ? cardProvidersMap[formData.emissor]
     : undefined;
 
-  const valorDisponivel = Math.max(limiteNumber - utilizadoNumber, 0);
-  const usoPercentual =
-    limiteNumber > 0
-      ? Math.min((utilizadoNumber / limiteNumber) * 100, 999)
+  const availableValue = Math.max(limitNumber - usedNumber, 0);
+  const usagePercentage =
+    limitNumber > 0
+      ? Math.min((usedNumber / limitNumber) * 100, 999)
       : 0;
 
   const updateField = (field: string, value: any) => {
@@ -66,7 +66,7 @@ export const useCardForm = ({ mode, initialCartao }: UseCardFormProps) => {
   };
 
   const resetForm = () => {
-    setFormData(getInitialFormState(mode, initialCartao));
+    setFormData(getInitialFormState(mode, initialCard));
   };
 
   const getSubmitData = () => {
@@ -75,11 +75,11 @@ export const useCardForm = ({ mode, initialCartao }: UseCardFormProps) => {
       apelido: formData.apelido?.trim() ? formData.apelido : null,
       bandeira: formData.bandeira || null,
       final_cartao: formData.final_cartao?.trim() || null,
-      limite_total: limiteNumber,
-      valor_utilizado: utilizadoNumber,
-      valor_disponivel: Math.max(limiteNumber - utilizadoNumber, 0),
+      limite_total: limitNumber,
+      valor_utilizado: usedNumber,
+      valor_disponivel: Math.max(limitNumber - usedNumber, 0),
       uso_percentual:
-        limiteNumber > 0 ? (utilizadoNumber / limiteNumber) * 100 : 0,
+        limitNumber > 0 ? (usedNumber / limitNumber) * 100 : 0,
       emissor: formData.emissor || null,
     };
 
@@ -103,8 +103,8 @@ export const useCardForm = ({ mode, initialCartao }: UseCardFormProps) => {
     formData,
     updateField,
     selectedProvider,
-    valorDisponivel,
-    usoPercentual,
+    availableValue,
+    usagePercentage,
     getSubmitData,
     resetForm,
   };

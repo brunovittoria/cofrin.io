@@ -1,11 +1,11 @@
-import { type Cartao } from "@/hooks/api/useCartoes";
+import { type Card } from "@/hooks/api/useCards";
 import { CardItem } from "./CardItem";
 import { EmptyCardSlot } from "./EmptyCardSlot";
 
 interface CardsGridProps {
-  cards: Cartao[];
+  cards: Card[];
   emptySlots: number;
-  onEdit: (card: Cartao) => void;
+  onEdit: (card: Card) => void;
   onDelete: (id: number) => void;
   onSetPrincipal: (id: number) => void;
   isPendingDelete: boolean;

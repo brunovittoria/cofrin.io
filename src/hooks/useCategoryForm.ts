@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Categoria } from "@/hooks/api/useCategories";
+import type { Category } from "@/hooks/api/useCategories";
 
 interface CategoryFormData {
   nome: string;
@@ -10,39 +10,39 @@ interface CategoryFormData {
 
 interface UseCategoryFormProps {
   mode: "create" | "edit";
-  categoria?: Categoria;
-  defaultTipo?: string;
+  category?: Category;
+  defaultType?: string;
 }
 
 const getInitialFormState = (
   mode: "create" | "edit",
-  categoria?: Categoria,
-  defaultTipo?: string
+  category?: Category,
+  defaultType?: string
 ): CategoryFormData => {
-  if (mode === "edit" && categoria) {
+  if (mode === "edit" && category) {
     return {
-      nome: categoria.nome || "",
-      descricao: categoria.descricao || "",
-      tipo: categoria.tipo || defaultTipo || "",
-      cor_hex: categoria.cor_hex || "",
+      nome: category.nome || "",
+      descricao: category.descricao || "",
+      tipo: category.tipo || defaultType || "",
+      cor_hex: category.cor_hex || "",
     };
   }
 
   return {
     nome: "",
     descricao: "",
-    tipo: defaultTipo || "",
+    tipo: defaultType || "",
     cor_hex: "",
   };
 };
 
 export const useCategoryForm = ({
   mode,
-  categoria,
-  defaultTipo,
+  category,
+  defaultType,
 }: UseCategoryFormProps) => {
   const [formData, setFormData] = useState<CategoryFormData>(() =>
-    getInitialFormState(mode, categoria, defaultTipo)
+    getInitialFormState(mode, category, defaultType)
   );
 
   const updateField = (field: keyof CategoryFormData, value: string) => {
@@ -50,19 +50,19 @@ export const useCategoryForm = ({
   };
 
   const resetForm = () => {
-    setFormData(getInitialFormState("create", undefined, defaultTipo));
+    setFormData(getInitialFormState("create", undefined, defaultType));
   };
 
   const initializeEditMode = () => {
-    if (mode === "edit" && categoria) {
-      setFormData(getInitialFormState("edit", categoria, defaultTipo));
+    if (mode === "edit" && category) {
+      setFormData(getInitialFormState("edit", category, defaultType));
     }
   };
 
   const getSubmitData = () => {
-    if (mode === "edit" && categoria?.id) {
+    if (mode === "edit" && category?.id) {
       return {
-        id: categoria.id,
+        id: category.id,
         nome: formData.nome,
         descricao: formData.descricao || undefined,
         tipo: formData.tipo,

@@ -12,12 +12,12 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { toLocalDateString } from "@/lib/formatters";
 import {
-  useCreateLancamentoFuturo,
-  useUpdateLancamentoFuturo,
-  type LancamentoFuturo,
-} from "@/hooks/api/useLancamentosFuturos";
-import { useLancamentoFuturoForm } from "@/hooks/useLancamentoFuturoForm";
-import type { LancamentoFuturoFormData } from "@/lib/validations";
+  useCreateFutureLaunch,
+  useUpdateFutureLaunch,
+  type FutureLaunch,
+} from "@/hooks/api/useFutureLaunches";
+import { useFutureLaunchForm } from "@/hooks/useFutureLaunchForm";
+import type { FutureLaunchFormData } from "@/lib/validations";
 import { DateFormField } from "./components/DateFormField";
 import { TypeFormField } from "./components/TypeFormField";
 import { DescriptionFormField } from "./components/DescriptionFormField";
@@ -25,30 +25,30 @@ import { CategoryFormField } from "./components/CategoryFormField";
 import { ValueFormField } from "./components/ValueFormField";
 import { FormActions } from "./components/FormActions";
 
-interface LancamentoFuturoModalProps {
+interface FutureLaunchModalProps {
   trigger?: React.ReactNode;
   mode?: "create" | "edit";
-  lancamento?: LancamentoFuturo & {
+  launch?: FutureLaunch & {
     categorias?: { nome: string; cor_hex?: string };
   };
 }
 
-export function LancamentoFuturoModal({
+export function FutureLaunchModal({
   trigger,
   mode = "create",
-  lancamento,
-}: LancamentoFuturoModalProps) {
+  launch,
+}: FutureLaunchModalProps) {
   const [open, setOpen] = useState(false);
-  const createLancamento = useCreateLancamentoFuturo();
-  const updateLancamento = useUpdateLancamentoFuturo();
+  const createLaunch = useCreateFutureLaunch();
+  const updateLaunch = useUpdateFutureLaunch();
 
-  const { form, tipo, categorias } = useLancamentoFuturoForm({
+  const { form, tipo, categories } = useFutureLaunchForm({
     mode,
-    lancamento,
+    launch,
     open,
   });
 
-  const handleSubmit = (data: LancamentoFuturoFormData) => {
+  const handleSubmit = (data: FutureLaunchFormData) => {
     const payload = {
       data: toLocalDateString(data.data),
       tipo: data.tipo,
@@ -57,9 +57,9 @@ export function LancamentoFuturoModal({
       valor: parseFloat(data.valor.replace(",", ".")),
     };
 
-    if (mode === "edit" && lancamento) {
-      updateLancamento.mutate(
-        { id: lancamento.id, ...payload },
+    if (mode === "edit" && launch) {
+      updateLaunch.mutate(
+        { id: launch.id, ...payload },
         {
           onSuccess: () => {
             setOpen(false);
@@ -68,7 +68,7 @@ export function LancamentoFuturoModal({
         }
       );
     } else {
-      createLancamento.mutate(payload, {
+      createLaunch.mutate(payload, {
         onSuccess: () => {
           setOpen(false);
           form.reset();
@@ -120,7 +120,7 @@ export function LancamentoFuturoModal({
 
             <CategoryFormField
               control={form.control}
-              categorias={categorias}
+              categories={categories}
               tipo={tipo}
             />
 
@@ -130,7 +130,7 @@ export function LancamentoFuturoModal({
               mode={mode}
               isSubmitting={form.formState.isSubmitting}
               isPending={
-                createLancamento.isPending || updateLancamento.isPending
+                createLaunch.isPending || updateLaunch.isPending
               }
               onCancel={() => setOpen(false)}
             />

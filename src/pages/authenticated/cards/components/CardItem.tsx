@@ -1,13 +1,13 @@
 import { Star, Edit, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { type Cartao } from "@/hooks/api/useCartoes";
+import { type Card } from "@/hooks/api/useCards";
 import { cardProvidersMap } from "@/mocks/cardProviders";
 import { brandStyles, getStatusStyles } from "@/styles/cardStyles";
 
 interface CardItemProps {
-  card: Cartao;
-  onEdit: (card: Cartao) => void;
+  card: Card;
+  onEdit: (card: Card) => void;
   onDelete: (id: number) => void;
   onSetPrincipal: (id: number) => void;
   isPendingDelete: boolean;

@@ -12,7 +12,7 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import type { Control } from "react-hook-form";
-import type { LancamentoFuturoFormData } from "@/lib/validations";
+import type { FutureLaunchFormData } from "@/lib/validations";
 
 const fieldWrapper =
   "group rounded-2xl border border-[#E4E8F4] bg-[rgba(249,250,255,0.9)] p-4 transition-all duration-200 hover:border-[#C6D4FF] hover:bg-white focus-within:border-[#0A84FF] focus-within:bg-white shadow-[0_24px_48px_-30px_rgba(10,132,255,0.25)]";
@@ -23,7 +23,7 @@ const popoverClass =
   "w-auto rounded-2xl border border-[#E2E8F0] bg-white p-3 text-[#0F172A] shadow-[0_32px_54px_-30px_rgba(10,132,255,0.28)]";
 
 interface DateFormFieldProps {
-  control: Control<LancamentoFuturoFormData>;
+  control: Control<FutureLaunchFormData>;
 }
 
 export const DateFormField = ({ control }: DateFormFieldProps) => {

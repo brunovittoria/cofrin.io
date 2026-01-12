@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import type { Control, UseFormSetValue } from "react-hook-form";
-import type { LancamentoFuturoFormData } from "@/lib/validations";
+import type { FutureLaunchFormData } from "@/lib/validations";
 
 const fieldWrapper =
   "group rounded-2xl border border-[#E4E8F4] bg-[rgba(249,250,255,0.9)] p-4 transition-all duration-200 hover:border-[#C6D4FF] hover:bg-white focus-within:border-[#0A84FF] focus-within:bg-white shadow-[0_24px_48px_-30px_rgba(10,132,255,0.25)]";
@@ -25,8 +25,8 @@ const selectContentClass =
 const selectItemClass = "text-sm text-[#0F172A] focus:bg-[#EEF2FF] focus:text-[#0F172A]";
 
 interface TypeFormFieldProps {
-  control: Control<LancamentoFuturoFormData>;
-  setValue: UseFormSetValue<LancamentoFuturoFormData>;
+  control: Control<FutureLaunchFormData>;
+  setValue: UseFormSetValue<FutureLaunchFormData>;
 }
 
 export const TypeFormField = ({ control, setValue }: TypeFormFieldProps) => {

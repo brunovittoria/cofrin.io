@@ -1,15 +1,15 @@
 import { useState, useMemo } from "react";
 import { DateRange } from "react-day-picker";
 import {
-  useEntradas,
-  useEntradasSummary,
-  useDeleteEntrada,
-} from "@/hooks/api/useEntradas";
+  useIncomes,
+  useIncomesSummary,
+  useDeleteIncome,
+} from "@/hooks/api/useIncomes";
 import {
-  useSaidas,
-  useSaidasSummary,
-  useDeleteSaida,
-} from "@/hooks/api/useSaidas";
+  useExpenses,
+  useExpensesSummary,
+  useDeleteExpense,
+} from "@/hooks/api/useExpenses";
 
 export type TransactionType = "all" | "income" | "expense";
 
@@ -33,44 +33,44 @@ export const useTransactionsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
 
-  // Fetch entradas (income)
+  // Fetch incomes
   const {
-    data: entradas = [],
-    isLoading: isLoadingEntradas,
-    refetch: refetchEntradas,
-  } = useEntradas(dateRange);
-  const { data: entradasSummary, refetch: refetchEntradasSummary } =
-    useEntradasSummary(dateRange);
-  const deleteEntrada = useDeleteEntrada();
+    data: incomes = [],
+    isLoading: isLoadingIncomes,
+    refetch: refetchIncomes,
+  } = useIncomes(dateRange);
+  const { data: incomesSummary, refetch: refetchIncomesSummary } =
+    useIncomesSummary(dateRange);
+  const deleteIncome = useDeleteIncome();
 
-  // Fetch saidas (expenses)
+  // Fetch expenses
   const {
-    data: saidas = [],
-    isLoading: isLoadingSaidas,
-    refetch: refetchSaidas,
-  } = useSaidas(dateRange);
-  const { data: saidasSummary, refetch: refetchSaidasSummary } =
-    useSaidasSummary(dateRange);
-  const deleteSaida = useDeleteSaida();
+    data: expenses = [],
+    isLoading: isLoadingExpenses,
+    refetch: refetchExpenses,
+  } = useExpenses(dateRange);
+  const { data: expensesSummary, refetch: refetchExpensesSummary } =
+    useExpensesSummary(dateRange);
+  const deleteExpense = useDeleteExpense();
 
   // Combine and transform data into unified transactions
   const transactions: Transaction[] = useMemo(() => {
-    const incomeTransactions: Transaction[] = entradas.map((entrada) => ({
-      id: entrada.id,
-      data: entrada.data,
-      descricao: entrada.descricao,
-      valor: entrada.valor,
+    const incomeTransactions: Transaction[] = incomes.map((income) => ({
+      id: income.id,
+      data: income.data,
+      descricao: income.descricao,
+      valor: income.valor,
       type: "income" as const,
-      categorias: entrada.categorias,
+      categorias: income.categorias,
     }));
 
-    const expenseTransactions: Transaction[] = saidas.map((saida) => ({
-      id: saida.id,
-      data: saida.data,
-      descricao: saida.descricao,
-      valor: saida.valor,
+    const expenseTransactions: Transaction[] = expenses.map((expense) => ({
+      id: expense.id,
+      data: expense.data,
+      descricao: expense.descricao,
+      valor: expense.valor,
       type: "expense" as const,
-      categorias: saida.categorias,
+      categorias: expense.categorias,
     }));
 
     // Combine and sort by date (newest first)
@@ -79,15 +79,15 @@ export const useTransactionsPage = () => {
       const dateB = new Date(b.data);
       return dateB.getTime() - dateA.getTime();
     });
-  }, [entradas, saidas]);
+  }, [incomes, expenses]);
 
   // Calculate metrics
   const metrics = useMemo(() => {
-    const totalIncome = entradasSummary?.total || 0;
-    const totalExpenses = saidasSummary?.total || 0;
+    const totalIncome = incomesSummary?.total || 0;
+    const totalExpenses = expensesSummary?.total || 0;
     const balance = totalIncome - totalExpenses;
-    const incomeCount = entradasSummary?.count || 0;
-    const expenseCount = saidasSummary?.count || 0;
+    const incomeCount = incomesSummary?.count || 0;
+    const expenseCount = expensesSummary?.count || 0;
 
     return {
       totalIncome,
@@ -96,7 +96,7 @@ export const useTransactionsPage = () => {
       incomeCount,
       expenseCount,
     };
-  }, [entradasSummary, saidasSummary]);
+  }, [incomesSummary, expensesSummary]);
 
   // Filter transactions based on search and type
   const filteredTransactions = useMemo(() => {
@@ -123,19 +123,19 @@ export const useTransactionsPage = () => {
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await Promise.all([
-      refetchEntradas(),
-      refetchSaidas(),
-      refetchEntradasSummary(),
-      refetchSaidasSummary(),
+      refetchIncomes(),
+      refetchExpenses(),
+      refetchIncomesSummary(),
+      refetchExpensesSummary(),
     ]);
     setIsRefreshing(false);
   };
 
   const handleDelete = (id: number, type: "income" | "expense") => {
     if (type === "income") {
-      deleteEntrada.mutate(id);
+      deleteIncome.mutate(id);
     } else {
-      deleteSaida.mutate(id);
+      deleteExpense.mutate(id);
     }
   };
 
@@ -151,9 +151,9 @@ export const useTransactionsPage = () => {
     paginatedTransactions,
     metrics,
     handleDelete,
-    deleteEntrada,
-    deleteSaida,
-    isLoading: isLoadingEntradas || isLoadingSaidas || isRefreshing,
+    deleteIncome,
+    deleteExpense,
+    isLoading: isLoadingIncomes || isLoadingExpenses || isRefreshing,
     handleRefresh,
     currentPage,
     setCurrentPage,

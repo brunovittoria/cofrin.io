@@ -12,12 +12,12 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useCategories } from "@/hooks/api/useCategories";
 import {
-  useCreateEntrada,
-  useUpdateEntrada,
-  type Entrada,
-} from "@/hooks/api/useEntradas";
+  useCreateIncome,
+  useUpdateIncome,
+  type Income,
+} from "@/hooks/api/useIncomes";
 import { toLocalDateString } from "@/lib/formatters";
-import { useEntradaForm } from "@/hooks/useEntradaForm";
+import { useIncomeForm } from "@/hooks/useIncomeForm";
 import { DateField } from "./components/DateField";
 import { DescriptionField } from "./components/DescriptionField";
 import { CategoryField } from "./components/CategoryField";
@@ -25,22 +25,22 @@ import { ValueField } from "./components/ValueField";
 import { TypeField } from "./components/TypeField";
 import { FormActions } from "./components/FormActions";
 
-interface EntradaModalProps {
+interface IncomeModalProps {
   trigger?: React.ReactNode;
   mode?: "create" | "edit";
-  entrada?: Entrada & { categorias?: { nome: string; cor_hex?: string } };
+  income?: Income & { categorias?: { nome: string; cor_hex?: string } };
 }
 
-export function EntradaModal({
+export function IncomeModal({
   trigger,
   mode = "create",
-  entrada,
-}: EntradaModalProps) {
+  income,
+}: IncomeModalProps) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
-  const { data: categorias = [] } = useCategories("entrada");
-  const createEntrada = useCreateEntrada();
-  const updateEntrada = useUpdateEntrada();
+  const { data: categories = [] } = useCategories("entrada");
+  const createIncome = useCreateIncome();
+  const updateIncome = useUpdateIncome();
 
   const {
     formData,
@@ -49,9 +49,9 @@ export function EntradaModal({
     updateField,
     resetForm,
     initializeEditMode,
-  } = useEntradaForm({
+  } = useIncomeForm({
     mode,
-    entrada,
+    income,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -82,9 +82,9 @@ export function EntradaModal({
       categoria_id: parseInt(formData.categoria_id),
     };
 
-    if (mode === "edit" && entrada?.id) {
-      updateEntrada.mutate(
-        { id: entrada.id, ...payload },
+    if (mode === "edit" && income?.id) {
+      updateIncome.mutate(
+        { id: income.id, ...payload },
         {
           onSuccess: () => {
             setOpen(false);
@@ -92,7 +92,7 @@ export function EntradaModal({
         }
       );
     } else {
-      createEntrada.mutate(payload, {
+      createIncome.mutate(payload, {
         onSuccess: () => {
           setOpen(false);
           resetForm();
@@ -140,7 +140,7 @@ export function EntradaModal({
           <CategoryField
             value={formData.categoria_id}
             onChange={(value) => updateField("categoria_id", value)}
-            categorias={categorias}
+            categories={categories}
           />
 
           <ValueField
@@ -155,8 +155,8 @@ export function EntradaModal({
 
           <FormActions
             mode={mode}
-            isCreating={createEntrada.isPending}
-            isUpdating={updateEntrada.isPending}
+            isCreating={createIncome.isPending}
+            isUpdating={updateIncome.isPending}
             onCancel={() => setOpen(false)}
           />
         </form>

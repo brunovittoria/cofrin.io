@@ -1,4 +1,4 @@
-﻿import { Cartao } from "@/hooks/api/useCartoes";
+﻿import { Card } from "@/hooks/api/useCards";
 import { cardProvidersMap } from "@/mocks/cardProviders";
 
 const formatCurrency = (value: number) =>
@@ -10,15 +10,15 @@ const getProgress = (used: number, limit: number) => {
 };
 
 type MyCardsSectionProps = {
-  cartoes?: Cartao[];
+  cards?: Card[];
 };
 
-export const MyCardsSection = ({ cartoes = [] }: MyCardsSectionProps) => {
-  // Encontrar o cartão principal, ou usar o primeiro cartão se não houver principal
-  const cartaoPrincipal =
-    cartoes.find((cartao) => cartao.is_principal) || cartoes[0];
+export const MyCardsSection = ({ cards = [] }: MyCardsSectionProps) => {
+  // Find primary card, or use the first card if none is primary
+  const primaryCard =
+    cards.find((card) => card.is_principal) || cards[0];
 
-  if (!cartaoPrincipal) {
+  if (!primaryCard) {
     return (
       <section className="flex h-full flex-col rounded-3xl border border-border bg-card p-6 shadow-sm transition-colors sm:p-7">
         <header className="flex items-center justify-between">
@@ -31,7 +31,7 @@ export const MyCardsSection = ({ cartoes = [] }: MyCardsSectionProps) => {
             </p>
           </div>
           <span className="inline-flex items-center rounded-full bg-info/10 px-3 py-1 text-xs font-semibold text-info dark:bg-info/20">
-            Total {cartoes.length}
+            Total {cards.length}
           </span>
         </header>
 
@@ -43,13 +43,13 @@ export const MyCardsSection = ({ cartoes = [] }: MyCardsSectionProps) => {
   }
 
   const progress = getProgress(
-    cartaoPrincipal.valor_utilizado,
-    cartaoPrincipal.limite_total
+    primaryCard.valor_utilizado,
+    primaryCard.limite_total
   );
-  const provider = cartaoPrincipal.emissor
-    ? cardProvidersMap[cartaoPrincipal.emissor]
+  const provider = primaryCard.emissor
+    ? cardProvidersMap[primaryCard.emissor]
     : undefined;
-  const imageUrl = cartaoPrincipal.imagem_url ?? provider?.imageUrl;
+  const imageUrl = primaryCard.imagem_url ?? provider?.imageUrl;
 
   return (
     <section className="flex h-full flex-col rounded-3xl border border-border bg-card p-6 shadow-sm transition-colors sm:p-7">
@@ -59,7 +59,7 @@ export const MyCardsSection = ({ cartoes = [] }: MyCardsSectionProps) => {
           <p className="text-sm text-muted-foreground">Cartão principal em destaque</p>
         </div>
         <span className="inline-flex items-center rounded-full bg-info/10 px-3 py-1 text-xs font-semibold text-info dark:bg-info/20">
-          Total {cartoes.length}
+          Total {cards.length}
         </span>
       </header>
 
@@ -68,12 +68,12 @@ export const MyCardsSection = ({ cartoes = [] }: MyCardsSectionProps) => {
           {imageUrl ? (
             <img
               src={imageUrl}
-              alt={provider?.name ?? cartaoPrincipal.nome_exibicao}
+              alt={provider?.name ?? primaryCard.nome_exibicao}
               className="h-full w-full object-cover"
             />
           ) : (
             <div className="flex aspect-[16/10] w-full items-center justify-center bg-info/10 text-sm font-semibold uppercase tracking-[0.25em] text-muted-foreground">
-              {cartaoPrincipal.nome_exibicao}
+              {primaryCard.nome_exibicao}
             </div>
           )}
         </div>
@@ -82,8 +82,8 @@ export const MyCardsSection = ({ cartoes = [] }: MyCardsSectionProps) => {
           <div className="flex items-center justify-between text-sm text-muted-foreground">
             <span>Uso do limite</span>
             <span className="font-semibold text-foreground">
-              {formatCurrency(cartaoPrincipal.valor_utilizado)} /{" "}
-              {formatCurrency(cartaoPrincipal.limite_total)}
+              {formatCurrency(primaryCard.valor_utilizado)} /{" "}
+              {formatCurrency(primaryCard.limite_total)}
             </span>
           </div>
           <div className="mt-3 h-2 rounded-full bg-border">
@@ -96,7 +96,7 @@ export const MyCardsSection = ({ cartoes = [] }: MyCardsSectionProps) => {
             <span>
               Disponível:{" "}
               {formatCurrency(
-                cartaoPrincipal.limite_total - cartaoPrincipal.valor_utilizado
+                primaryCard.limite_total - primaryCard.valor_utilizado
               )}
             </span>
             <span className="font-semibold text-foreground">{progress}%</span>

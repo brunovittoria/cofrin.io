@@ -12,8 +12,8 @@ interface CardUsageFieldsProps {
   onValorUtilizadoChange: (value: string) => void;
   providerImageUrl?: string;
   providerName?: string;
-  valorDisponivel: number;
-  usoPercentual: number;
+  availableValue: number;
+  usagePercentage: number;
 }
 
 export const CardUsageFields = ({
@@ -21,8 +21,8 @@ export const CardUsageFields = ({
   onValorUtilizadoChange,
   providerImageUrl,
   providerName,
-  valorDisponivel,
-  usoPercentual,
+  availableValue,
+  usagePercentage,
 }: CardUsageFieldsProps) => {
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:items-start">
@@ -43,8 +43,8 @@ export const CardUsageFields = ({
       </div>
       <CardPreview imageUrl={providerImageUrl} providerName={providerName} />
       <CardMetrics
-        valorDisponivel={valorDisponivel}
-        usoPercentual={usoPercentual}
+        availableValue={availableValue}
+        usagePercentage={usagePercentage}
       />
     </div>
   );

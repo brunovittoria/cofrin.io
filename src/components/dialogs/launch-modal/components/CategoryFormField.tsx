@@ -13,8 +13,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import type { Control } from "react-hook-form";
-import type { LancamentoFuturoFormData } from "@/lib/validations";
-import type { Categoria } from "@/hooks/useCategories";
+import type { FutureLaunchFormData } from "@/lib/validations";
+import type { Category } from "@/hooks/api/useCategories";
 
 const fieldWrapper =
   "group rounded-2xl border border-[#E4E8F4] bg-[rgba(249,250,255,0.9)] p-4 transition-all duration-200 hover:border-[#C6D4FF] hover:bg-white focus-within:border-[#0A84FF] focus-within:bg-white shadow-[0_24px_48px_-30px_rgba(10,132,255,0.25)]";
@@ -26,12 +26,12 @@ const selectContentClass =
 const selectItemClass = "text-sm text-[#0F172A] focus:bg-[#EEF2FF] focus:text-[#0F172A]";
 
 interface CategoryFormFieldProps {
-  control: Control<LancamentoFuturoFormData>;
-  categorias: Categoria[];
+  control: Control<FutureLaunchFormData>;
+  categories: Category[];
   tipo?: string;
 }
 
-export const CategoryFormField = ({ control, categorias, tipo }: CategoryFormFieldProps) => {
+export const CategoryFormField = ({ control, categories, tipo }: CategoryFormFieldProps) => {
   if (!tipo) return null;
 
   return (
@@ -48,10 +48,10 @@ export const CategoryFormField = ({ control, categorias, tipo }: CategoryFormFie
               </SelectTrigger>
             </FormControl>
             <SelectContent className={selectContentClass}>
-              {categorias.map((categoria) => (
+              {categories.map((category) => (
                 <SelectItem
-                  key={categoria.id}
-                  value={categoria.id.toString()}
+                  key={category.id}
+                  value={category.id.toString()}
                   className={selectItemClass}
                 >
                   <div className="flex items-center gap-2">
@@ -59,10 +59,10 @@ export const CategoryFormField = ({ control, categorias, tipo }: CategoryFormFie
                       className="h-3.5 w-3.5 rounded-full"
                       style={{
                         backgroundColor:
-                          categoria.cor_hex || (tipo === "entrada" ? "#16A34A" : "#DC2626"),
+                          category.cor_hex || (tipo === "entrada" ? "#16A34A" : "#DC2626"),
                       }}
                     />
-                    {categoria.nome}
+                    {category.nome}
                   </div>
                 </SelectItem>
               ))}
@@ -74,4 +74,3 @@ export const CategoryFormField = ({ control, categorias, tipo }: CategoryFormFie
     />
   );
 };
-

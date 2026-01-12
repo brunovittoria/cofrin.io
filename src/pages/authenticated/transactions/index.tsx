@@ -22,8 +22,8 @@ export default function Transactions() {
     filteredTransactions,
     metrics,
     handleDelete,
-    deleteEntrada,
-    deleteSaida,
+    deleteIncome,
+    deleteExpense,
     isLoading,
     handleRefresh,
     paginatedTransactions,
@@ -33,9 +33,9 @@ export default function Transactions() {
   } = useTransactionsPage();
 
   useEffect(() => {
-    const categoria = searchParams.get("categoria");
-    if (categoria) {
-      setSearchTerm(categoria);
+    const category = searchParams.get("categoria");
+    if (category) {
+      setSearchTerm(category);
     }
   }, [searchParams, setSearchTerm]);
 
@@ -82,7 +82,7 @@ export default function Transactions() {
               transactions={paginatedTransactions}
               searchTerm={searchTerm}
               onDelete={handleDelete}
-              isPending={deleteEntrada.isPending || deleteSaida.isPending}
+              isPending={deleteIncome.isPending || deleteExpense.isPending}
             />
           </div>
 
@@ -98,4 +98,3 @@ export default function Transactions() {
     </div>
   );
 }
-
