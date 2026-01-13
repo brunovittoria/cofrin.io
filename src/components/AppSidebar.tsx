@@ -9,6 +9,7 @@ import {
   Moon,
   Sun,
   ArrowLeftRight,
+  Target,
 } from "lucide-react";
 import { matchPath, NavLink, useLocation } from "react-router-dom";
 import {
@@ -32,6 +33,7 @@ const navItems = [
   { title: "Transações", url: "/transactions", icon: ArrowLeftRight },
   { title: "Categorias", url: "/categories", icon: Tag },
   { title: "Futuros", url: "/future-launches", icon: CalendarClock },
+  { title: "Metas", url: "/goals", icon: Target },
   { title: "Cartões", url: "/cards", icon: CreditCard },
 ];
 

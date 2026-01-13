@@ -82,8 +82,104 @@ export const futureLaunchSchema = futureLaunchInputSchema.transform((data) => ({
   valor: parseFloat(data.valor.replace(",", ".")),
 }));
 
+// Goal reflection step validation schema
+export const goalReflectionSchema = z.object({
+  porque: z
+    .string()
+    .min(1, "Por favor, responda por que essa meta é importante.")
+    .min(10, "Sua reflexão deve ter pelo menos 10 caracteres."),
+  mudanca: z
+    .string()
+    .min(1, "Por favor, responda o que está disposto a ajustar.")
+    .min(10, "Sua reflexão deve ter pelo menos 10 caracteres."),
+  sentimento: z.string().optional(),
+});
+
+// Goal type validation
+export const goalTypeSchema = z.object({
+  tipo: z.enum(["economizar", "reduzir", "quitar", "personalizada"], {
+    required_error: "Por favor, selecione um tipo de meta.",
+  }),
+});
+
+// Goal details validation schema
+export const goalDetailsSchema = z.object({
+  titulo: z
+    .string()
+    .min(1, "O título é obrigatório.")
+    .min(3, "O título deve ter pelo menos 3 caracteres.")
+    .max(100, "O título deve ter no máximo 100 caracteres."),
+  descricao: z
+    .string()
+    .max(500, "A descrição deve ter no máximo 500 caracteres.")
+    .optional(),
+  valor_alvo: z
+    .string()
+    .min(1, "O valor da meta é obrigatório.")
+    .refine((val) => {
+      const num = parseFloat(val.replace(",", "."));
+      return !isNaN(num) && num > 0;
+    }, {
+      message: "O valor deve ser um número positivo.",
+    }),
+  valor_atual: z
+    .string()
+    .optional()
+    .refine((val) => {
+      if (!val || val === "") return true;
+      const num = parseFloat(val.replace(",", "."));
+      return !isNaN(num) && num >= 0;
+    }, {
+      message: "O valor atual deve ser um número válido.",
+    }),
+  prazo: z
+    .string()
+    .min(1, "O prazo é obrigatório.")
+    .refine((val) => {
+      const date = new Date(val);
+      return date > new Date();
+    }, {
+      message: "O prazo deve ser uma data futura.",
+    }),
+  categoria_id: z.string().optional(),
+  cartao_id: z.string().optional(),
+});
+
+// Combined goal form schema (for the full wizard)
+export const goalFormSchema = goalReflectionSchema
+  .merge(goalTypeSchema)
+  .merge(goalDetailsSchema);
+
+// Check-in validation schema
+export const checkInSchema = z.object({
+  humor: z.enum(["positivo", "neutro", "negativo"]).optional(),
+  valor_adicionado: z
+    .string()
+    .optional()
+    .refine((val) => {
+      if (!val || val === "") return true;
+      const num = parseFloat(val.replace(",", "."));
+      return !isNaN(num) && num >= 0;
+    }, {
+      message: "O valor deve ser um número válido.",
+    }),
+  obstaculos: z
+    .string()
+    .max(500, "Os obstáculos devem ter no máximo 500 caracteres.")
+    .optional(),
+  nota: z
+    .string()
+    .max(200, "A nota deve ter no máximo 200 caracteres.")
+    .optional(),
+});
+
 // Type inference for TypeScript
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type RegisterFormData = z.infer<typeof registerSchema>;
 export type FutureLaunchFormData = z.infer<typeof futureLaunchInputSchema>;
 export type FutureLaunchOutputData = z.infer<typeof futureLaunchSchema>;
+export type GoalReflectionFormData = z.infer<typeof goalReflectionSchema>;
+export type GoalTypeFormData = z.infer<typeof goalTypeSchema>;
+export type GoalDetailsFormData = z.infer<typeof goalDetailsSchema>;
+export type GoalFormData = z.infer<typeof goalFormSchema>;
+export type CheckInFormData = z.infer<typeof checkInSchema>;

@@ -14,6 +14,9 @@ import { LoginPage } from "@/pages/authenticated/auth/login";
 import { RegisterPage } from "@/pages/authenticated/auth/register";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import FutureLaunches from "./pages/authenticated/future-launches";
+import GoalsPage from "./pages/authenticated/goals";
+import CreateGoalPage from "./pages/authenticated/goals/create";
+import GoalDetailPage from "./pages/authenticated/goals/[id]";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import LandingPage from "./pages/landing";
 
@@ -50,6 +53,9 @@ const App = () => (
                       <Route path="/transactions" element={<Transactions />} />
                       <Route path="/categories" element={<Categories />} />
                       <Route path="/future-launches" element={<FutureLaunches />} />
+                      <Route path="/goals" element={<GoalsPage />} />
+                      <Route path="/goals/create" element={<CreateGoalPage />} />
+                      <Route path="/goals/:id" element={<GoalDetailPage />} />
                       <Route path="/cards" element={<CardsPage />} />
                       <Route path="*" element={<NotFound />} />
                     </Routes>
