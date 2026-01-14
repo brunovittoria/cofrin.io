@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 import { GoalCard } from "./GoalCard";
 import { Goal } from "@/hooks/api/useGoals";
 
@@ -13,7 +13,7 @@ export const GoalsGrid = ({ goals }: GoalsGridProps) => {
   const navigate = useNavigate();
 
   const handleGoalClick = (id: string) => {
-    navigate(`/goals/${id}`);
+    navigate({ to: "/goals/$id", params: { id } });
   };
 
   return (

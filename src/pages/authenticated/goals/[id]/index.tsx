@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, getRouteApi } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Calendar,
@@ -37,8 +37,10 @@ import {
   getGoalTypeColors,
 } from "@/lib/goalUtils";
 
+const routeApi = getRouteApi("/_authenticated/goals/$id");
+
 export default function GoalDetailPage() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = routeApi.useParams();
   const navigate = useNavigate();
   const [showCheckIn, setShowCheckIn] = useState(false);
 
@@ -48,7 +50,7 @@ export default function GoalDetailPage() {
   const deleteGoal = useDeleteGoal();
 
   const handleBack = () => {
-    navigate("/goals");
+    navigate({ to: "/goals" });
   };
 
   const handleTogglePause = () => {
@@ -63,7 +65,7 @@ export default function GoalDetailPage() {
     if (!goal) return;
     deleteGoal.mutate(goal.id, {
       onSuccess: () => {
-        navigate("/goals");
+        navigate({ to: "/goals" });
       },
     });
   };

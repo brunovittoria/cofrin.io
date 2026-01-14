@@ -5,13 +5,15 @@ import { TransactionMetrics } from "./components/TransactionMetrics";
 import { FilterBar } from "./components/FilterBar";
 import { TransactionTable } from "./components/TransactionTable";
 import { LoadingSkeleton } from "./components/LoadingSkeleton";
-import { useSearchParams } from "react-router-dom";
+import { getRouteApi } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Pagination } from "@/components/ui/pagination";
 import { PaginationButton } from "@/components/PaginationButton";
 
+const routeApi = getRouteApi("/_authenticated/transactions");
+
 export default function Transactions() {
-  const [searchParams] = useSearchParams();
+  const search = routeApi.useSearch();
   const {
     dateRange,
     setDateRange,
@@ -33,11 +35,10 @@ export default function Transactions() {
   } = useTransactionsPage();
 
   useEffect(() => {
-    const category = searchParams.get("categoria");
-    if (category) {
-      setSearchTerm(category);
+    if (search.categoria) {
+      setSearchTerm(search.categoria);
     }
-  }, [searchParams, setSearchTerm]);
+  }, [search.categoria, setSearchTerm]);
 
   useEffect(() => {
     // Reset to page 1 when filters change

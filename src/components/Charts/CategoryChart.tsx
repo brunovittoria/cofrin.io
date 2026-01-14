@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useCategoryData } from "@/hooks/api/useChartData";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExternalLink } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 
 type TooltipPayload = {
   payload: {
@@ -158,9 +158,10 @@ export function CategoryChart({
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    navigate(
-                      `/transacoes?categoria=${encodeURIComponent(entry.name)}`
-                    );
+                    navigate({
+                      to: "/transactions",
+                      search: { categoria: entry.name },
+                    });
                   }}
                 >
                   <ExternalLink size={16} />

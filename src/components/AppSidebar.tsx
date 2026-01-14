@@ -10,8 +10,9 @@ import {
   Sun,
   ArrowLeftRight,
   Target,
+  LogOut,
 } from "lucide-react";
-import { matchPath, NavLink, useLocation } from "react-router-dom";
+import { Link, useLocation } from "@tanstack/react-router";
 import {
   Sidebar,
   SidebarContent,
@@ -26,15 +27,14 @@ import { cn } from "@/lib/utils";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Switch } from "@/components/ui/switch";
 import { useClerk } from "@clerk/clerk-react";
-import { LogOut } from "lucide-react";
 
 const navItems = [
-  { title: "Dashboard", url: "/", icon: BarChart3 },
-  { title: "Transações", url: "/transactions", icon: ArrowLeftRight },
-  { title: "Categorias", url: "/categories", icon: Tag },
-  { title: "Futuros", url: "/future-launches", icon: CalendarClock },
-  { title: "Metas", url: "/goals", icon: Target },
-  { title: "Cartões", url: "/cards", icon: CreditCard },
+  { title: "Dashboard", url: "/dashboard" as const, icon: BarChart3 },
+  { title: "Transações", url: "/transactions" as const, icon: ArrowLeftRight },
+  { title: "Categorias", url: "/categories" as const, icon: Tag },
+  { title: "Futuros", url: "/future-launches" as const, icon: CalendarClock },
+  { title: "Metas", url: "/goals" as const, icon: Target },
+  { title: "Cartões", url: "/cards" as const, icon: CreditCard },
 ];
 
 export function AppSidebar() {
@@ -60,10 +60,9 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu className="space-y-2">
               {navItems.map((item) => {
-                const isActive = !!matchPath(
-                  { path: item.url, end: item.url === "/" },
-                  location.pathname
-                );
+                const isActive = item.url === "/dashboard"
+                  ? location.pathname === "/dashboard"
+                  : location.pathname.startsWith(item.url);
 
                 return (
                   <SidebarMenuItem key={item.title}>
@@ -77,9 +76,8 @@ export function AppSidebar() {
                           "border-primary/30 bg-accent text-primary shadow-[0_12px_28px_-18px_rgba(10,132,255,0.35)]"
                       )}
                     >
-                      <NavLink
+                      <Link
                         to={item.url}
-                        end={item.url === "/"}
                         className="flex w-full items-center gap-3"
                       >
                         <span
@@ -103,7 +101,7 @@ export function AppSidebar() {
                             isActive && "scale-x-100 opacity-100"
                           )}
                         />
-                      </NavLink>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
@@ -135,7 +133,7 @@ export function AppSidebar() {
             )}
           </div>
 
-          <NavLink
+          <Link
             to="/transactions"
             className={cn(
               "group flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground shadow-[0_8px_24px_-18px_rgba(15,23,42,0.22)] transition-all",
@@ -146,7 +144,7 @@ export function AppSidebar() {
               <PlusCircle className="h-4 w-4" />
             </span>
             {!isCollapsed && <span>Nova transação</span>}
-          </NavLink>
+          </Link>
 
           <button
             onClick={() => signOut({ redirectUrl: "/login" })}

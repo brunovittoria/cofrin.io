@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ChevronRight, Menu, X, Moon, Sun, PiggyBank } from "lucide-react";
 import { Button } from "@/components/ui/button";

@@ -1,5 +1,5 @@
 import { Plus, RefreshCw } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 
 interface PageHeaderProps {
@@ -11,7 +11,7 @@ export const PageHeader = ({ onRefresh, isLoading }: PageHeaderProps) => {
   const navigate = useNavigate();
 
   const handleCreateClick = () => {
-    navigate("/goals/create");
+    navigate({ to: "/goals/create" });
   };
 
   return (

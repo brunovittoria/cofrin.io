@@ -1,12 +1,12 @@
 import { Target } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 
 export const EmptyState = () => {
   const navigate = useNavigate();
 
   const handleCreateClick = () => {
-    navigate("/goals/create");
+    navigate({ to: "/goals/create" });
   };
 
   return (

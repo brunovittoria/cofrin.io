@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ArrowLeft, Check } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { useGoalForm, GoalFormStep } from "@/hooks/useGoalForm";
@@ -28,7 +28,7 @@ export default function CreateGoalPage() {
 
   const handleBack = () => {
     if (step === 1) {
-      navigate("/goals");
+      navigate({ to: "/goals" });
     } else {
       setStep((prev) => (prev - 1) as GoalFormStep);
     }
@@ -40,7 +40,7 @@ export default function CreateGoalPage() {
       createGoal.mutate(submitData, {
         onSuccess: () => {
           resetForm();
-          navigate("/goals");
+          navigate({ to: "/goals" });
         },
       });
     } else {

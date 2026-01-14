@@ -5,11 +5,13 @@ import { SummaryCards } from "./components/SummaryCards";
 import { FilterBar } from "./components/FilterBar";
 import { EntriesTable } from "./components/EntriesTable";
 import { LoadingSkeleton } from "./components/LoadingSkeleton";
-import { useSearchParams } from "react-router-dom";
+import { getRouteApi } from "@tanstack/react-router";
 import { useEffect } from "react";
 
+const routeApi = getRouteApi("/_authenticated/incomes");
+
 export default function Incomes() {
-  const [searchParams] = useSearchParams();
+  const search = routeApi.useSearch();
   const {
     dateRange,
     setDateRange,
@@ -23,11 +25,10 @@ export default function Incomes() {
   } = useIncomesPage();
 
   useEffect(() => {
-    const category = searchParams.get("categoria");
-    if (category) {
-      setSearchTerm(category);
+    if (search.categoria) {
+      setSearchTerm(search.categoria);
     }
-  }, [searchParams, setSearchTerm]);
+  }, [search.categoria, setSearchTerm]);
 
   if (isLoading) {
     return (

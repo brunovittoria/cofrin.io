@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Check, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
