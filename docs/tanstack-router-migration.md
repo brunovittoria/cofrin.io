@@ -14,6 +14,15 @@ navigate("/transactoins"); // ❌ Typo won't be caught
 navigate({ to: "/transactions" }); // ✅ TypeScript knows all valid routes
 ```
 
+When you type navigate({ to: " your IDE will show autocomplete with all valid routes:
+
+````
+/
+/login
+/register
+/cards
+````
+
 ### 2. Type-Safe Search Parameters
 
 React Router treats search params as an afterthought - just a `URLSearchParams` object with string values. TanStack Router makes search params **first-class citizens** with full type safety and validation.

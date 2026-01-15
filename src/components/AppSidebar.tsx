@@ -11,6 +11,7 @@ import {
   ArrowLeftRight,
   Target,
   LogOut,
+  Settings,
 } from "lucide-react";
 import { Link, useLocation } from "@tanstack/react-router";
 import {
@@ -35,6 +36,7 @@ const navItems = [
   { title: "Futuros", url: "/future-launches" as const, icon: CalendarClock },
   { title: "Metas", url: "/goals" as const, icon: Target },
   { title: "Cartões", url: "/cards" as const, icon: CreditCard },
+  { title: "Configurações", url: "/settings" as const, icon: Settings },
 ];
 
 export function AppSidebar() {

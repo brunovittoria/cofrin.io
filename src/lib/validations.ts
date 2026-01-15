@@ -173,6 +173,60 @@ export const checkInSchema = z.object({
     .optional(),
 });
 
+// Settings - Personal Info validation schema
+export const personalInfoSchema = z.object({
+  firstName: z
+    .string()
+    .min(1, "O nome é obrigatório.")
+    .min(2, "O nome deve ter pelo menos 2 caracteres.")
+    .max(50, "O nome deve ter no máximo 50 caracteres."),
+  lastName: z
+    .string()
+    .min(1, "O sobrenome é obrigatório.")
+    .min(2, "O sobrenome deve ter pelo menos 2 caracteres.")
+    .max(50, "O sobrenome deve ter no máximo 50 caracteres."),
+  birthDate: z.string().optional(),
+  phone: z
+    .string()
+    .max(20, "O telefone deve ter no máximo 20 caracteres.")
+    .optional(),
+});
+
+// Settings - Address validation schema
+export const addressSchema = z.object({
+  country: z
+    .string()
+    .min(1, "O país é obrigatório.")
+    .max(50, "O país deve ter no máximo 50 caracteres."),
+  city: z
+    .string()
+    .min(1, "A cidade é obrigatória.")
+    .max(100, "A cidade deve ter no máximo 100 caracteres."),
+  postalCode: z
+    .string()
+    .min(1, "O CEP é obrigatório.")
+    .max(20, "O CEP deve ter no máximo 20 caracteres."),
+});
+
+// Settings - Change Password validation schema
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "A senha atual é obrigatória."),
+    newPassword: z
+      .string()
+      .min(1, "A nova senha é obrigatória.")
+      .min(8, "A senha deve ter pelo menos 8 caracteres.")
+      .regex(/[A-Z]/, "A senha deve conter pelo menos uma letra maiúscula.")
+      .regex(/[a-z]/, "A senha deve conter pelo menos uma letra minúscula.")
+      .regex(/\d/, "A senha deve conter pelo menos um número.")
+      .regex(/[^A-Za-z0-9]/, "A senha deve conter pelo menos um caractere especial."),
+    confirmPassword: z.string().min(1, "Por favor, confirme sua nova senha."),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "As senhas não coincidem.",
+    path: ["confirmPassword"],
+  });
+
 // Type inference for TypeScript
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type RegisterFormData = z.infer<typeof registerSchema>;
@@ -183,3 +237,6 @@ export type GoalTypeFormData = z.infer<typeof goalTypeSchema>;
 export type GoalDetailsFormData = z.infer<typeof goalDetailsSchema>;
 export type GoalFormData = z.infer<typeof goalFormSchema>;
 export type CheckInFormData = z.infer<typeof checkInSchema>;
+export type PersonalInfoFormData = z.infer<typeof personalInfoSchema>;
+export type AddressFormData = z.infer<typeof addressSchema>;
+export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
