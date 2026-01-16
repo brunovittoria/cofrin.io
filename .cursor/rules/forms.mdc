@@ -1,0 +1,332 @@
+---
+description: Form patterns using React Hook Form, Zod validation, and custom form hooks for the Cofrinio project.
+globs: **/*Form*.tsx,**/*Form*.ts,**/*Field*.tsx,**/*Modal*.tsx
+alwaysApply: true
+---
+
+# Forms Rules
+
+## Form Architecture
+
+### Two Form Approaches
+
+This project supports two form patterns:
+
+1. **Custom Form Hooks** (current pattern) - Simple forms with custom `use*Form` hooks
+2. **React Hook Form + Zod** - Complex forms with schema validation
+
+## Custom Form Hooks Pattern (Preferred for Simple Forms)
+
+### Hook Structure
+
+```tsx
+interface CategoryFormData {
+  nome: string;
+  descricao: string;
+  tipo: string;
+  cor_hex: string;
+}
+
+interface UseCategoryFormProps {
+  mode: "create" | "edit";
+  category?: Category;
+  defaultType?: string;
+}
+
+export const useCategoryForm = ({ mode, category, defaultType }: UseCategoryFormProps) => {
+  const [formData, setFormData] = useState<CategoryFormData>(() =>
+    getInitialFormState(mode, category, defaultType)
+  );
+
+  const updateField = (field: keyof CategoryFormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const resetForm = () => {
+    setFormData(getInitialFormState("create", undefined, defaultType));
+  };
+
+  const initializeEditMode = () => {
+    if (mode === "edit" && category) {
+      setFormData(getInitialFormState("edit", category, defaultType));
+    }
+  };
+
+  const getSubmitData = () => {
+    // Transform formData to API format
+  };
+
+  return { formData, updateField, resetForm, initializeEditMode, getSubmitData };
+};
+```
+
+### Usage in Components
+
+```tsx
+const { formData, updateField, resetForm, getSubmitData } = useCategoryForm({
+  mode,
+  category,
+  defaultType,
+});
+
+const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
+  const submitData = getSubmitData();
+  
+  if (mode === "edit") {
+    updateMutation.mutate(submitData, {
+      onSuccess: () => setOpen(false),
+    });
+    return;
+  }
+
+  createMutation.mutate(submitData, {
+    onSuccess: () => {
+      setOpen(false);
+      resetForm();
+    },
+  });
+};
+```
+
+## React Hook Form + Zod Pattern (Complex Forms)
+
+### Schema Definition
+
+```tsx
+import { z } from "zod";
+
+export const categorySchema = z.object({
+  nome: z.string().min(1, "Nome é obrigatório").max(100, "Nome muito longo"),
+  descricao: z.string().max(500, "Descrição muito longa").optional(),
+  tipo: z.enum(["receita", "despesa"], {
+    required_error: "Selecione um tipo",
+  }),
+  cor_hex: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Cor inválida"),
+});
+
+export type CategoryFormData = z.infer<typeof categorySchema>;
+```
+
+### Form Setup
+
+```tsx
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const form = useForm<CategoryFormData>({
+  resolver: zodResolver(categorySchema),
+  defaultValues: {
+    nome: "",
+    descricao: "",
+    tipo: undefined,
+    cor_hex: "#6366f1",
+  },
+});
+```
+
+### Form Component with Shadcn
+
+```tsx
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+<Form {...form}>
+  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+    <FormField
+      control={form.control}
+      name="nome"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Nome da Categoria</FormLabel>
+          <FormControl>
+            <Input placeholder="Ex: Alimentação" {...field} />
+          </FormControl>
+          <FormDescription>
+            Digite um nome único para a categoria.
+          </FormDescription>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  </form>
+</Form>
+```
+
+## Field Components
+
+### Naming Convention
+- Follow pattern: `{Entity}{FieldName}Field.tsx`
+- Examples: `CategoryNameField.tsx`, `ExpenseValueField.tsx`
+
+### Props Pattern
+
+```tsx
+interface CategoryNameFieldProps {
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+  disabled?: boolean;
+}
+
+export const CategoryNameField = ({ 
+  value, 
+  onChange, 
+  error, 
+  disabled 
+}: CategoryNameFieldProps) => {
+  return (
+    <div className={fieldWrapper}>
+      <Label htmlFor="nome" className={labelClass}>
+        Nome da Categoria
+      </Label>
+      <Input
+        id="nome"
+        placeholder="Ex: Alimentação"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        required
+        disabled={disabled}
+        className={cn(controlClass, error && "border-red-500")}
+        aria-describedby={error ? "nome-error" : undefined}
+        aria-invalid={!!error}
+      />
+      {error && (
+        <p id="nome-error" className="mt-1 text-sm text-red-500">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+};
+```
+
+### Consistent Field Styling
+
+```tsx
+const fieldWrapper =
+  "group rounded-2xl border border-[#E4E8F4] bg-[rgba(249,250,255,0.9)] p-4 transition-all duration-200 hover:border-[#C6D4FF] hover:bg-white focus-within:border-[#0A84FF] focus-within:bg-white shadow-[0_24px_48px_-30px_rgba(10,132,255,0.22)]";
+
+const labelClass = 
+  "text-xs font-semibold uppercase tracking-[0.18em] text-[#6B7280]";
+
+const controlClass =
+  "mt-3 h-11 rounded-xl border border-[#E2E8F0] bg-white px-4 text-sm text-[#0F172A] placeholder:text-[#9CA3AF] focus-visible:ring-[#0A84FF]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white";
+```
+
+## Form Actions Component
+
+```tsx
+interface FormActionsProps {
+  mode: "create" | "edit";
+  isCreating: boolean;
+  isUpdating: boolean;
+  onCancel: () => void;
+}
+
+export const FormActions = ({
+  mode,
+  isCreating,
+  isUpdating,
+  onCancel,
+}: FormActionsProps) => {
+  const isPending = mode === "edit" ? isUpdating : isCreating;
+  const buttonText = mode === "edit" ? "Salvar Alterações" : "Criar";
+  const loadingText = mode === "edit" ? "Salvando..." : "Criando...";
+
+  return (
+    <div className="flex justify-end gap-3 pt-2">
+      <Button 
+        type="button" 
+        variant="outline" 
+        onClick={onCancel}
+        disabled={isPending}
+      >
+        Cancelar
+      </Button>
+      <Button type="submit" disabled={isPending}>
+        {isPending ? loadingText : buttonText}
+      </Button>
+    </div>
+  );
+};
+```
+
+## Validation Rules
+
+### Zod Schema Patterns
+
+```tsx
+// Required string
+nome: z.string().min(1, "Campo obrigatório")
+
+// Optional string with max length
+descricao: z.string().max(500).optional()
+
+// Numeric value (from string input)
+valor: z.coerce.number().positive("Valor deve ser positivo")
+
+// Date
+data: z.date({ required_error: "Selecione uma data" })
+
+// Enum/Select
+tipo: z.enum(["receita", "despesa"], {
+  required_error: "Selecione um tipo",
+})
+
+// Email
+email: z.string().email("Email inválido")
+
+// Conditional validation
+schema.refine(
+  (data) => data.tipo === "despesa" ? data.categoria_id !== undefined : true,
+  { message: "Categoria é obrigatória para despesas", path: ["categoria_id"] }
+)
+```
+
+## Form Submission
+
+### With API Hooks
+
+```tsx
+const createCategory = useCreateCategory();
+const updateCategory = useUpdateCategory();
+
+const handleSubmit = (data: CategoryFormData) => {
+  if (mode === "edit" && categoryId) {
+    updateCategory.mutate(
+      { id: categoryId, ...data },
+      {
+        onSuccess: () => {
+          setOpen(false);
+          form.reset();
+        },
+      }
+    );
+    return;
+  }
+
+  createCategory.mutate(data, {
+    onSuccess: () => {
+      setOpen(false);
+      form.reset();
+    },
+  });
+};
+```
+
+## Accessibility
+
+- Always associate labels with inputs via `htmlFor` and `id`
+- Include `aria-describedby` for error messages
+- Use `aria-invalid` when field has errors
+- Disable submit button during pending mutations
+- Show loading states on buttons
+- Use `required` attribute for required fields

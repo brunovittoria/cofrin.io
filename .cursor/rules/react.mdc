@@ -1,0 +1,283 @@
+---
+description: React component patterns, hooks usage, TypeScript, and best practices for the Cofrinio project.
+globs: **/*.jsx,**/*.tsx,**/*.ts
+alwaysApply: false
+---
+
+# React Rules
+
+## Component Patterns
+
+- Use functional components with hooks instead of class components
+- Use `const` arrow functions for component definitions
+- Use custom hooks (`use*`) to encapsulate reusable logic
+- Prefer composition over inheritance
+- Use fragments (`<>...</>`) to avoid unnecessary DOM elements
+- Use proper list rendering with unique `key` props
+- Use `React.memo` for performance optimization only when necessary
+
+## TypeScript Guidelines
+
+### Strict Typing
+- **Avoid `any`**: Never use `any` in type definitions. Use specific types that express intent clearly.
+- Use TypeScript `strict` mode
+- Prefer `interface` for object shapes, `type` for unions and complex types
+- Export types alongside their related hooks/components
+
+```tsx
+// ✅ Good: Explicit types exported with the hook
+export type Category = {
+  id: number;
+  nome: string;
+  descricao?: string;
+  tipo?: string;
+  cor_hex?: string;
+  created_at: string;
+};
+
+export type NewCategory = {
+  nome: string;
+  descricao?: string;
+  tipo: string;
+  cor_hex: string;
+};
+```
+
+### Props Typing
+- Define explicit interfaces for component props
+- Use optional props (`?`) for non-required values
+- Prefer `React.ReactNode` for children props
+
+```tsx
+// ✅ Good: Clear prop interface
+interface CategoryModalProps {
+  trigger?: React.ReactNode;
+  defaultType?: string;
+  mode?: "create" | "edit";
+  category?: Category;
+}
+```
+
+### Event Handler Naming
+- Prefix event handlers with `handle` (e.g., `handleClick`, `handleSubmit`, `handleOpenChange`)
+- Use proper event types from React
+
+```tsx
+const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
+  // ...
+};
+
+const handleOpenChange = (next: boolean) => {
+  setOpen(next);
+};
+```
+
+## Custom Hooks
+
+### Structure
+- Hooks should be in `src/hooks/` directory
+- API hooks in `src/hooks/api/` subdirectory
+- Form hooks follow pattern: `use{Entity}Form.ts`
+- Page hooks follow pattern: `use{Entity}Page.ts`
+
+### API Hooks Pattern (TanStack Query)
+- Use `useQuery` for data fetching
+- Use `useMutation` for create/update/delete operations
+- Invalidate queries on successful mutations
+- Show toast notifications for user feedback
+
+```tsx
+// ✅ Good: Standard API hook pattern
+export const useCategories = (tipo?: string) => {
+  return useQuery({
+    queryKey: ['categories', tipo],
+    queryFn: async () => {
+      let query = supabase.from('categorias').select('*');
+      if (tipo) {
+        query = query.eq('tipo', tipo);
+      }
+      const { data, error } = await query.order('nome');
+      if (error) throw error;
+      return data as Category[];
+    },
+  });
+};
+
+export const useCreateCategory = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (category: NewCategory) => {
+      const { data, error } = await supabase
+        .from('categorias')
+        .insert(category)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      toast({
+        title: "Categoria criada",
+        description: "A categoria foi criada com sucesso.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erro ao criar categoria",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+};
+```
+
+### Form Hooks Pattern
+- Encapsulate form state and logic in custom hooks
+- Return `formData`, `updateField`, `resetForm`, and submission helpers
+- Handle both create and edit modes
+
+```tsx
+// ✅ Good: Form hook pattern
+export const useCategoryForm = ({ mode, category, defaultType }: UseCategoryFormProps) => {
+  const [formData, setFormData] = useState<CategoryFormData>(() =>
+    getInitialFormState(mode, category, defaultType)
+  );
+
+  const updateField = (field: keyof CategoryFormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const resetForm = () => {
+    setFormData(getInitialFormState("create", undefined, defaultType));
+  };
+
+  return { formData, updateField, resetForm, getSubmitData };
+};
+```
+
+## Component Structure
+
+### Modal/Dialog Pattern
+- Use controlled `open` state
+- Separate field components into `./components/` subdirectory
+- Use form hooks for state management
+- Handle both create and edit modes
+
+```
+src/components/dialogs/category-modal/
+├── index.tsx              # Main modal component
+└── components/
+    ├── CategoryNameField.tsx
+    ├── CategoryTypeField.tsx
+    ├── CategoryColorField.tsx
+    └── FormActions.tsx
+```
+
+### Field Components
+- Accept `value` and `onChange` props
+- Apply consistent styling classes
+- Include proper labels and accessibility attributes
+
+```tsx
+interface CategoryNameFieldProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+export const CategoryNameField = ({ value, onChange }: CategoryNameFieldProps) => {
+  return (
+    <div className={fieldWrapper}>
+      <Label htmlFor="nome" className={labelClass}>
+        Nome da Categoria
+      </Label>
+      <Input
+        id="nome"
+        placeholder="Ex: Alimentação"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        required
+        className={controlClass}
+      />
+    </div>
+  );
+};
+```
+
+## Accessibility
+
+- Include proper `htmlFor` on labels linking to input `id`
+- Use `aria-label` for icon-only buttons
+- Add `tabIndex={0}` to interactive non-button elements
+- Use semantic HTML elements (`<button>`, `<form>`, `<nav>`)
+- Include `aria-describedby` for form validation messages
+
+## State Management
+
+- Use `useState` for local component state
+- Use TanStack Query for server state
+- Use Zustand for global client state (UI state, user preferences, etc.)
+- Prefer lifting state up or prop drilling over premature global state usage
+
+### Zustand Store Pattern
+
+```tsx
+// ✅ Good: Simple Zustand store
+import { create } from 'zustand';
+
+interface UIState {
+  sidebarOpen: boolean;
+  selectedMonth: Date;
+  toggleSidebar: () => void;
+  setSidebarOpen: (open: boolean) => void;
+  setSelectedMonth: (date: Date) => void;
+}
+
+export const useUIStore = create<UIState>((set) => ({
+  sidebarOpen: true,
+  selectedMonth: new Date(),
+  toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+  setSidebarOpen: (open) => set({ sidebarOpen: open }),
+  setSelectedMonth: (date) => set({ selectedMonth: date }),
+}));
+
+// Usage in components
+const { sidebarOpen, toggleSidebar } = useUIStore();
+
+// Or select specific slice to avoid unnecessary re-renders
+const sidebarOpen = useUIStore((state) => state.sidebarOpen);
+```
+
+### When to Use Each
+
+| State Type | Solution |
+|------------|----------|
+| Local component state | `useState` |
+| Server/async data | TanStack Query |
+| Global UI state | Zustand |
+| Form state | Custom form hooks or React Hook Form |
+
+## Performance
+
+- Use early returns to reduce nesting and improve readability
+- Avoid inline object/array creation in render when used as deps
+- Use `useMemo`/`useCallback` only when profiling shows a need
+- Keep components focused and small (prefer composition)
+
+## Imports
+
+- Group imports: React → External libs → Internal components → Hooks → Types → Utils
+- Use absolute imports with `@/` prefix
+
+```tsx
+import { useState } from "react";
+import { Plus } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { useCreateCategory, type Category } from "@/hooks/api/useCategories";
+import { useCategoryForm } from "@/hooks/useCategoryForm";
+```

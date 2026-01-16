@@ -1,0 +1,395 @@
+---
+description: Backend standards for NestJS + TypeScript + Prisma/Postgres REST API (future implementation).
+globs: apps/**/*.ts,libs/**/*.ts,**/schema.prisma,**/*.dto.ts,**/*.service.ts,**/*.controller.ts,**/*.module.ts
+alwaysApply: false
+---
+
+# NestJS Backend Rules
+
+> Note: This project currently uses Supabase as the backend. These rules are for the future NestJS migration.
+
+## Architecture
+
+### Project Structure
+
+```
+src/
+├── modules/
+│   ├── categories/
+│   │   ├── categories.module.ts
+│   │   ├── categories.controller.ts
+│   │   ├── categories.service.ts
+│   │   ├── dto/
+│   │   │   ├── create-category.dto.ts
+│   │   │   ├── update-category.dto.ts
+│   │   │   └── category-response.dto.ts
+│   │   └── entities/
+│   │       └── category.entity.ts
+│   └── ...
+├── common/
+│   ├── decorators/
+│   ├── filters/
+│   ├── guards/
+│   ├── interceptors/
+│   └── pipes/
+├── config/
+├── prisma/
+│   ├── prisma.module.ts
+│   ├── prisma.service.ts
+│   └── schema.prisma
+└── main.ts
+```
+
+### Module Organization
+- **Domain-first modules**: Organize by feature/domain (categories, expenses, incomes)
+- Export only what's needed from modules
+- Avoid circular dependencies between modules
+- Use a shared `CommonModule` for cross-cutting concerns
+
+## TypeScript Guidelines
+
+### Strict Typing
+- Enable TypeScript `strict` mode
+- **Avoid `any`** unless absolutely necessary and justified with a comment
+- Use `readonly` for immutable properties
+- Prefer narrow types over broad ones
+
+```typescript
+// ✅ Good: Specific types
+interface CreateCategoryDto {
+  readonly nome: string;
+  readonly descricao?: string;
+  readonly tipo: 'receita' | 'despesa';
+  readonly cor_hex: string;
+}
+
+// ❌ Bad: Using any
+interface CreateCategoryDto {
+  nome: any;
+  data: Record<string, any>;
+}
+```
+
+### DTO Patterns
+
+```typescript
+// create-category.dto.ts
+import { IsString, IsOptional, IsEnum, MaxLength, Matches } from 'class-validator';
+
+export class CreateCategoryDto {
+  @IsString()
+  @MaxLength(100)
+  readonly nome: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  readonly descricao?: string;
+
+  @IsEnum(['receita', 'despesa'])
+  readonly tipo: 'receita' | 'despesa';
+
+  @Matches(/^#[0-9A-Fa-f]{6}$/)
+  readonly cor_hex: string;
+}
+
+// update-category.dto.ts
+import { PartialType } from '@nestjs/mapped-types';
+
+export class UpdateCategoryDto extends PartialType(CreateCategoryDto) {}
+```
+
+## Controllers
+
+### REST API Conventions
+- Use proper HTTP methods: `GET`, `POST`, `PATCH`, `DELETE`
+- Return appropriate status codes (201 for creation, 204 for deletion)
+- Use resource-based URLs (`/categories`, `/expenses`)
+- Keep controllers thin - delegate logic to services
+
+```typescript
+@Controller('categories')
+export class CategoriesController {
+  constructor(private readonly categoriesService: CategoriesService) {}
+
+  @Get()
+  findAll(@Query('tipo') tipo?: string) {
+    return this.categoriesService.findAll(tipo);
+  }
+
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.categoriesService.findOne(id);
+  }
+
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  create(@Body() createCategoryDto: CreateCategoryDto) {
+    return this.categoriesService.create(createCategoryDto);
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateCategoryDto: UpdateCategoryDto,
+  ) {
+    return this.categoriesService.update(id, updateCategoryDto);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.categoriesService.remove(id);
+  }
+}
+```
+
+## Services
+
+### Business Logic
+- Services contain all business logic
+- Handle errors and throw appropriate exceptions
+- Use transactions for multi-step operations
+
+```typescript
+@Injectable()
+export class CategoriesService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async findAll(tipo?: string) {
+    return this.prisma.categoria.findMany({
+      where: tipo ? { tipo } : undefined,
+      orderBy: { nome: 'asc' },
+    });
+  }
+
+  async findOne(id: number) {
+    const category = await this.prisma.categoria.findUnique({
+      where: { id },
+    });
+
+    if (!category) {
+      throw new NotFoundException(`Category with ID ${id} not found`);
+    }
+
+    return category;
+  }
+
+  async create(data: CreateCategoryDto) {
+    return this.prisma.categoria.create({ data });
+  }
+
+  async update(id: number, data: UpdateCategoryDto) {
+    await this.findOne(id); // Ensure exists
+    
+    return this.prisma.categoria.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async remove(id: number) {
+    await this.findOne(id); // Ensure exists
+    
+    await this.prisma.categoria.delete({
+      where: { id },
+    });
+  }
+}
+```
+
+## Prisma + PostgreSQL
+
+### Schema Best Practices
+- Prisma schema and migrations are authoritative (don't edit migration history)
+- Prefer database constraints (NOT NULL, UNIQUE, FK with `ON DELETE`)
+- Use meaningful model and field names
+
+```prisma
+model Categoria {
+  id         Int       @id @default(autoincrement())
+  nome       String    @db.VarChar(100)
+  descricao  String?   @db.VarChar(500)
+  tipo       String    @db.VarChar(20)
+  cor_hex    String    @db.VarChar(7)
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+
+  despesas   Despesa[]
+  receitas   Receita[]
+
+  @@map("categorias")
+}
+```
+
+### Transactions
+- Keep transactions short
+- Use `prisma.$transaction` for atomic operations
+
+```typescript
+async transferBetweenCategories(fromId: number, toId: number, expenseIds: number[]) {
+  return this.prisma.$transaction(async (tx) => {
+    await tx.despesa.updateMany({
+      where: { id: { in: expenseIds }, categoria_id: fromId },
+      data: { categoria_id: toId },
+    });
+
+    return tx.categoria.findUnique({ where: { id: toId } });
+  });
+}
+```
+
+### Indexes
+- Add indexes for frequently queried/filtered fields
+- Document index rationale in migration notes
+
+```prisma
+model Despesa {
+  // ...fields
+
+  @@index([user_id, data])
+  @@index([categoria_id])
+  @@map("despesas")
+}
+```
+
+## Validation
+
+### Global Validation Pipe
+Configure in `main.ts`:
+
+```typescript
+app.useGlobalPipes(
+  new ValidationPipe({
+    whitelist: true,           // Strip non-whitelisted properties
+    forbidNonWhitelisted: true, // Throw on non-whitelisted properties
+    transform: true,           // Transform payloads to DTO instances
+    transformOptions: {
+      enableImplicitConversion: true,
+    },
+  }),
+);
+```
+
+## Error Handling
+
+### Exception Filters
+- Use built-in NestJS exceptions (`NotFoundException`, `BadRequestException`, etc.)
+- Create custom exception filter for consistent error responses
+
+```typescript
+// Standard error response format
+{
+  "statusCode": 404,
+  "message": "Category with ID 123 not found",
+  "error": "Not Found",
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "path": "/api/categories/123"
+}
+```
+
+### Service Error Handling
+
+```typescript
+async findOne(id: number) {
+  const category = await this.prisma.categoria.findUnique({
+    where: { id },
+  });
+
+  if (!category) {
+    throw new NotFoundException(`Category with ID ${id} not found`);
+  }
+
+  return category;
+}
+```
+
+## Authentication & Authorization
+
+### Guards
+- Use `@UseGuards()` decorator for protected routes
+- Implement JWT-based authentication
+- Use custom decorators for extracting user info
+
+```typescript
+@Controller('categories')
+@UseGuards(JwtAuthGuard)
+export class CategoriesController {
+  @Get()
+  findAll(@CurrentUser() user: User) {
+    return this.categoriesService.findAllForUser(user.id);
+  }
+}
+```
+
+## Testing
+
+### Unit Tests
+- Test services with mocked Prisma client
+- Focus on business logic validation
+
+```typescript
+describe('CategoriesService', () => {
+  let service: CategoriesService;
+  let prisma: DeepMockProxy<PrismaClient>;
+
+  beforeEach(async () => {
+    const module = await Test.createTestingModule({
+      providers: [
+        CategoriesService,
+        { provide: PrismaService, useValue: mockDeep<PrismaClient>() },
+      ],
+    }).compile();
+
+    service = module.get(CategoriesService);
+    prisma = module.get(PrismaService);
+  });
+
+  it('should throw NotFoundException when category not found', async () => {
+    prisma.categoria.findUnique.mockResolvedValue(null);
+
+    await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
+  });
+});
+```
+
+### Integration Tests
+- Test full request/response cycles
+- Use ephemeral test database with migrations applied
+
+```typescript
+describe('Categories (e2e)', () => {
+  let app: INestApplication;
+
+  beforeAll(async () => {
+    const moduleFixture = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+
+    app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+    await app.init();
+  });
+
+  it('/categories (POST) should create a category', () => {
+    return request(app.getHttpServer())
+      .post('/categories')
+      .send({ nome: 'Test', tipo: 'despesa', cor_hex: '#FF0000' })
+      .expect(201)
+      .expect((res) => {
+        expect(res.body.nome).toBe('Test');
+      });
+  });
+});
+```
+
+## PR Checklist
+
+- [ ] DTOs have proper validation decorators
+- [ ] Controllers are thin, services handle business logic
+- [ ] New endpoints have proper HTTP status codes
+- [ ] Database changes include migrations with rationale
+- [ ] Indexes added for new query patterns
+- [ ] Unit tests for service methods
+- [ ] Integration tests for new endpoints
+- [ ] Error handling uses NestJS exceptions
