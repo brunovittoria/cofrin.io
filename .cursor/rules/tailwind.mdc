@@ -52,3 +52,11 @@ alwaysApply: false
   <div>Item 2</div>
 </div>
 ```
+
+## Documentation References
+
+| Technology | Documentation |
+|------------|---------------|
+| Tailwind CSS | https://tailwindcss.com/docs |
+| Tailwind Plus UI Blocks | https://tailwindcss.com/plus/ui-blocks/documentation |
+| Shadcn UI | https://ui.shadcn.com/docs |

@@ -6,6 +6,55 @@ alwaysApply: false
 
 # React Rules
 
+## Code Standards
+
+### Language
+- **All code must be written in English** (variables, functions, types, file names)
+- User-facing strings (labels, messages) can be in Portuguese for this project
+
+```typescript
+// ✅ Good: English code
+const handleSubmit = (e: React.FormEvent) => { ... }
+const isLoading = true;
+const categoryList = [];
+
+// ❌ Bad: Portuguese code
+const aoEnviar = (e: React.FormEvent) => { ... }
+const estaCarregando = true;
+const listaDeCategorias = [];
+```
+
+### Comments
+- **Avoid inline comments** - code should be self-documenting
+- Use clear, descriptive names instead of comments
+- JSDoc is acceptable for complex utility functions or public APIs
+- TODO comments are allowed for tracking pending work
+
+```typescript
+// ❌ Bad: Comment explaining obvious code
+// Set the user name
+setUserName(name);
+
+// ✅ Good: Self-documenting code
+const handleUserNameChange = (newName: string) => {
+  setUserName(newName);
+};
+
+// ✅ Acceptable: TODO for tracking
+// TODO: Add validation for email format
+```
+
+### Naming Conventions
+
+| Type | Convention | Example |
+|------|------------|---------|
+| Components | PascalCase | `CategoryModal`, `UserProfile` |
+| Hooks | camelCase with `use` prefix | `useCategories`, `useCategoryForm` |
+| Event handlers | camelCase with `handle` prefix | `handleSubmit`, `handleClick` |
+| Boolean variables | camelCase with `is`/`has`/`can` prefix | `isLoading`, `hasError`, `canEdit` |
+| Constants | SCREAMING_SNAKE_CASE | `API_URL`, `MAX_RETRIES` |
+| Types/Interfaces | PascalCase | `Category`, `CreateCategoryDto` |
+
 ## Component Patterns
 
 - Use functional components with hooks instead of class components
@@ -281,3 +330,13 @@ import { Button } from "@/components/ui/button";
 import { useCreateCategory, type Category } from "@/hooks/api/useCategories";
 import { useCategoryForm } from "@/hooks/useCategoryForm";
 ```
+
+## Documentation References
+
+| Technology | Documentation |
+|------------|---------------|
+| React | https://react.dev/learn |
+| TypeScript | https://www.typescriptlang.org/docs/ |
+| TanStack Query | https://tanstack.com/query/latest/docs/react/overview |
+| Zustand | https://zustand-demo.pmnd.rs/ |
+| Supabase | https://supabase.com/docs |

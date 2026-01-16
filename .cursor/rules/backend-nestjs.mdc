@@ -8,6 +8,50 @@ alwaysApply: false
 
 > Note: This project currently uses Supabase as the backend. These rules are for the future NestJS migration.
 
+## Request Lifecycle
+
+Understanding the NestJS request lifecycle is essential for placing logic in the correct part of the pipeline.
+
+```
+Request → Middleware → Guards → Interceptors (before) → Pipes → Handler → Interceptors (after) → Exception Filters → Response
+```
+
+| Component | Purpose | Access |
+|-----------|---------|--------|
+| Middleware | Logging, CORS, body parsing | Request/Response only |
+| Guards | Authorization, authentication | ExecutionContext |
+| Interceptors | Transform request/response, logging, caching | ExecutionContext + RxJS |
+| Pipes | Validation, transformation of input data | ArgumentMetadata |
+| Exception Filters | Catch and format errors | ArgumentsHost |
+
+## NestJS CLI
+
+Use the CLI for consistent scaffolding:
+
+```bash
+# Create new module with controller and service
+nest g module categories
+nest g controller categories --no-spec
+nest g service categories --no-spec
+
+# Generate with tests
+nest g service categories
+
+# Generate a complete resource (module + controller + service + dto)
+nest g resource categories
+```
+
+Configure `nest-cli.json` for project settings:
+
+```json
+{
+  "compilerOptions": {
+    "plugins": ["@nestjs/swagger"]
+  },
+  "sourceRoot": "src"
+}
+```
+
 ## Architecture
 
 ### Project Structure
@@ -45,6 +89,66 @@ src/
 - Export only what's needed from modules
 - Avoid circular dependencies between modules
 - Use a shared `CommonModule` for cross-cutting concerns
+
+### Module Patterns
+
+**Feature Module** (domain-specific):
+
+```typescript
+@Module({
+  imports: [PrismaModule],
+  controllers: [CategoriesController],
+  providers: [CategoriesService],
+  exports: [CategoriesService],
+})
+export class CategoriesModule {}
+```
+
+**Core Module** (global, loaded once):
+
+```typescript
+@Global()
+@Module({
+  imports: [ConfigModule, PrismaModule],
+  providers: [LoggerService],
+  exports: [LoggerService],
+})
+export class CoreModule {
+  constructor(@Optional() @SkipSelf() parentModule: CoreModule) {
+    if (parentModule) {
+      throw new Error('CoreModule already loaded. Import only in AppModule.');
+    }
+  }
+}
+```
+
+**Dynamic Module** (configurable):
+
+```typescript
+@Module({})
+export class DatabaseModule {
+  static forRoot(options: DatabaseOptions): DynamicModule {
+    return {
+      module: DatabaseModule,
+      global: true,
+      providers: [
+        { provide: DATABASE_OPTIONS, useValue: options },
+        DatabaseService,
+      ],
+      exports: [DatabaseService],
+    };
+  }
+}
+```
+
+### Module Anti-Patterns to Avoid
+
+| Anti-Pattern | Problem | Solution |
+|--------------|---------|----------|
+| God Module | One module doing everything | Split by domain/feature |
+| Circular Dependencies | ModuleA imports ModuleB imports ModuleA | Use events or shared abstractions |
+| Tight Coupling | Domain modules importing each other directly | Use interfaces and dependency injection |
+| Over-exporting | Exporting everything from a module | Export only what other modules need |
 
 ## TypeScript Guidelines
 
@@ -148,8 +252,10 @@ export class CategoriesController {
 
 ### Business Logic
 - Services contain all business logic
+- **All service methods MUST have try-catch blocks** for proper error handling
 - Handle errors and throw appropriate exceptions
 - Use transactions for multi-step operations
+- All methods receive parameters exclusively through DTOs (never inline objects)
 
 ```typescript
 @Injectable()
@@ -157,46 +263,77 @@ export class CategoriesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(tipo?: string) {
-    return this.prisma.categoria.findMany({
-      where: tipo ? { tipo } : undefined,
-      orderBy: { nome: 'asc' },
-    });
+    try {
+      return await this.prisma.categoria.findMany({
+        where: tipo ? { tipo } : undefined,
+        orderBy: { nome: 'asc' },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to fetch categories');
+    }
   }
 
   async findOne(id: number) {
-    const category = await this.prisma.categoria.findUnique({
-      where: { id },
-    });
+    try {
+      const category = await this.prisma.categoria.findUnique({
+        where: { id },
+      });
 
-    if (!category) {
-      throw new NotFoundException(`Category with ID ${id} not found`);
+      if (!category) {
+        throw new NotFoundException(`Category with ID ${id} not found`);
+      }
+
+      return category;
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException('Failed to fetch category');
     }
-
-    return category;
   }
 
-  async create(data: CreateCategoryDto) {
-    return this.prisma.categoria.create({ data });
+  async create(dto: CreateCategoryDto) {
+    try {
+      return await this.prisma.categoria.create({ data: dto });
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to create category');
+    }
   }
 
-  async update(id: number, data: UpdateCategoryDto) {
-    await this.findOne(id); // Ensure exists
-    
-    return this.prisma.categoria.update({
-      where: { id },
-      data,
-    });
+  async update(id: number, dto: UpdateCategoryDto) {
+    try {
+      await this.findOne(id); // Ensure exists
+      
+      return await this.prisma.categoria.update({
+        where: { id },
+        data: dto,
+      });
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException('Failed to update category');
+    }
   }
 
   async remove(id: number) {
-    await this.findOne(id); // Ensure exists
-    
-    await this.prisma.categoria.delete({
-      where: { id },
-    });
+    try {
+      await this.findOne(id); // Ensure exists
+      
+      await this.prisma.categoria.delete({
+        where: { id },
+      });
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException('Failed to delete category');
+    }
   }
 }
 ```
+
+### Service Error Handling Rules
+
+1. **Always use try-catch** in service methods
+2. **Re-throw known exceptions** (NotFoundException, BadRequestException, etc.)
+3. **Wrap unknown errors** in InternalServerErrorException with descriptive message
+4. **Never expose internal error details** to the client in production
+5. **Log errors** before re-throwing for debugging
 
 ## Prisma + PostgreSQL
 
@@ -322,6 +459,162 @@ export class CategoriesController {
 }
 ```
 
+### Guard Implementation Pattern
+
+```typescript
+@Injectable()
+export class JwtAuthGuard implements CanActivate {
+  constructor(private readonly jwtService: JwtService) {}
+
+  canActivate(context: ExecutionContext): boolean | Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const token = this.extractToken(request);
+
+    if (!token) {
+      throw new UnauthorizedException('Missing authorization token');
+    }
+
+    try {
+      const payload = this.jwtService.verify(token);
+      request.user = payload;
+      return true;
+    } catch {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+  }
+
+  private extractToken(request: Request): string | undefined {
+    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    return type === 'Bearer' ? token : undefined;
+  }
+}
+```
+
+## Interceptors
+
+Interceptors can transform requests/responses, add logging, implement caching, and more.
+
+### Response Transformation Interceptor
+
+```typescript
+@Injectable()
+export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<Response<T>> {
+    return next.handle().pipe(
+      map((data) => ({
+        statusCode: context.switchToHttp().getResponse().statusCode,
+        data,
+        timestamp: new Date().toISOString(),
+      })),
+    );
+  }
+}
+```
+
+### Logging Interceptor
+
+```typescript
+@Injectable()
+export class LoggingInterceptor implements NestInterceptor {
+  private readonly logger = new Logger(LoggingInterceptor.name);
+
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    const request = context.switchToHttp().getRequest();
+    const { method, url } = request;
+    const now = Date.now();
+
+    return next.handle().pipe(
+      tap(() => {
+        this.logger.log(`${method} ${url} - ${Date.now() - now}ms`);
+      }),
+    );
+  }
+}
+```
+
+### Applying Interceptors
+
+```typescript
+// Globally in main.ts
+app.useGlobalInterceptors(new TransformInterceptor());
+
+// Per controller
+@UseInterceptors(LoggingInterceptor)
+@Controller('categories')
+export class CategoriesController {}
+
+// Per method
+@UseInterceptors(CacheInterceptor)
+@Get()
+findAll() {}
+```
+
+## Swagger / OpenAPI Documentation
+
+Use `@nestjs/swagger` for automatic API documentation.
+
+### Setup in main.ts
+
+```typescript
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
+const config = new DocumentBuilder()
+  .setTitle('Cofrinio API')
+  .setDescription('Financial management API')
+  .setVersion('1.0')
+  .addBearerAuth()
+  .build();
+
+const document = SwaggerModule.createDocument(app, config);
+SwaggerModule.setup('api/docs', app, document);
+```
+
+### Controller Documentation
+
+```typescript
+@ApiTags('categories')
+@ApiBearerAuth()
+@Controller('categories')
+export class CategoriesController {
+  @Post()
+  @ApiOperation({ summary: 'Create a new category' })
+  @ApiBody({ type: CreateCategoryDto })
+  @ApiCreatedResponse({ description: 'Category created', type: CategoryResponseDto })
+  @ApiBadRequestResponse({ description: 'Invalid input data' })
+  create(@Body() dto: CreateCategoryDto) {
+    return this.categoriesService.create(dto);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'List all categories' })
+  @ApiQuery({ name: 'tipo', required: false, enum: ['receita', 'despesa'] })
+  @ApiOkResponse({ description: 'List of categories', type: [CategoryResponseDto] })
+  findAll(@Query('tipo') tipo?: string) {
+    return this.categoriesService.findAll(tipo);
+  }
+}
+```
+
+### DTO Documentation
+
+```typescript
+export class CreateCategoryDto {
+  @ApiProperty({ description: 'Category name', example: 'Alimentação' })
+  @IsString()
+  @MaxLength(100)
+  readonly nome: string;
+
+  @ApiProperty({ description: 'Category type', enum: ['receita', 'despesa'] })
+  @IsEnum(['receita', 'despesa'])
+  readonly tipo: 'receita' | 'despesa';
+
+  @ApiPropertyOptional({ description: 'Category description' })
+  @IsOptional()
+  @IsString()
+  readonly descricao?: string;
+}
+```
+
 ## Testing
 
 ### Unit Tests
@@ -393,3 +686,13 @@ describe('Categories (e2e)', () => {
 - [ ] Unit tests for service methods
 - [ ] Integration tests for new endpoints
 - [ ] Error handling uses NestJS exceptions
+
+## Documentation References
+
+| Technology | Documentation |
+|------------|---------------|
+| NestJS | https://docs.nestjs.com/ |
+| Prisma | https://www.prisma.io/docs |
+| Node.js | https://nodejs.org/docs/latest/api/ |
+| TypeScript | https://www.typescriptlang.org/docs/ |
+| class-validator | https://github.com/typestack/class-validator |

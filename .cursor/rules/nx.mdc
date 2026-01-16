@@ -1,0 +1,88 @@
+---
+description: Guidelines for working with Nx monorepo tooling and commands.
+globs: nx.json,project.json,**/project.json,workspace.json
+alwaysApply: false
+---
+
+# Nx Monorepo Rules
+
+## Running Tasks
+
+- Always run tasks through `nx` commands instead of using underlying tooling directly
+- Use `nx run <project>:<target>` for single project tasks
+- Use `nx run-many` for running tasks across multiple projects
+- Use `nx affected` to run tasks only on projects affected by changes
+
+```bash
+# ✅ Good: Use Nx commands
+nx run api:build
+nx run-many -t build
+nx affected -t test
+
+# ❌ Bad: Direct tooling
+npm run build
+pnpm test
+```
+
+## Understanding the Workspace
+
+- Use `nx graph` to visualize project dependencies
+- Use `nx show project <name>` to see project details and available targets
+- Check `nx.json` for workspace-wide configuration
+- Check `project.json` in each project for project-specific configuration
+
+## Project Structure
+
+```
+apps/           # Deployable applications
+libs/           # Shared libraries
+  ├── feature/      # Feature libraries (smart components, pages)
+  ├── data-access/  # API/state management
+  ├── ui/           # Presentational components
+  └── util/         # Pure utilities and helpers
+```
+
+## Module Boundaries
+
+- Enforce boundaries with tags in `project.json`
+- Use `type:*` tags for library type (feature, data-access, ui, util)
+- Use `scope:*` tags for domain scope (shared, categories, expenses, etc.)
+
+```json
+// project.json
+{
+  "tags": ["type:feature", "scope:categories"]
+}
+```
+
+## Generators
+
+- Use Nx generators to scaffold new projects and libraries
+- Prefer generators over manual file creation for consistency
+
+```bash
+# Generate a new React library
+nx g @nx/react:library my-lib --directory=libs/feature
+
+# Generate a new NestJS module
+nx g @nx/nest:module users --project=api
+```
+
+## Caching
+
+- Nx caches task results automatically
+- Use `nx reset` to clear the cache if needed
+- Configure `inputs` and `outputs` in `nx.json` for proper cache invalidation
+
+## CI/CD
+
+- Use `nx affected` in CI to only build/test changed projects
+- Enable Nx Cloud for distributed caching and task execution
+
+## Documentation References
+
+| Technology | Documentation |
+|------------|---------------|
+| Nx | https://nx.dev/docs/getting-started/intro |
+| Nx Cloud | https://nx.dev/nx-cloud |
+| Nx Recipes | https://nx.dev/recipes |
