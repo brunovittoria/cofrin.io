@@ -6,9 +6,15 @@ import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  root: __dirname,
   server: {
     host: "::",
     port: 8080,
+  },
+  build: {
+    outDir: "../../dist/apps/web",
+    emptyOutDir: true,
+    reportCompressedSize: true,
   },
   plugins: [
     TanStackRouterVite(),
