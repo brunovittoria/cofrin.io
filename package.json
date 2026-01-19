@@ -14,7 +14,8 @@
     "lint": "nx run-many -t lint",
     "test": "nx run-many -t test",
     "preview": "nx preview web",
-    "graph": "nx graph"
+    "graph": "nx graph",
+    "prepare": "husky"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.49.1",
@@ -72,6 +73,8 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.3.1",
+    "@commitlint/config-conventional": "^20.3.1",
     "@eslint/js": "^9.32.0",
     "@nx/eslint": "22.3.3",
     "@nx/js": "^22.3.3",
@@ -90,6 +93,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^15.15.0",
+    "husky": "^9.1.7",
     "jiti": "2.4.2",
     "lovable-tagger": "^1.1.10",
     "nx": "22.3.3",
