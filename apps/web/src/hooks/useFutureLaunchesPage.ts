@@ -1,19 +1,23 @@
 import { useState, useMemo, useEffect } from "react";
-import { DateRange } from "react-day-picker";
 import {
   useFutureLaunches,
   useFutureLaunchesSummary,
   useCompleteFutureLaunch,
   useDeleteFutureLaunch,
 } from "@/hooks/api/useFutureLaunches";
+import { useFiltersStore, usePaginationStore } from "@/stores/ui-store";
 
 export const useFutureLaunchesPage = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const searchTerm = useFiltersStore((state) => state.futureLaunchesSearchTerm);
+  const setSearchTerm = useFiltersStore((state) => state.setFutureLaunchesSearchTerm);
+  const dateRange = useFiltersStore((state) => state.futureLaunchesDateRange);
+  const setDateRange = useFiltersStore((state) => state.setFutureLaunchesDateRange);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [currentPagePending, setCurrentPagePending] = useState(1);
-  const [currentPageCompleted, setCurrentPageCompleted] = useState(1);
-  const pageSize = 5;
+  const currentPagePending = usePaginationStore((state) => state.futureLaunchesPendingPage);
+  const setCurrentPagePending = usePaginationStore((state) => state.setFutureLaunchesPendingPage);
+  const currentPageCompleted = usePaginationStore((state) => state.futureLaunchesCompletedPage);
+  const setCurrentPageCompleted = usePaginationStore((state) => state.setFutureLaunchesCompletedPage);
+  const pageSize = usePaginationStore((state) => state.futureLaunchesPageSize);
 
   const {
     data: pendingLaunches = [],
@@ -66,7 +70,7 @@ export const useFutureLaunchesPage = () => {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPagePending(1);
-  }, [searchTerm, dateRange]);
+  }, [searchTerm, dateRange, setCurrentPagePending]);
 
   useEffect(() => {
     setCurrentPageCompleted(1);

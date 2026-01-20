@@ -25,7 +25,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { useTheme } from "@/providers/ThemeProvider";
+import { useThemeStore } from "@/stores/ui-store";
 import { Switch } from "@/components/ui/switch";
 import { useClerk } from "@clerk/clerk-react";
 
@@ -44,7 +44,8 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
   const isCollapsed = state === "collapsed";
-  const { theme, toggleTheme } = useTheme();
+  const theme = useThemeStore((state) => state.theme);
+  const toggleTheme = useThemeStore((state) => state.toggleTheme);
 
   return (
     <Sidebar className="border-r border-border bg-sidebar">

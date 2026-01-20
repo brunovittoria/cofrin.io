@@ -1,11 +1,14 @@
 import { useState, useMemo } from "react";
 import { useGoals, useGoalsSummary, useDeleteGoal, GoalStatus } from "@/hooks/api/useGoals";
+import { useFiltersStore, usePaginationStore } from "@/stores/ui-store";
 
 export const useGoalsPage = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState<GoalStatus | "all">("all");
-  const pageSize = 6;
+  const currentPage = usePaginationStore((state) => state.goalsPage);
+  const setCurrentPage = usePaginationStore((state) => state.setGoalsPage);
+  const pageSize = usePaginationStore((state) => state.goalsPageSize);
+  const statusFilter = useFiltersStore((state) => state.goalsStatusFilter);
+  const setStatusFilter = useFiltersStore((state) => state.setGoalsStatusFilter);
 
   const {
     data: goals = [],

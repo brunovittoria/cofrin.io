@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { DateRange } from "react-day-picker";
 import {
   useExpenses,
   useExpensesSummary,
   useDeleteExpense,
 } from "@/hooks/api/useExpenses";
+import { useFiltersStore } from "@/stores";
 
 export const useExpensesPage = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const searchTerm = useFiltersStore((state) => state.expensesSearchTerm);
+  const setSearchTerm = useFiltersStore((state) => state.setExpensesSearchTerm);
+  const dateRange = useFiltersStore((state) => state.expensesDateRange);
+  const setDateRange = useFiltersStore((state) => state.setExpensesDateRange);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { data: expenses = [], isLoading, refetch: refetchExpenses } = useExpenses(dateRange);

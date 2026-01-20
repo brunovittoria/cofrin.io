@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   useCards,
   useDeleteCard,
@@ -8,6 +7,7 @@ import {
   type NewCard,
   type Card,
 } from "@/hooks/api/useCards";
+import { useCardStore } from "@/stores";
 
 export const useCardsPage = () => {
   const { data: cards, isLoading } = useCards();
@@ -16,9 +16,15 @@ export const useCardsPage = () => {
   const createCard = useCreateCard();
   const updateCard = useUpdateCard();
   
-  const [addModalOpen, setAddModalOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+  const {
+    cardModalOpen: addModalOpen,
+    cardEditModalOpen: editModalOpen,
+    selectedCard,
+    setCardModalOpen: setAddModalOpen,
+    setCardEditModalOpen: setEditModalOpen,
+    openCardEditModal,
+    closeCardModals,
+  } = useCardStore();
 
   const cardsList = cards ?? [];
   const cardsToDisplay = cardsList.slice(0, 3);
@@ -38,16 +44,14 @@ export const useCardsPage = () => {
       { ...data, id: selectedCard.id },
       {
         onSuccess: () => {
-          setEditModalOpen(false);
-          setSelectedCard(null);
+          closeCardModals();
         },
       }
     );
   };
 
-  const openEditModal = (card: Card) => {
-    setSelectedCard(card);
-    setEditModalOpen(true);
+  const handleOpenEditModal = (card: Card) => {
+    openCardEditModal(card);
   };
 
   const handleDeleteCard = (id: number) => {
@@ -70,7 +74,7 @@ export const useCardsPage = () => {
     selectedCard,
     handleCreateCard,
     handleEditCard,
-    openEditModal,
+    openEditModal: handleOpenEditModal,
     handleDeleteCard,
     handleSetPrimary,
     isPendingDelete: deleteCard.isPending,

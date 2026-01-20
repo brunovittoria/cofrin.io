@@ -1,7 +1,11 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AccountTab, SubscriptionTab } from "./components";
+import { useSettingsStore } from "@/stores";
 
 export const SettingsPage = () => {
+  const activeTab = useSettingsStore((state) => state.activeTab);
+  const setActiveTab = useSettingsStore((state) => state.setActiveTab);
+  
   return (
     <div className="min-h-screen bg-muted/30 p-6 md:p-8">
       <div className="mx-auto max-w-7xl space-y-6">
@@ -9,7 +13,7 @@ export const SettingsPage = () => {
           Configurações
         </h1>
 
-        <Tabs defaultValue="account" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "account" | "subscription")} className="space-y-6">
           <TabsList className="grid w-full max-w-md grid-cols-2">
             <TabsTrigger value="account">Conta</TabsTrigger>
             <TabsTrigger value="subscription">Assinatura</TabsTrigger>

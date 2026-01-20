@@ -3,12 +3,15 @@ import {
   useCategories,
   useDeleteCategory,
 } from "@/hooks/api/useCategories";
+import { usePaginationStore } from "@/stores/ui-store";
 
 export const useCategoriesPage = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [currentPageIncome, setCurrentPageIncome] = useState(1);
-  const [currentPageExpense, setCurrentPageExpense] = useState(1);
-  const pageSize = 5;
+  const currentPageIncome = usePaginationStore((state) => state.categoriesIncomePage);
+  const setCurrentPageIncome = usePaginationStore((state) => state.setCategoriesIncomePage);
+  const currentPageExpense = usePaginationStore((state) => state.categoriesExpensePage);
+  const setCurrentPageExpense = usePaginationStore((state) => state.setCategoriesExpensePage);
+  const pageSize = usePaginationStore((state) => state.categoriesPageSize);
 
   const { 
     data: incomeCategories = [], 

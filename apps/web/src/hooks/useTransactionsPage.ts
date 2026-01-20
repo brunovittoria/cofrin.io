@@ -1,5 +1,4 @@
 import { useState, useMemo } from "react";
-import { DateRange } from "react-day-picker";
 import {
   useIncomes,
   useIncomesSummary,
@@ -10,6 +9,7 @@ import {
   useExpensesSummary,
   useDeleteExpense,
 } from "@/hooks/api/useExpenses";
+import { useFiltersStore, usePaginationStore } from "@/stores/ui-store";
 
 export type TransactionType = "all" | "income" | "expense";
 
@@ -26,12 +26,16 @@ export interface Transaction {
 }
 
 export const useTransactionsPage = () => {
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [activeFilter, setActiveFilter] = useState<TransactionType>("all");
+  const dateRange = useFiltersStore((state) => state.transactionsDateRange);
+  const setDateRange = useFiltersStore((state) => state.setTransactionsDateRange);
+  const searchTerm = useFiltersStore((state) => state.transactionsSearchTerm);
+  const setSearchTerm = useFiltersStore((state) => state.setTransactionsSearchTerm);
+  const activeFilter = useFiltersStore((state) => state.transactionsActiveFilter);
+  const setActiveFilter = useFiltersStore((state) => state.setTransactionsActiveFilter);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5;
+  const currentPage = usePaginationStore((state) => state.transactionsPage);
+  const setCurrentPage = usePaginationStore((state) => state.setTransactionsPage);
+  const pageSize = usePaginationStore((state) => state.transactionsPageSize);
 
   // Fetch incomes
   const {

@@ -1,6 +1,5 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { TrendingUp, TrendingDown, Wallet } from "lucide-react";
-import { DateRange } from "react-day-picker";
 import { Button } from "@/components/ui/button";
 import { FinancialCard } from "@/components/FinancialCard";
 import { IncomeExpenseChart } from "@/components/Charts/IncomeExpenseChart";
@@ -18,15 +17,11 @@ import { useCards } from "@/hooks/api/useCards";
 import { useFutureLaunchesSummary, useFutureLaunchesSummaryPreviousMonth } from "@/hooks/api/useFutureLaunches";
 import { calculatePercentageChange } from "@/lib/trendUtils";
 import { formatCurrency } from "@/lib/formatters";
+import { useFiltersStore } from "@/stores";
 
 const DashboardPage = () => {
-  // Default to current month
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
-    const now = new Date();
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    return { from: firstDay, to: lastDay };
-  });
+  const dateRange = useFiltersStore((state) => state.dashboardDateRange);
+  const setDateRange = useFiltersStore((state) => state.setDashboardDateRange);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const {

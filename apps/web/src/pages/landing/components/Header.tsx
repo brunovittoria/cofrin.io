@@ -3,12 +3,13 @@ import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ChevronRight, Menu, X, Moon, Sun, PiggyBank } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "@/providers/ThemeProvider";
+import { useThemeStore } from "@/stores/ui-store";
 
 export const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { theme, toggleTheme } = useTheme();
+  const theme = useThemeStore((state) => state.theme);
+  const toggleTheme = useThemeStore((state) => state.toggleTheme);
 
   useEffect(() => {
     const handleScroll = () => {
