@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { toLocalDateString } from '@/lib/formatters';
 import { getPreviousMonthRange } from '@/lib/trendUtils';
+import { useAuth } from '@/contexts/AuthContext';
 
 export type Income = {
   id: number;
@@ -11,6 +12,7 @@ export type Income = {
   descricao?: string;
   valor: number;
   categoria_id?: number;
+  user_id?: string;
   created_at: string;
 };
 
@@ -22,9 +24,15 @@ export type NewIncome = {
 };
 
 export const useIncomes = (dateRange?: DateRange) => {
+  const { user } = useAuth();
+
   return useQuery({
-    queryKey: ['incomes', dateRange?.from?.toISOString(), dateRange?.to?.toISOString()],
+    queryKey: ['incomes', dateRange?.from?.toISOString(), dateRange?.to?.toISOString(), user?.id],
     queryFn: async () => {
+      if (!user?.id) {
+        return [];
+      }
+
       let query = supabase
         .from('entradas')
         .select(`
@@ -49,13 +57,20 @@ export const useIncomes = (dateRange?: DateRange) => {
       if (error) throw error;
       return data as (Income & { categorias?: { nome: string; cor_hex?: string } })[];
     },
+    enabled: !!user?.id,
   });
 };
 
 export const useIncomesSummary = (dateRange?: DateRange) => {
+  const { user } = useAuth();
+
   return useQuery({
-    queryKey: ['incomes-summary', dateRange?.from?.toISOString(), dateRange?.to?.toISOString()],
+    queryKey: ['incomes-summary', dateRange?.from?.toISOString(), dateRange?.to?.toISOString(), user?.id],
     queryFn: async () => {
+      if (!user?.id) {
+        return { total: 0, count: 0, average: 0 };
+      }
+
       let query = supabase.from('entradas').select('valor');
       
       // Filter by date range if provided
@@ -79,16 +94,18 @@ export const useIncomesSummary = (dateRange?: DateRange) => {
       
       return { total, count, average };
     },
+    enabled: !!user?.id,
   });
 };
 
 export const useIncomesSummaryPreviousMonth = (dateRange?: DateRange) => {
   const previousMonthRange = getPreviousMonthRange(dateRange);
+  const { user } = useAuth();
   
   return useQuery({
-    queryKey: ['incomes-summary-previous', previousMonthRange?.from?.toISOString(), previousMonthRange?.to?.toISOString()],
+    queryKey: ['incomes-summary-previous', previousMonthRange?.from?.toISOString(), previousMonthRange?.to?.toISOString(), user?.id],
     queryFn: async () => {
-      if (!previousMonthRange?.from || !previousMonthRange?.to) {
+      if (!previousMonthRange?.from || !previousMonthRange?.to || !user?.id) {
         return { total: 0, count: 0, average: 0 };
       }
 
@@ -109,19 +126,38 @@ export const useIncomesSummaryPreviousMonth = (dateRange?: DateRange) => {
       
       return { total, count, average };
     },
-    enabled: !!previousMonthRange?.from && !!previousMonthRange?.to,
+    enabled: !!previousMonthRange?.from && !!previousMonthRange?.to && !!user?.id,
   });
 };
 
 export const useCreateIncome = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async (income: NewIncome) => {
+      if (!user?.id) {
+        throw new Error("Usuário não autenticado");
+      }
+
+      // Get user_id from 'usuarios' table based on auth_user_id
+      const { data: usuario, error: userError } = await supabase
+        .from("usuarios")
+        .select("id")
+        .eq("auth_user_id", user.id)
+        .single();
+
+      if (userError) {
+        throw new Error("Usuário não encontrado na tabela usuarios");
+      }
+
       const { data, error } = await supabase
         .from('entradas')
-        .insert(income)
+        .insert({
+          ...income,
+          user_id: usuario.id,
+        })
         .select()
         .single();
       

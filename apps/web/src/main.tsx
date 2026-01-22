@@ -1,21 +1,15 @@
-﻿import { createRoot } from "react-dom/client";
+import { createRoot } from "react-dom/client";
 import { RouterProvider } from "@tanstack/react-router";
-import { ClerkProvider, useAuth } from "@clerk/clerk-react";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { QueryProvider } from "./providers/QueryProvider";
 import { router } from "./router";
 import "./fonts.css";
 import "./index.css";
 
-const PUBLISHABLE_KEY = import.meta.env.VITE_PUBLIC_CLERK_PUBLISHABLE_KEY;
-
-if (!PUBLISHABLE_KEY) {
-  throw new Error("Missing Publishable Key");
-}
-
 function InnerApp() {
-  const { isSignedIn, isLoaded } = useAuth();
+  const { user, loading } = useAuth();
 
-  if (!isLoaded) {
+  if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -26,15 +20,15 @@ function InnerApp() {
   return (
     <RouterProvider
       router={router}
-      context={{ isSignedIn: isSignedIn ?? false }}
+      context={{ isSignedIn: !!user }}
     />
   );
 }
 
 createRoot(document.getElementById("root")!).render(
-  <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+  <AuthProvider>
     <QueryProvider>
       <InnerApp />
     </QueryProvider>
-  </ClerkProvider>
+  </AuthProvider>
 );

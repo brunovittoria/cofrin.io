@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { cardProvidersMap } from "@/mocks/cardProviders";
+import { useAuth } from "@/contexts/AuthContext";
 
 type CardRow = {
   id: number;
@@ -17,6 +18,7 @@ type CardRow = {
   emissor: string | null;
   imagem_url: string | null;
   criado_em: string | null;
+  user_id?: string;
 };
 
 export type Card = {
@@ -90,9 +92,15 @@ const mapCard = (row: CardRow): Card => {
 };
 
 export const useCards = () => {
+  const { user } = useAuth();
+
   return useQuery({
-    queryKey: ["cards"],
+    queryKey: ["cards", user?.id],
     queryFn: async () => {
+      if (!user?.id) {
+        return [];
+      }
+
       const { data, error } = await supabase
         .from("cartoes")
         .select("*")
@@ -101,15 +109,32 @@ export const useCards = () => {
       if (error) throw error;
       return (data as CardRow[]).map(mapCard);
     },
+    enabled: !!user?.id,
   });
 };
 
 export const useCreateCard = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async (card: NewCard) => {
+      if (!user?.id) {
+        throw new Error("Usuário não autenticado");
+      }
+
+      // Get user_id from 'usuarios' table based on auth_user_id
+      const { data: usuario, error: userError } = await supabase
+        .from("usuarios")
+        .select("id")
+        .eq("auth_user_id", user.id)
+        .single();
+
+      if (userError) {
+        throw new Error("Usuário não encontrado na tabela usuarios");
+      }
+
       const { data, error } = await supabase
         .from("cartoes")
         .insert({
@@ -123,6 +148,7 @@ export const useCreateCard = () => {
           uso_percentual: Number(card.uso_percentual) || 0,
           is_principal: card.is_principal ?? false,
           emissor: card.emissor ?? null,
+          user_id: usuario.id,
         })
         .select("*")
         .single();

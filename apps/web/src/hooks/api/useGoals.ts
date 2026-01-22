@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useUser } from "@clerk/clerk-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export type GoalType = "economizar" | "reduzir" | "quitar" | "personalizada";
 export type GoalStatus = "ativa" | "concluida" | "pausada";
@@ -9,7 +9,6 @@ export type GoalStatus = "ativa" | "concluida" | "pausada";
 export type Goal = {
   id: string;
   user_id: string | null;
-  clerk_id: string;
   titulo: string;
   tipo: GoalType;
   descricao: string | null;
@@ -42,12 +41,12 @@ export type NewGoal = {
 };
 
 export const useGoals = (status?: GoalStatus) => {
-  const { user: clerkUser } = useUser();
+  const { user } = useAuth();
 
   return useQuery({
-    queryKey: ["goals", status, clerkUser?.id],
+    queryKey: ["goals", status, user?.id],
     queryFn: async () => {
-      if (!clerkUser?.id) {
+      if (!user?.id) {
         return [];
       }
 
@@ -60,7 +59,6 @@ export const useGoals = (status?: GoalStatus) => {
           cartoes(nome_exibicao, emissor)
         `
         )
-        .eq("clerk_id", clerkUser.id)
         .order("created_at", { ascending: false });
 
       if (status) {
@@ -75,17 +73,17 @@ export const useGoals = (status?: GoalStatus) => {
         cartoes?: { nome_exibicao: string; emissor?: string } | null;
       })[];
     },
-    enabled: !!clerkUser?.id,
+    enabled: !!user?.id,
   });
 };
 
 export const useGoal = (id: string) => {
-  const { user: clerkUser } = useUser();
+  const { user } = useAuth();
 
   return useQuery({
-    queryKey: ["goal", id, clerkUser?.id],
+    queryKey: ["goal", id, user?.id],
     queryFn: async () => {
-      if (!clerkUser?.id || !id) {
+      if (!user?.id || !id) {
         return null;
       }
 
@@ -99,7 +97,6 @@ export const useGoal = (id: string) => {
         `
         )
         .eq("id", id)
-        .eq("clerk_id", clerkUser.id)
         .single();
 
       if (error) throw error;
@@ -108,24 +105,23 @@ export const useGoal = (id: string) => {
         cartoes?: { nome_exibicao: string; emissor?: string } | null;
       };
     },
-    enabled: !!clerkUser?.id && !!id,
+    enabled: !!user?.id && !!id,
   });
 };
 
 export const useGoalsSummary = () => {
-  const { user: clerkUser } = useUser();
+  const { user } = useAuth();
 
   return useQuery({
-    queryKey: ["goals-summary", clerkUser?.id],
+    queryKey: ["goals-summary", user?.id],
     queryFn: async () => {
-      if (!clerkUser?.id) {
+      if (!user?.id) {
         return { total: 0, active: 0, completed: 0, paused: 0, totalProgress: 0 };
       }
 
       const { data, error } = await supabase
         .from("metas")
-        .select("status, valor_alvo, valor_atual")
-        .eq("clerk_id", clerkUser.id);
+        .select("status, valor_alvo, valor_atual");
 
       if (error) throw error;
 
@@ -140,26 +136,26 @@ export const useGoalsSummary = () => {
 
       return { total, active, completed, paused, totalProgress };
     },
-    enabled: !!clerkUser?.id,
+    enabled: !!user?.id,
   });
 };
 
 export const useCreateGoal = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { user: clerkUser } = useUser();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async (goal: NewGoal) => {
-      if (!clerkUser?.id) {
+      if (!user?.id) {
         throw new Error("Usuário não autenticado");
       }
 
-      // Get user_id from 'usuarios' table based on clerk_id
-      const { data: user, error: userError } = await supabase
+      // Get user_id from 'usuarios' table based on auth_user_id
+      const { data: usuario, error: userError } = await supabase
         .from("usuarios")
         .select("id")
-        .eq("clerk_id", clerkUser.id)
+        .eq("auth_user_id", user.id)
         .single();
 
       if (userError) {
@@ -170,8 +166,7 @@ export const useCreateGoal = () => {
         .from("metas")
         .insert({
           ...goal,
-          clerk_id: clerkUser.id,
-          user_id: user.id,
+          user_id: usuario.id,
           valor_atual: goal.valor_atual || 0,
           status: goal.status || "ativa",
         })

@@ -1,15 +1,16 @@
 import { useState } from "react";
-import { useSignUp } from "@clerk/clerk-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, type RegisterFormData } from "@/lib/validations";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "@tanstack/react-router";
 
 export const useRegisterForm = () => {
-  const { signUp, isLoaded } = useSignUp();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -35,30 +36,44 @@ export const useRegisterForm = () => {
   const passwordsMatch = watchedPassword === watchedConfirmPassword;
 
   const onSubmit = async (data: RegisterFormData) => {
-    if (!isLoaded || !signUp) return;
-
     setIsLoading(true);
 
     try {
-      await signUp.create({
-        emailAddress: data.email,
+      // Sign up with Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: data.email,
         password: data.password,
-        firstName: data.firstName,
-        lastName: data.lastName,
+        options: {
+          data: {
+            first_name: data.firstName,
+            last_name: data.lastName,
+          },
+        },
       });
 
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      if (authError) {
+        toast.error(authError.message || "Failed to create account. Please try again.");
+        return;
+      }
 
-      toast.success("Account created! Please check your email for verification.");
+      if (authData.user) {
+        // Create user record in usuarios table
+        const { error: userError } = await supabase.from("usuarios").insert({
+          auth_user_id: authData.user.id,
+          // Add other fields as needed based on your usuarios table structure
+        });
+
+        if (userError) {
+          console.error("Error creating user record:", userError);
+          toast.error("Account created but failed to initialize profile. Please contact support.");
+        } else {
+          toast.success("Account created! Please check your email for verification.");
+          navigate({ to: "/login" });
+        }
+      }
     } catch (error: any) {
       console.error("Registration error:", error);
-
-      if (error.errors && error.errors.length > 0) {
-        const errorMessage = error.errors[0].message;
-        toast.error(errorMessage);
-      } else {
-        toast.error("Failed to create account. Please try again.");
-      }
+      toast.error(error.message || "Failed to create account. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +86,7 @@ export const useRegisterForm = () => {
     errors,
     isValid,
     isLoading,
-    isLoaded,
+    isLoaded: true, // Always loaded for Supabase Auth
     showPassword,
     setShowPassword,
     showConfirmPassword,
@@ -83,4 +98,3 @@ export const useRegisterForm = () => {
     passwordsMatch,
   };
 };
-

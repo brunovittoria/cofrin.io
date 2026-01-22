@@ -1,14 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useUser } from "@clerk/clerk-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export type CheckInMood = "positivo" | "neutro" | "negativo";
 
 export type CheckIn = {
   id: string;
   meta_id: string;
-  clerk_id: string;
+  user_id: string;
   data: string;
   humor: CheckInMood | null;
   obstaculos: string | null;
@@ -27,12 +27,12 @@ export type NewCheckIn = {
 };
 
 export const useCheckIns = (metaId: string) => {
-  const { user: clerkUser } = useUser();
+  const { user } = useAuth();
 
   return useQuery({
-    queryKey: ["checkins", metaId, clerkUser?.id],
+    queryKey: ["checkins", metaId, user?.id],
     queryFn: async () => {
-      if (!clerkUser?.id || !metaId) {
+      if (!user?.id || !metaId) {
         return [];
       }
 
@@ -40,23 +40,22 @@ export const useCheckIns = (metaId: string) => {
         .from("meta_checkins")
         .select("*")
         .eq("meta_id", metaId)
-        .eq("clerk_id", clerkUser.id)
         .order("data", { ascending: false });
 
       if (error) throw error;
       return data as CheckIn[];
     },
-    enabled: !!clerkUser?.id && !!metaId,
+    enabled: !!user?.id && !!metaId,
   });
 };
 
 export const useRecentCheckIns = (limit: number = 5) => {
-  const { user: clerkUser } = useUser();
+  const { user } = useAuth();
 
   return useQuery({
-    queryKey: ["checkins-recent", clerkUser?.id, limit],
+    queryKey: ["checkins-recent", user?.id, limit],
     queryFn: async () => {
-      if (!clerkUser?.id) {
+      if (!user?.id) {
         return [];
       }
 
@@ -68,7 +67,6 @@ export const useRecentCheckIns = (limit: number = 5) => {
           metas(titulo, tipo)
         `
         )
-        .eq("clerk_id", clerkUser.id)
         .order("created_at", { ascending: false })
         .limit(limit);
 
@@ -77,26 +75,37 @@ export const useRecentCheckIns = (limit: number = 5) => {
         metas?: { titulo: string; tipo: string } | null;
       })[];
     },
-    enabled: !!clerkUser?.id,
+    enabled: !!user?.id,
   });
 };
 
 export const useCreateCheckIn = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { user: clerkUser } = useUser();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async (checkIn: NewCheckIn) => {
-      if (!clerkUser?.id) {
+      if (!user?.id) {
         throw new Error("Usuário não autenticado");
+      }
+
+      // Get user_id from 'usuarios' table based on auth_user_id
+      const { data: usuario, error: userError } = await supabase
+        .from("usuarios")
+        .select("id")
+        .eq("auth_user_id", user.id)
+        .single();
+
+      if (userError) {
+        throw new Error("Usuário não encontrado na tabela usuarios");
       }
 
       const { data, error } = await supabase
         .from("meta_checkins")
         .insert({
           ...checkIn,
-          clerk_id: clerkUser.id,
+          user_id: usuario.id,
           data: checkIn.data || new Date().toISOString().split("T")[0],
           valor_adicionado: checkIn.valor_adicionado || 0,
         })

@@ -13,6 +13,7 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as AuthenticatedTransactionsRouteImport } from './routes/_authenticated/transactions'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedIncomesRouteImport } from './routes/_authenticated/incomes'
@@ -42,6 +43,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedTransactionsRoute =
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/incomes': typeof AuthenticatedIncomesRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/goals/$id': typeof AuthenticatedGoalsIdRoute
   '/goals/create': typeof AuthenticatedGoalsCreateRoute
   '/goals': typeof AuthenticatedGoalsIndexRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/incomes': typeof AuthenticatedIncomesRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/goals/$id': typeof AuthenticatedGoalsIdRoute
   '/goals/create': typeof AuthenticatedGoalsCreateRoute
   '/goals': typeof AuthenticatedGoalsIndexRoute
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/_authenticated/incomes': typeof AuthenticatedIncomesRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/transactions': typeof AuthenticatedTransactionsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/_authenticated/goals/$id': typeof AuthenticatedGoalsIdRoute
   '/_authenticated/goals/create': typeof AuthenticatedGoalsCreateRoute
   '/_authenticated/goals/': typeof AuthenticatedGoalsIndexRoute
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
     | '/incomes'
     | '/settings'
     | '/transactions'
+    | '/auth/callback'
     | '/goals/$id'
     | '/goals/create'
     | '/goals'
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
     | '/incomes'
     | '/settings'
     | '/transactions'
+    | '/auth/callback'
     | '/goals/$id'
     | '/goals/create'
     | '/goals'
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/_authenticated/incomes'
     | '/_authenticated/settings'
     | '/_authenticated/transactions'
+    | '/auth/callback'
     | '/_authenticated/goals/$id'
     | '/_authenticated/goals/create'
     | '/_authenticated/goals/'
@@ -210,6 +222,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -240,6 +253,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/transactions': {
@@ -359,6 +379,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

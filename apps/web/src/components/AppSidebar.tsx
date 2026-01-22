@@ -27,7 +27,8 @@ import {
 import { cn } from "@/lib/utils";
 import { useThemeStore } from "@/stores/ui-store";
 import { Switch } from "@/components/ui/switch";
-import { useClerk } from "@clerk/clerk-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "@tanstack/react-router";
 
 const navItems = [
   { title: "Dashboard", url: "/dashboard" as const, icon: BarChart3 },
@@ -40,12 +41,22 @@ const navItems = [
 ];
 
 export function AppSidebar() {
-  const { signOut } = useClerk();
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
   const { state } = useSidebar();
   const location = useLocation();
   const isCollapsed = state === "collapsed";
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate({ to: "/login" });
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
 
   return (
     <Sidebar className="border-r border-border bg-sidebar">
@@ -150,7 +161,7 @@ export function AppSidebar() {
           </Link>
 
           <button
-            onClick={() => signOut({ redirectUrl: "/login" })}
+            onClick={handleSignOut}
             className={cn(
               "group flex w-full items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground shadow-[0_8px_24px_-18px_rgba(15,23,42,0.22)] transition-all",
               "hover:-translate-y-[2px] hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive"

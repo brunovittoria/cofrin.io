@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 export type Category = {
   id: number;
@@ -8,6 +9,7 @@ export type Category = {
   descricao?: string;
   tipo?: string;
   cor_hex?: string;
+  user_id?: string;
   created_at: string;
 };
 
@@ -19,9 +21,15 @@ export type NewCategory = {
 };
 
 export const useCategories = (tipo?: string) => {
+  const { user } = useAuth();
+
   return useQuery({
-    queryKey: ['categories', tipo],
+    queryKey: ['categories', tipo, user?.id],
     queryFn: async () => {
+      if (!user?.id) {
+        return [];
+      }
+
       let query = supabase.from('categorias').select('*');
       
       if (tipo) {
@@ -33,18 +41,38 @@ export const useCategories = (tipo?: string) => {
       if (error) throw error;
       return data as Category[];
     },
+    enabled: !!user?.id,
   });
 };
 
 export const useCreateCategory = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async (category: NewCategory) => {
+      if (!user?.id) {
+        throw new Error("Usuário não autenticado");
+      }
+
+      // Get user_id from 'usuarios' table based on auth_user_id
+      const { data: usuario, error: userError } = await supabase
+        .from("usuarios")
+        .select("id")
+        .eq("auth_user_id", user.id)
+        .single();
+
+      if (userError) {
+        throw new Error("Usuário não encontrado na tabela usuarios");
+      }
+
       const { data, error } = await supabase
         .from('categorias')
-        .insert(category)
+        .insert({
+          ...category,
+          user_id: usuario.id,
+        })
         .select()
         .single();
       

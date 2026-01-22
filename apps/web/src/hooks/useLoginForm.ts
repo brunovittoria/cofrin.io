@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { useSignIn } from "@clerk/clerk-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginFormData } from "@/lib/validations";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "@tanstack/react-router";
 
 export const useLoginForm = () => {
-  const { signIn, isLoaded } = useSignIn();
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -19,30 +20,23 @@ export const useLoginForm = () => {
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    if (!isLoaded || !signIn) return;
-
     setIsLoading(true);
 
     try {
-      const result = await signIn.create({
-        identifier: data.email,
+      const { data: authData, error } = await supabase.auth.signInWithPassword({
+        email: data.email,
         password: data.password,
       });
 
-      if (result.status === "complete") {
+      if (error) {
+        toast.error(error.message || "Login failed. Please check your credentials.");
+      } else if (authData.user) {
         toast.success("Login successful!");
-      } else {
-        toast.error("Login failed. Please check your credentials.");
+        navigate({ to: "/dashboard" });
       }
     } catch (error: any) {
       console.error("Login error:", error);
-
-      if (error.errors && error.errors.length > 0) {
-        const errorMessage = error.errors[0].message;
-        toast.error(errorMessage);
-      } else {
-        toast.error("Login failed. Please try again.");
-      }
+      toast.error(error.message || "Login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +49,6 @@ export const useLoginForm = () => {
     errors,
     isValid,
     isLoading,
-    isLoaded,
+    isLoaded: true, // Always loaded for Supabase Auth
   };
 };
-

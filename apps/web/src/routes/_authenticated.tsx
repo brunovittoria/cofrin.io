@@ -1,12 +1,13 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated")({
-  beforeLoad: async ({ context }) => {
-    // If user is not authenticated, redirect to landing page
-    const { isSignedIn } = context as { isSignedIn: boolean };
-    if (!isSignedIn) {
+  beforeLoad: async () => {
+    // Check if user is authenticated using Supabase Auth
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
       throw redirect({ to: "/login" });
     }
   },

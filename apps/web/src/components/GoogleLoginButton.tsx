@@ -1,9 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useSignIn } from "@clerk/clerk-react";
 import type { FC } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface GoogleButtonProps {
   className?: string;
@@ -16,19 +16,26 @@ export const GoogleLoginButton: FC<GoogleButtonProps> = ({
   disabled = false,
   children = "Entrar com o Google",
 }) => {
-  const { signIn, isLoaded } = useSignIn();
-
   const handleGoogleSignIn = async () => {
-    if (!isLoaded || !signIn) return;
-
     try {
-      await signIn.authenticateWithRedirect({
-        strategy: "oauth_google",
-        redirectUrl: "/",
-        redirectUrlComplete: "/",
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
-    } catch (error) {
-      toast.error("Erro ao fazer login com Google");
+
+      if (error) {
+        console.error("Google OAuth error:", error);
+        if (error.message?.includes("not enabled") || error.message?.includes("provider")) {
+          toast.error("Google OAuth não está habilitado. Verifique as configurações do Supabase.");
+        } else {
+          toast.error(`Erro ao fazer login com Google: ${error.message || "Erro desconhecido"}`);
+        }
+      }
+    } catch (error: any) {
+      console.error("Google OAuth exception:", error);
+      toast.error(`Erro ao fazer login com Google: ${error?.message || "Erro desconhecido"}`);
     }
   };
 
@@ -37,7 +44,7 @@ export const GoogleLoginButton: FC<GoogleButtonProps> = ({
       type="button"
       variant="outline"
       onClick={handleGoogleSignIn}
-      disabled={disabled || !isLoaded}
+      disabled={disabled}
       className={`flex w-full items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 transition duration-200 hover:bg-muted disabled:cursor-not-allowed disabled:bg-muted/50 ${className}`}
       tabIndex={0}
       aria-label="Entrar com Google"

@@ -3,7 +3,7 @@ import { DateRange } from "react-day-picker";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { toLocalDateString } from "@/lib/formatters";
-import { useUser } from "@clerk/clerk-react";
+import { useAuth } from "@/contexts/AuthContext";
 import { getPreviousMonthRange } from "@/lib/trendUtils";
 
 export type FutureLaunch = {
@@ -15,7 +15,6 @@ export type FutureLaunch = {
   categoria_id?: number;
   status: "pendente" | "efetivado";
   user_id?: string;
-  clerk_id?: string;
   created_at: string;
   updated_at?: string;
 };
@@ -33,14 +32,21 @@ export const useFutureLaunches = (
   dateRange?: DateRange,
   status?: "pendente" | "efetivado"
 ) => {
+  const { user } = useAuth();
+
   return useQuery({
     queryKey: [
       "future-launches",
       dateRange?.from?.toISOString(),
       dateRange?.to?.toISOString(),
       status,
+      user?.id,
     ],
     queryFn: async () => {
+      if (!user?.id) {
+        return [];
+      }
+
       let query = supabase
         .from("lancamentos_futuros")
         .select(
@@ -74,17 +80,25 @@ export const useFutureLaunches = (
         categorias?: { nome: string; cor_hex?: string };
       })[];
     },
+    enabled: !!user?.id,
   });
 };
 
 export const useFutureLaunchesSummary = (dateRange?: DateRange) => {
+  const { user } = useAuth();
+
   return useQuery({
     queryKey: [
       "future-launches-summary",
       dateRange?.from?.toISOString(),
       dateRange?.to?.toISOString(),
+      user?.id,
     ],
     queryFn: async () => {
+      if (!user?.id) {
+        return { toReceive: 0, toPay: 0, projectedBalance: 0, completed: 0 };
+      }
+
       let query = supabase
         .from("lancamentos_futuros")
         .select("valor, tipo, status");
@@ -124,20 +138,23 @@ export const useFutureLaunchesSummary = (dateRange?: DateRange) => {
 
       return { toReceive, toPay, projectedBalance, completed };
     },
+    enabled: !!user?.id,
   });
 };
 
 export const useFutureLaunchesSummaryPreviousMonth = (dateRange?: DateRange) => {
   const previousMonthRange = getPreviousMonthRange(dateRange);
+  const { user } = useAuth();
   
   return useQuery({
     queryKey: [
       "future-launches-summary-previous",
       previousMonthRange?.from?.toISOString(),
       previousMonthRange?.to?.toISOString(),
+      user?.id,
     ],
     queryFn: async () => {
-      if (!previousMonthRange?.from || !previousMonthRange?.to) {
+      if (!previousMonthRange?.from || !previousMonthRange?.to || !user?.id) {
         return { toReceive: 0, toPay: 0, projectedBalance: 0, completed: 0 };
       }
 
@@ -172,26 +189,26 @@ export const useFutureLaunchesSummaryPreviousMonth = (dateRange?: DateRange) => 
 
       return { toReceive, toPay, projectedBalance, completed };
     },
-    enabled: !!previousMonthRange?.from && !!previousMonthRange?.to,
+    enabled: !!previousMonthRange?.from && !!previousMonthRange?.to && !!user?.id,
   });
 };
 
 export const useCreateFutureLaunch = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { user: clerkUser } = useUser();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async (launch: NewFutureLaunch) => {
-      if (!clerkUser?.id) {
+      if (!user?.id) {
         throw new Error("Usuário não autenticado");
       }
 
-      // Get user_id from 'usuarios' table based on clerk_id
-      const { data: user, error: userError } = await supabase
+      // Get user_id from 'usuarios' table based on auth_user_id
+      const { data: usuario, error: userError } = await supabase
         .from("usuarios")
         .select("id")
-        .eq("clerk_id", clerkUser.id)
+        .eq("auth_user_id", user.id)
         .single();
 
       if (userError) {
@@ -202,8 +219,7 @@ export const useCreateFutureLaunch = () => {
         .from("lancamentos_futuros")
         .insert({
           ...launch,
-          clerk_id: clerkUser.id,
-          user_id: user.id,
+          user_id: usuario.id,
           status: launch.status || "pendente",
         })
         .select()
@@ -309,7 +325,7 @@ export const useDeleteFutureLaunch = () => {
 export const useCompleteFutureLaunch = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { user } = useUser();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async (id: number) => {
@@ -326,6 +342,17 @@ export const useCompleteFutureLaunch = () => {
 
       if (fetchError) throw fetchError;
 
+      // Get user_id from 'usuarios' table
+      const { data: usuario, error: userError } = await supabase
+        .from("usuarios")
+        .select("id")
+        .eq("auth_user_id", user.id)
+        .single();
+
+      if (userError) {
+        throw new Error("Usuário não encontrado na tabela usuarios");
+      }
+
       // Create corresponding income or expense
       const table = launch.tipo === "entrada" ? "entradas" : "saidas";
       const { error: insertError } = await supabase.from(table).insert({
@@ -333,6 +360,7 @@ export const useCompleteFutureLaunch = () => {
         descricao: launch.descricao,
         valor: launch.valor,
         categoria_id: launch.categoria_id,
+        user_id: usuario.id,
       });
 
       if (insertError) throw insertError;
