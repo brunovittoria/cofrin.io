@@ -8,18 +8,18 @@ export const useIncomeExpenseData = (dateRange?: DateRange) => {
     queryKey: ['chart-data', 'income-expense', dateRange?.from?.toISOString(), dateRange?.to?.toISOString()],
     queryFn: async () => {
       let query = supabase
-        .from('vw_entradas_saidas_mensal')
+        .from('vw_monthly_income_expense')
         .select('*')
-        .order('mes');
+        .order('month');
       
       // Filter by date range if provided
       if (dateRange?.from && dateRange?.to) {
         const startDate = toLocalDateString(dateRange.from);
         const endDate = toLocalDateString(dateRange.to);
-        query = query.gte('mes', startDate).lte('mes', endDate);
+        query = query.gte('month', startDate).lte('month', endDate);
       } else if (dateRange?.from) {
         const startDate = toLocalDateString(dateRange.from);
-        query = query.gte('mes', startDate);
+        query = query.gte('month', startDate);
       }
       
       const { data, error } = await query;
@@ -27,9 +27,9 @@ export const useIncomeExpenseData = (dateRange?: DateRange) => {
       if (error) throw error;
       
       return data.map((item: any) => ({
-        mes: new Date(item.mes).toLocaleDateString('pt-BR', { month: 'short' }),
-        entradas: Number(item.total_entradas || 0),
-        saidas: Number(item.total_saidas || 0),
+        mes: new Date(item.month).toLocaleDateString('pt-BR', { month: 'short' }),
+        entradas: Number(item.total_incomes || 0),
+        saidas: Number(item.total_expenses || 0),
       }));
     },
   });
@@ -46,23 +46,23 @@ export const useCategoryData = (dateRange?: DateRange) => {
         const endDate = toLocalDateString(dateRange.to);
         
         const { data, error } = await supabase
-          .from('saidas')
+          .from('expenses')
           .select(`
-            valor,
-            categoria_id,
-            categorias(nome)
+            amount,
+            category_id,
+            categories(name)
           `)
-          .gte('data', startDate)
-          .lte('data', endDate);
+          .gte('date', startDate)
+          .lte('date', endDate);
         
         if (error) throw error;
         
         // Group by category
         const categoryMap = new Map<string, number>();
         data.forEach((item: any) => {
-          const categoryName = item.categorias?.nome || 'Sem categoria';
+          const categoryName = item.categories?.name || 'Sem categoria';
           const currentValue = categoryMap.get(categoryName) || 0;
-          categoryMap.set(categoryName, currentValue + Number(item.valor || 0));
+          categoryMap.set(categoryName, currentValue + Number(item.amount || 0));
         });
         
         const colors = [
@@ -86,22 +86,22 @@ export const useCategoryData = (dateRange?: DateRange) => {
         const startDate = toLocalDateString(dateRange.from);
         
         const { data, error } = await supabase
-          .from('saidas')
+          .from('expenses')
           .select(`
-            valor,
-            categoria_id,
-            categorias(nome)
+            amount,
+            category_id,
+            categories(name)
           `)
-          .gte('data', startDate);
+          .gte('date', startDate);
         
         if (error) throw error;
         
         // Group by category
         const categoryMap = new Map<string, number>();
         data.forEach((item: any) => {
-          const categoryName = item.categorias?.nome || 'Sem categoria';
+          const categoryName = item.categories?.name || 'Sem categoria';
           const currentValue = categoryMap.get(categoryName) || 0;
-          categoryMap.set(categoryName, currentValue + Number(item.valor || 0));
+          categoryMap.set(categoryName, currentValue + Number(item.amount || 0));
         });
         
         const colors = [
@@ -123,9 +123,9 @@ export const useCategoryData = (dateRange?: DateRange) => {
       } else {
         // Use view when no filter
         const { data, error } = await supabase
-          .from('vw_saidas_por_categoria')
+          .from('vw_expenses_by_category')
           .select('*')
-          .order('total_saidas', { ascending: false });
+          .order('total_expenses', { ascending: false });
         
         if (error) throw error;
         
@@ -139,8 +139,8 @@ export const useCategoryData = (dateRange?: DateRange) => {
         ];
         
         return data.map((item: any, index: number) => ({
-          name: item.categoria || 'Sem categoria',
-          value: Number(item.total_saidas),
+          name: item.category || 'Sem categoria',
+          value: Number(item.total_expenses),
           fill: colors[index % colors.length],
         }));
       }
@@ -153,19 +153,19 @@ export const useBalanceData = (dateRange?: DateRange) => {
     queryKey: ['chart-data', 'balance', dateRange?.from?.toISOString(), dateRange?.to?.toISOString()],
     queryFn: async () => {
       let query = supabase
-        .from('vw_saldo_diario')
+        .from('vw_daily_balance')
         .select('*')
-        .order('dia');
+        .order('day');
       
       // Filter by date range if provided
       if (dateRange?.from && dateRange?.to) {
         const startDate = toLocalDateString(dateRange.from);
         const endDate = toLocalDateString(dateRange.to);
-        query = query.gte('dia', startDate).lte('dia', endDate);
+        query = query.gte('day', startDate).lte('day', endDate);
       } else if (dateRange?.from) {
         // Only from date provided
         const startDate = toLocalDateString(dateRange.from);
-        query = query.gte('dia', startDate);
+        query = query.gte('day', startDate);
       } else {
         // Limit to last 30 days if no filter
         query = query.limit(30);
@@ -176,8 +176,8 @@ export const useBalanceData = (dateRange?: DateRange) => {
       if (error) throw error;
       
       return data.map((item: any) => ({
-        dia: new Date(item.dia).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
-        saldo: Number(item.saldo_acumulado || 0),
+        dia: new Date(item.day).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+        saldo: Number(item.accumulated_balance || 0),
       }));
     },
   });

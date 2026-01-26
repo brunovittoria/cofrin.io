@@ -14,7 +14,10 @@ export const parseLocalDate = (dateString: string): Date => {
  * Formats a date-only string (YYYY-MM-DD) to Brazilian format (DD/MM/YYYY)
  * without timezone conversion.
  */
-export const formatLocalDate = (dateString: string): string => {
+export const formatLocalDate = (dateString: string | null | undefined): string => {
+  if (!dateString) {
+    return "";
+  }
   const [year, month, day] = dateString.split("-");
   return `${day}/${month}/${year}`;
 };

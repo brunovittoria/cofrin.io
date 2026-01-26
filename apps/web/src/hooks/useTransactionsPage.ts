@@ -15,13 +15,13 @@ export type TransactionType = "all" | "income" | "expense";
 
 export interface Transaction {
   id: number;
-  data: string;
-  descricao?: string;
-  valor: number;
+  date: string;
+  description?: string;
+  amount: number;
   type: "income" | "expense";
-  categorias?: {
-    nome?: string;
-    cor_hex?: string | null;
+  categories?: {
+    name?: string;
+    hex_color?: string | null;
   } | null;
 }
 
@@ -61,26 +61,26 @@ export const useTransactionsPage = () => {
   const transactions: Transaction[] = useMemo(() => {
     const incomeTransactions: Transaction[] = incomes.map((income) => ({
       id: income.id,
-      data: income.data,
-      descricao: income.descricao,
-      valor: income.valor,
+      date: income.date,
+      description: income.description,
+      amount: income.amount,
       type: "income" as const,
-      categorias: income.categorias,
+      categories: income.categories,
     }));
 
     const expenseTransactions: Transaction[] = expenses.map((expense) => ({
       id: expense.id,
-      data: expense.data,
-      descricao: expense.descricao,
-      valor: expense.valor,
+      date: expense.date,
+      description: expense.description,
+      amount: expense.amount,
       type: "expense" as const,
-      categorias: expense.categorias,
+      categories: expense.categories,
     }));
 
     // Combine and sort by date (newest first)
     return [...incomeTransactions, ...expenseTransactions].sort((a, b) => {
-      const dateA = new Date(a.data);
-      const dateB = new Date(b.data);
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
       return dateB.getTime() - dateA.getTime();
     });
   }, [incomes, expenses]);
@@ -106,8 +106,8 @@ export const useTransactionsPage = () => {
   const filteredTransactions = useMemo(() => {
     return transactions.filter((t) => {
       const matchesSearch =
-        t.descricao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.categorias?.nome?.toLowerCase().includes(searchTerm.toLowerCase());
+        t.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        t.categories?.name?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesType =
         activeFilter === "all" ? true : t.type === activeFilter;
       return matchesSearch && matchesType;

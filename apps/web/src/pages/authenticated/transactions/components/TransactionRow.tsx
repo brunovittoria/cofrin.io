@@ -28,10 +28,10 @@ export const TransactionRow = ({
   const defaultColor = isIncome ? INCOME_COLOR : EXPENSE_COLOR;
 
   const { accent: accentColor, style: badgeStyle } = buildCategoryBadgeTokens(
-    transaction.categorias?.cor_hex,
+    transaction.categories?.hex_color,
     defaultColor
   );
-  const categoryName = transaction.categorias?.nome || "Sem categoria";
+  const categoryName = transaction.categories?.name || "Sem categoria";
 
   return (
     <TableRow
@@ -40,7 +40,7 @@ export const TransactionRow = ({
       }`}
     >
       <TableCell className="whitespace-nowrap text-sm font-semibold text-[#0F172A]">
-        {formatLocalDate(transaction.data)}
+        {formatLocalDate(transaction.date)}
       </TableCell>
       <TableCell className="px-6 py-4">
         {isIncome ? (
@@ -56,7 +56,7 @@ export const TransactionRow = ({
         )}
       </TableCell>
       <TableCell className="max-w-[280px] text-sm text-[#4B5563]">
-        {transaction.descricao}
+        {transaction.description}
       </TableCell>
       <TableCell className="w-[220px]">
         <Badge
@@ -82,7 +82,7 @@ export const TransactionRow = ({
         }`}
       >
         {isIncome ? "+ " : "- "}
-        {formatCurrency(transaction.valor)}
+        {formatCurrency(transaction.amount)}
       </TableCell>
       <TableCell className="text-center">
         <div className="flex items-center justify-center gap-2">
@@ -94,7 +94,7 @@ export const TransactionRow = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  aria-label={`Editar ${transaction.descricao || "entrada"}`}
+                  aria-label={`Editar ${transaction.description || "entrada"}`}
                   className="h-9 w-9 rounded-xl border border-[#BFDBFE] bg-[#EFF6FF] p-0 text-[#2563EB] transition-colors hover:bg-[#DBEAFE]"
                 >
                   <Edit className="h-4 w-4" />
@@ -109,7 +109,7 @@ export const TransactionRow = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  aria-label={`Editar ${transaction.descricao || "saída"}`}
+                  aria-label={`Editar ${transaction.description || "saída"}`}
                   className="h-9 w-9 rounded-xl border border-[#FB923C] bg-[#FFF7ED] p-0 text-[#EA580C] transition-colors hover:bg-[#FFEAD5]"
                 >
                   <Edit className="h-4 w-4" />
@@ -120,7 +120,7 @@ export const TransactionRow = ({
           <DeleteTransactionDialog
             transactionId={transaction.id}
             transactionType={transaction.type}
-            transactionDescription={transaction.descricao}
+            transactionDescription={transaction.description}
             onDelete={onDelete}
             isPending={isPending}
           />
