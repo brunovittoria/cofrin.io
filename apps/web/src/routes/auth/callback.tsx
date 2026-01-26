@@ -22,9 +22,9 @@ function AuthCallback() {
         }
 
         if (session?.user) {
-          // Check if user exists in usuarios table, create if not
+          // Check if user exists in users table, create if not
           const { data: existingUser, error: userError } = await supabase
-            .from("usuarios")
+            .from("users")
             .select("id")
             .eq("auth_user_id", session.user.id)
             .single();
@@ -35,8 +35,8 @@ function AuthCallback() {
           }
 
           if (!existingUser) {
-            // Create user record in usuarios table
-            const { error: insertError } = await supabase.from("usuarios").insert({
+            // Create user record in users table
+            const { error: insertError } = await supabase.from("users").insert({
               auth_user_id: session.user.id,
             });
 

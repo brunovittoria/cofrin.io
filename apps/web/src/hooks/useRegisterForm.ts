@@ -57,10 +57,10 @@ export const useRegisterForm = () => {
       }
 
       if (authData.user) {
-        // Create user record in usuarios table
-        const { error: userError } = await supabase.from("usuarios").insert({
+        // Create user record in users table
+        const { error: userError } = await supabase.from("users").insert({
           auth_user_id: authData.user.id,
-          // Add other fields as needed based on your usuarios table structure
+          // Add other fields as needed based on your users table structure
         });
 
         if (userError) {
