@@ -40,8 +40,8 @@ export const useFutureLaunchesPage = () => {
   const filteredPending = useMemo(() => {
     return pendingLaunches.filter(
       (launch) =>
-        launch.descricao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        launch.categorias?.nome
+        launch.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        launch.categories?.name
           ?.toLowerCase()
           .includes(searchTerm.toLowerCase())
     );

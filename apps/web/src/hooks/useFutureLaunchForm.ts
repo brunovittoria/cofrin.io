@@ -11,7 +11,7 @@ import type { FutureLaunch } from "@/hooks/api/useFutureLaunches";
 interface UseFutureLaunchFormProps {
   mode: "create" | "edit";
   launch?: FutureLaunch & {
-    categorias?: { nome: string; cor_hex?: string };
+    categories?: { name: string; hex_color?: string };
   };
   open: boolean;
 }
@@ -28,11 +28,11 @@ export const useFutureLaunchForm = ({
     resolver: zodResolver(futureLaunchInputSchema),
     mode: "onChange",
     defaultValues: {
-      data: launch ? new Date(launch.data) : undefined,
-      tipo: launch?.tipo,
-      descricao: launch?.descricao || "",
-      categoria_id: launch?.categoria_id?.toString() || "",
-      valor: launch?.valor.toString() || "",
+      data: launch ? new Date(launch.date) : undefined,
+      tipo: launch?.type,
+      descricao: launch?.description || "",
+      categoria_id: launch?.category_id?.toString() || "",
+      valor: launch?.amount.toString() || "",
     },
   });
 
@@ -48,11 +48,11 @@ export const useFutureLaunchForm = ({
   useEffect(() => {
     if (open && mode === "edit" && launch) {
       form.reset({
-        data: new Date(launch.data + "T00:00:00"),
-        tipo: launch.tipo,
-        descricao: launch.descricao || "",
-        categoria_id: launch.categoria_id?.toString() || "",
-        valor: launch.valor.toString(),
+        data: new Date(launch.date + "T00:00:00"),
+        tipo: launch.type,
+        descricao: launch.description || "",
+        categoria_id: launch.category_id?.toString() || "",
+        valor: launch.amount.toString(),
       });
     }
   }, [open, mode, launch, form]);

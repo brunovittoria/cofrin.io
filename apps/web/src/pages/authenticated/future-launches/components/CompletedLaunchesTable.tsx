@@ -11,12 +11,12 @@ import { formatCurrency, formatLocalDate } from "@/lib/formatters";
 interface CompletedLaunchesTableProps {
   launches: Array<{
     id: number;
-    data: string;
-    descricao?: string;
-    valor: number;
-    tipo: "entrada" | "saida";
-    categorias?: {
-      nome?: string;
+    date: string;
+    description?: string;
+    amount: number;
+    type: "entrada" | "saida";
+    categories?: {
+      name?: string;
     } | null;
   }>;
 }
@@ -72,34 +72,34 @@ export const CompletedLaunchesTable = ({
                 className="border-b border-[#F1F5F9] last:border-0 hover:bg-[#F8FAFC]"
               >
                 <TableCell className="whitespace-nowrap text-sm font-semibold text-[#0F172A]">
-                  {formatLocalDate(launch.data)}
+                  {formatLocalDate(launch.date)}
                 </TableCell>
                 <TableCell className="max-w-[280px] text-sm text-[#4B5563]">
-                  {launch.descricao}
+                  {launch.description}
                 </TableCell>
                 <TableCell className="text-sm text-[#4B5563]">
-                  {launch.categorias?.nome || "Sem categoria"}
+                  {launch.categories?.name || "Sem categoria"}
                 </TableCell>
                 <TableCell>
                   <span
                     className={
-                      launch.tipo === "entrada"
+                      launch.type === "entrada"
                         ? "text-[#16A34A] font-medium"
                         : "text-[#DC2626] font-medium"
                     }
                   >
-                    {launch.tipo === "entrada" ? "Entrada" : "Saída"}
+                    {launch.type === "entrada" ? "Entrada" : "Saída"}
                   </span>
                 </TableCell>
                 <TableCell
                   className={`text-right font-semibold ${
-                    launch.tipo === "entrada"
+                    launch.type === "entrada"
                       ? "text-[#16A34A]"
                       : "text-[#DC2626]"
                   }`}
                 >
-                  {launch.tipo === "entrada" ? "+ " : "- "}
-                  {formatCurrency(launch.valor)}
+                  {launch.type === "entrada" ? "+ " : "- "}
+                  {formatCurrency(launch.amount)}
                 </TableCell>
               </TableRow>
             ))}

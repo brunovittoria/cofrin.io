@@ -8,11 +8,11 @@ import { getPreviousMonthRange } from "@/lib/trendUtils";
 
 export type FutureLaunch = {
   id: number;
-  data: string;
-  tipo: "entrada" | "saida";
-  descricao?: string;
-  valor: number;
-  categoria_id?: number;
+  date: string;
+  type: "entrada" | "saida";
+  description?: string;
+  amount: number;
+  category_id?: number;
   status: "pendente" | "efetivado";
   user_id?: string;
   created_at: string;
@@ -20,11 +20,11 @@ export type FutureLaunch = {
 };
 
 export type NewFutureLaunch = {
-  data: string;
-  tipo: "entrada" | "saida";
-  descricao?: string;
-  valor: number;
-  categoria_id?: number;
+  date: string;
+  type: "entrada" | "saida";
+  description?: string;
+  amount: number;
+  category_id?: number;
   status?: "pendente" | "efetivado";
 };
 
@@ -48,24 +48,24 @@ export const useFutureLaunches = (
       }
 
       let query = supabase
-        .from("lancamentos_futuros")
+        .from("future_transactions")
         .select(
           `
           *,
-          categorias(nome, cor_hex)
+          categories(name, hex_color)
         `
         )
-        .order("data", { ascending: true });
+        .order("date", { ascending: true });
 
       // Filter by date range if provided
       if (dateRange?.from && dateRange?.to) {
         const startDate = toLocalDateString(dateRange.from);
         const endDate = toLocalDateString(dateRange.to);
-        query = query.gte("data", startDate).lte("data", endDate);
+        query = query.gte("date", startDate).lte("date", endDate);
       } else if (dateRange?.from) {
         // Only from date provided
         const startDate = toLocalDateString(dateRange.from);
-        query = query.gte("data", startDate);
+        query = query.gte("date", startDate);
       }
 
       // Filter by status if provided
@@ -77,7 +77,7 @@ export const useFutureLaunches = (
 
       if (error) throw error;
       return data as (FutureLaunch & {
-        categorias?: { nome: string; cor_hex?: string };
+        categories?: { name: string; hex_color?: string };
       })[];
     },
     enabled: !!user?.id,
@@ -100,18 +100,18 @@ export const useFutureLaunchesSummary = (dateRange?: DateRange) => {
       }
 
       let query = supabase
-        .from("lancamentos_futuros")
-        .select("valor, tipo, status");
+        .from("future_transactions")
+        .select("amount, type, status");
 
       // Filter by date range if provided
       if (dateRange?.from && dateRange?.to) {
         const startDate = toLocalDateString(dateRange.from);
         const endDate = toLocalDateString(dateRange.to);
-        query = query.gte("data", startDate).lte("data", endDate);
+        query = query.gte("date", startDate).lte("date", endDate);
       } else if (dateRange?.from) {
         // Only from date provided
         const startDate = toLocalDateString(dateRange.from);
-        query = query.gte("data", startDate);
+        query = query.gte("date", startDate);
       }
 
       const { data, error } = await query;
@@ -120,18 +120,18 @@ export const useFutureLaunchesSummary = (dateRange?: DateRange) => {
 
       // Calculate totals
       const toReceive = data
-        .filter((item) => item.tipo === "entrada" && item.status === "pendente")
-        .reduce((sum, item) => sum + Number(item.valor), 0);
+        .filter((item) => item.type === "entrada" && item.status === "pendente")
+        .reduce((sum, item) => sum + Number(item.amount), 0);
 
       const toPay = data
-        .filter((item) => item.tipo === "saida" && item.status === "pendente")
-        .reduce((sum, item) => sum + Number(item.valor), 0);
+        .filter((item) => item.type === "saida" && item.status === "pendente")
+        .reduce((sum, item) => sum + Number(item.amount), 0);
 
       const completed = data
         .filter((item) => item.status === "efetivado")
         .reduce((sum, item) => {
-          const value = Number(item.valor);
-          return sum + (item.tipo === "entrada" ? value : -value);
+          const value = Number(item.amount);
+          return sum + (item.type === "entrada" ? value : -value);
         }, 0);
 
       const projectedBalance = toReceive - toPay;
@@ -162,27 +162,27 @@ export const useFutureLaunchesSummaryPreviousMonth = (dateRange?: DateRange) => 
       const endDate = toLocalDateString(previousMonthRange.to);
       
       const { data, error } = await supabase
-        .from("lancamentos_futuros")
-        .select("valor, tipo, status")
-        .gte("data", startDate)
-        .lte("data", endDate);
+        .from("future_transactions")
+        .select("amount, type, status")
+        .gte("date", startDate)
+        .lte("date", endDate);
       
       if (error) throw error;
       
       // Calculate totals
       const toReceive = data
-        .filter((item) => item.tipo === "entrada" && item.status === "pendente")
-        .reduce((sum, item) => sum + Number(item.valor), 0);
+        .filter((item) => item.type === "entrada" && item.status === "pendente")
+        .reduce((sum, item) => sum + Number(item.amount), 0);
 
       const toPay = data
-        .filter((item) => item.tipo === "saida" && item.status === "pendente")
-        .reduce((sum, item) => sum + Number(item.valor), 0);
+        .filter((item) => item.type === "saida" && item.status === "pendente")
+        .reduce((sum, item) => sum + Number(item.amount), 0);
 
       const completed = data
         .filter((item) => item.status === "efetivado")
         .reduce((sum, item) => {
-          const value = Number(item.valor);
-          return sum + (item.tipo === "entrada" ? value : -value);
+          const value = Number(item.amount);
+          return sum + (item.type === "entrada" ? value : -value);
         }, 0);
 
       const projectedBalance = toReceive - toPay;
@@ -204,19 +204,19 @@ export const useCreateFutureLaunch = () => {
         throw new Error("Usuário não autenticado");
       }
 
-      // Get user_id from 'usuarios' table based on auth_user_id
+      // Get user_id from 'users' table based on auth_user_id
       const { data: usuario, error: userError } = await supabase
-        .from("usuarios")
+        .from("users")
         .select("id")
         .eq("auth_user_id", user.id)
         .single();
 
       if (userError) {
-        throw new Error("Usuário não encontrado na tabela usuarios");
+        throw new Error("Usuário não encontrado na tabela users");
       }
 
       const { data, error } = await supabase
-        .from("lancamentos_futuros")
+        .from("future_transactions")
         .insert({
           ...launch,
           user_id: usuario.id,
@@ -260,7 +260,7 @@ export const useUpdateFutureLaunch = () => {
       ...updates
     }: Partial<FutureLaunch> & { id: number }) => {
       const { data, error } = await supabase
-        .from("lancamentos_futuros")
+        .from("future_transactions")
         .update(updates)
         .eq("id", id)
         .select()
@@ -296,7 +296,7 @@ export const useDeleteFutureLaunch = () => {
   return useMutation({
     mutationFn: async (id: number) => {
       const { error } = await supabase
-        .from("lancamentos_futuros")
+        .from("future_transactions")
         .delete()
         .eq("id", id);
 
@@ -335,31 +335,31 @@ export const useCompleteFutureLaunch = () => {
 
       // Fetch the launch
       const { data: launch, error: fetchError } = await supabase
-        .from("lancamentos_futuros")
+        .from("future_transactions")
         .select("*")
         .eq("id", id)
         .single();
 
       if (fetchError) throw fetchError;
 
-      // Get user_id from 'usuarios' table
+      // Get user_id from 'users' table
       const { data: usuario, error: userError } = await supabase
-        .from("usuarios")
+        .from("users")
         .select("id")
         .eq("auth_user_id", user.id)
         .single();
 
       if (userError) {
-        throw new Error("Usuário não encontrado na tabela usuarios");
+        throw new Error("Usuário não encontrado na tabela users");
       }
 
       // Create corresponding income or expense
-      const table = launch.tipo === "entrada" ? "entradas" : "saidas";
+      const table = launch.type === "entrada" ? "incomes" : "expenses";
       const { error: insertError } = await supabase.from(table).insert({
-        data: launch.data,
-        descricao: launch.descricao,
-        valor: launch.valor,
-        categoria_id: launch.categoria_id,
+        date: launch.date,
+        description: launch.description,
+        amount: launch.amount,
+        category_id: launch.category_id,
         user_id: usuario.id,
       });
 
@@ -367,7 +367,7 @@ export const useCompleteFutureLaunch = () => {
 
       // Update launch status
       const { error: updateError } = await supabase
-        .from("lancamentos_futuros")
+        .from("future_transactions")
         .update({ status: "efetivado" })
         .eq("id", id);
 

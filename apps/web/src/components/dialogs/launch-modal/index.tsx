@@ -29,7 +29,7 @@ interface FutureLaunchModalProps {
   trigger?: React.ReactNode;
   mode?: "create" | "edit";
   launch?: FutureLaunch & {
-    categorias?: { nome: string; cor_hex?: string };
+    categories?: { name: string; hex_color?: string };
   };
 }
 
@@ -50,11 +50,11 @@ export function FutureLaunchModal({
 
   const handleSubmit = (data: FutureLaunchFormData) => {
     const payload = {
-      data: toLocalDateString(data.data),
-      tipo: data.tipo,
-      descricao: data.descricao,
-      categoria_id: parseInt(data.categoria_id, 10),
-      valor: parseFloat(data.valor.replace(",", ".")),
+      date: toLocalDateString(data.data),
+      type: data.tipo,
+      description: data.descricao,
+      category_id: parseInt(data.categoria_id, 10),
+      amount: parseFloat(data.valor.replace(",", ".")),
     };
 
     if (mode === "edit" && launch) {
