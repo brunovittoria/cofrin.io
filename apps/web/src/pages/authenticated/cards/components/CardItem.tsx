@@ -23,15 +23,15 @@ export const CardItem = ({
   isPendingSetPrincipal,
 }: CardItemProps) => {
   const percentual =
-    card.uso_percentual ??
-    (card.limite_total > 0
-      ? Number((card.valor_utilizado / card.limite_total) * 100)
+    card.usage_percentage ??
+    (card.total_limit > 0
+      ? Number((card.used_amount / card.total_limit) * 100)
       : 0);
   const available =
-    card.valor_disponivel ?? card.limite_total - card.valor_utilizado;
+    card.available_amount ?? card.total_limit - card.used_amount;
   const { label: statusLabel, className: statusClass } =
     getStatusStyles(percentual);
-  const provider = card.emissor ? cardProvidersMap[card.emissor] : undefined;
+  const provider = card.issuer ? cardProvidersMap[card.issuer] : undefined;
   const imageUrl = card.imagem_url ?? provider?.imageUrl;
 
   return (
@@ -39,7 +39,7 @@ export const CardItem = ({
       {imageUrl ? (
         <img
           src={imageUrl}
-          alt={provider?.name ?? card.nome_exibicao}
+          alt={provider?.name ?? card.display_name}
           className="object-cover w-[65%] h-[65%] mx-auto my-4"
         />
       ) : (
@@ -55,18 +55,18 @@ export const CardItem = ({
               <span
                 className={cn(
                   "inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold",
-                  brandStyles[card.bandeira as keyof typeof brandStyles]
+                  brandStyles[card.flag as keyof typeof brandStyles]
                     ?.badge ?? "bg-[#E2E8F0] text-[#475569]"
                 )}
               >
-                {card.bandeira ?? "Sem bandeira"}
+                {card.flag ?? "Sem bandeira"}
               </span>
               <span className="text-xs uppercase tracking-[0.3em] text-[#9CA3AF]">
-                **** {card.final_cartao ?? "0000"}
+                **** {card.card_last_four ?? "0000"}
               </span>
             </div>
             <h2 className="text-lg font-semibold text-[#0F172A]">
-              {card.nome_exibicao}
+              {card.display_name}
             </h2>
           </div>
           <span
@@ -86,7 +86,7 @@ export const CardItem = ({
             </p>
             <p className="mt-1 text-base font-semibold text-[#0F172A]">
               R${" "}
-              {card.limite_total.toLocaleString("pt-BR", {
+              {(card.total_limit ?? 0).toLocaleString("pt-BR", {
                 minimumFractionDigits: 2,
               })}
             </p>
@@ -97,7 +97,7 @@ export const CardItem = ({
             </p>
             <p className="mt-1 text-base font-semibold text-[#0F172A]">
               R${" "}
-              {card.valor_utilizado.toLocaleString("pt-BR", {
+              {(card.used_amount ?? 0).toLocaleString("pt-BR", {
                 minimumFractionDigits: 2,
               })}
             </p>
@@ -143,14 +143,14 @@ export const CardItem = ({
       <div className="flex gap-2 mt-2">
         <Button
           size="sm"
-          variant={card.is_principal ? "default" : "outline"}
+          variant={card.is_primary ? "default" : "outline"}
           className="flex-1"
           onClick={() => onSetPrincipal(card.id)}
           disabled={isPendingSetPrincipal}
         >
           <Star
             className={`h-4 w-4 ${
-              card.is_principal
+              card.is_primary
                 ? "text-yellow-500 fill-yellow-500"
                 : "text-gray-500"
             }`}

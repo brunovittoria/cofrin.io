@@ -3,18 +3,18 @@ import { cardProvidersMap } from "@/mocks/cardProviders";
 
 interface Card {
   id?: string;
-  nome_exibicao: string;
-  apelido?: string;
-  bandeira?: string;
-  final_cartao?: string;
-  limite_total: number | string;
-  valor_utilizado: number | string;
-  valor_disponivel?: number;
-  uso_percentual?: number;
-  emissor?: string;
+  display_name: string;
+  nickname?: string;
+  flag?: string;
+  card_last_four?: string;
+  total_limit: number | string;
+  used_amount: number | string;
+  available_amount?: number;
+  usage_percentage?: number;
+  issuer?: string;
   imagem_url?: string;
-  criado_em?: string;
-  is_principal?: boolean;
+  created_at?: string;
+  is_primary?: boolean;
 }
 
 interface UseCardFormProps {
@@ -28,13 +28,13 @@ const getInitialFormState = (mode: "add" | "edit", card?: Card) => {
   }
 
   return {
-    nome_exibicao: "",
-    apelido: "",
-    bandeira: "",
-    emissor: "",
-    final_cartao: "",
-    limite_total: "",
-    valor_utilizado: "",
+    display_name: "",
+    nickname: "",
+    flag: "",
+    issuer: "",
+    card_last_four: "",
+    total_limit: "",
+    used_amount: "",
   };
 };
 
@@ -44,15 +44,15 @@ export const useCardForm = ({ mode, initialCard }: UseCardFormProps) => {
   );
 
   const limitNumber = useMemo(
-    () => Number(formData.limite_total) || 0,
-    [formData.limite_total]
+    () => Number(formData.total_limit) || 0,
+    [formData.total_limit]
   );
   const usedNumber = useMemo(
-    () => Number(formData.valor_utilizado) || 0,
-    [formData.valor_utilizado]
+    () => Number(formData.used_amount) || 0,
+    [formData.used_amount]
   );
-  const selectedProvider = formData.emissor
-    ? cardProvidersMap[formData.emissor]
+  const selectedProvider = formData.issuer
+    ? cardProvidersMap[formData.issuer]
     : undefined;
 
   const availableValue = Math.max(limitNumber - usedNumber, 0);
@@ -71,16 +71,16 @@ export const useCardForm = ({ mode, initialCard }: UseCardFormProps) => {
 
   const getSubmitData = () => {
     const baseData = {
-      nome_exibicao: formData.nome_exibicao,
-      apelido: formData.apelido?.trim() ? formData.apelido : null,
-      bandeira: formData.bandeira || null,
-      final_cartao: formData.final_cartao?.trim() || null,
-      limite_total: limitNumber,
-      valor_utilizado: usedNumber,
-      valor_disponivel: Math.max(limitNumber - usedNumber, 0),
-      uso_percentual:
+      display_name: formData.display_name,
+      nickname: formData.nickname?.trim() ? formData.nickname : null,
+      flag: formData.flag || null,
+      card_last_four: formData.card_last_four?.trim() || null,
+      total_limit: limitNumber,
+      used_amount: usedNumber,
+      available_amount: Math.max(limitNumber - usedNumber, 0),
+      usage_percentage:
         limitNumber > 0 ? (usedNumber / limitNumber) * 100 : 0,
-      emissor: formData.emissor || null,
+      issuer: formData.issuer || null,
     };
 
     if (mode === "edit" && formData.id) {
@@ -88,14 +88,14 @@ export const useCardForm = ({ mode, initialCard }: UseCardFormProps) => {
         ...baseData,
         id: formData.id,
         imagem_url: formData.imagem_url || null,
-        criado_em: formData.criado_em || null,
-        is_principal: formData.is_principal || false,
+        created_at: formData.created_at || null,
+        is_primary: formData.is_primary || false,
       };
     }
 
     return {
       ...baseData,
-      is_principal: false,
+      is_primary: false,
     };
   };
 

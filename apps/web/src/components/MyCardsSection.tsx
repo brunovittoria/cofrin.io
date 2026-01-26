@@ -1,8 +1,12 @@
-﻿import { Card } from "@/hooks/api/useCards";
+import { Card } from "@/hooks/api/useCards";
 import { cardProvidersMap } from "@/mocks/cardProviders";
 
-const formatCurrency = (value: number) =>
-  "R$ " + value.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+const formatCurrency = (value: number | undefined) => {
+  if (value === undefined || value === null) {
+    return "R$ 0,00";
+  }
+  return "R$ " + value.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+};
 
 const getProgress = (used: number, limit: number) => {
   if (!limit) return 0;
@@ -16,7 +20,7 @@ type MyCardsSectionProps = {
 export const MyCardsSection = ({ cards = [] }: MyCardsSectionProps) => {
   // Find primary card, or use the first card if none is primary
   const primaryCard =
-    cards.find((card) => card.is_principal) || cards[0];
+    cards.find((card) => card.is_primary) || cards[0];
 
   if (!primaryCard) {
     return (
@@ -43,11 +47,11 @@ export const MyCardsSection = ({ cards = [] }: MyCardsSectionProps) => {
   }
 
   const progress = getProgress(
-    primaryCard.valor_utilizado,
-    primaryCard.limite_total
+    primaryCard.used_amount,
+    primaryCard.total_limit
   );
-  const provider = primaryCard.emissor
-    ? cardProvidersMap[primaryCard.emissor]
+  const provider = primaryCard.issuer
+    ? cardProvidersMap[primaryCard.issuer]
     : undefined;
   const imageUrl = primaryCard.imagem_url ?? provider?.imageUrl;
 
@@ -68,12 +72,12 @@ export const MyCardsSection = ({ cards = [] }: MyCardsSectionProps) => {
           {imageUrl ? (
             <img
               src={imageUrl}
-              alt={provider?.name ?? primaryCard.nome_exibicao}
+              alt={provider?.name ?? primaryCard.display_name}
               className="h-full w-full object-cover"
             />
           ) : (
             <div className="flex aspect-[16/10] w-full items-center justify-center bg-info/10 text-sm font-semibold uppercase tracking-[0.25em] text-muted-foreground">
-              {primaryCard.nome_exibicao}
+              {primaryCard.display_name}
             </div>
           )}
         </div>
@@ -82,8 +86,8 @@ export const MyCardsSection = ({ cards = [] }: MyCardsSectionProps) => {
           <div className="flex items-center justify-between text-sm text-muted-foreground">
             <span>Uso do limite</span>
             <span className="font-semibold text-foreground">
-              {formatCurrency(primaryCard.valor_utilizado)} /{" "}
-              {formatCurrency(primaryCard.limite_total)}
+              {formatCurrency(primaryCard.used_amount)} /{" "}
+              {formatCurrency(primaryCard.total_limit)}
             </span>
           </div>
           <div className="mt-3 h-2 rounded-full bg-border">
@@ -96,7 +100,7 @@ export const MyCardsSection = ({ cards = [] }: MyCardsSectionProps) => {
             <span>
               Disponível:{" "}
               {formatCurrency(
-                primaryCard.limite_total - primaryCard.valor_utilizado
+                primaryCard.total_limit - primaryCard.used_amount
               )}
             </span>
             <span className="font-semibold text-foreground">{progress}%</span>

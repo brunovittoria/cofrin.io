@@ -6,54 +6,54 @@ import { useAuth } from "@/contexts/AuthContext";
 
 type CardRow = {
   id: number;
-  nome_exibicao: string;
-  apelido: string | null;
-  bandeira: string | null;
-  final_cartao: string | null;
-  limite_total: number | string;
-  valor_utilizado: number | string;
-  valor_disponivel: number | string | null;
-  uso_percentual: number | string | null;
-  is_principal: boolean | null;
-  emissor: string | null;
+  display_name: string;
+  nickname: string | null;
+  flag: string | null;
+  card_last_four: string | null;
+  total_limit: number | string;
+  used_amount: number | string;
+  available_amount: number | string | null;
+  usage_percentage: number | string | null;
+  is_primary: boolean | null;
+  issuer: string | null;
   imagem_url: string | null;
-  criado_em: string | null;
+  created_at: string | null;
   user_id?: string;
 };
 
 export type Card = {
   id: number;
-  nome_exibicao: string;
-  apelido: string | null;
-  bandeira: string | null;
-  final_cartao: string | null;
-  limite_total: number;
-  valor_utilizado: number;
-  valor_disponivel: number;
-  uso_percentual: number;
-  is_principal: boolean;
-  emissor: string | null;
+  display_name: string;
+  nickname: string | null;
+  flag: string | null;
+  card_last_four: string | null;
+  total_limit: number;
+  used_amount: number;
+  available_amount: number;
+  usage_percentage: number;
+  is_primary: boolean;
+  issuer: string | null;
   imagem_url: string | null;
-  criado_em: string | null;
+  created_at: string | null;
 };
 
 export type NewCard = {
-  nome_exibicao: string;
-  apelido?: string | null;
-  bandeira?: string | null;
-  final_cartao?: string | null;
-  limite_total: number;
-  valor_utilizado: number;
-  valor_disponivel: number;
-  uso_percentual: number;
-  is_principal?: boolean;
-  emissor?: string | null;
+  display_name: string;
+  nickname?: string | null;
+  flag?: string | null;
+  card_last_four?: string | null;
+  total_limit: number;
+  used_amount: number;
+  available_amount: number;
+  usage_percentage: number;
+  is_primary?: boolean;
+  issuer?: string | null;
 };
 
-const resolveImageUrl = (row: Pick<CardRow, "imagem_url" | "emissor">) => {
+const resolveImageUrl = (row: Pick<CardRow, "imagem_url" | "issuer">) => {
   if (row.imagem_url) return row.imagem_url;
-  if (row.emissor && cardProvidersMap[row.emissor]) {
-    return cardProvidersMap[row.emissor].imageUrl;
+  if (row.issuer && cardProvidersMap[row.issuer]) {
+    return cardProvidersMap[row.issuer].imageUrl;
   }
   return null;
 };
@@ -65,29 +65,29 @@ const parseNumeric = (value: number | string | null | undefined) => {
 };
 
 const mapCard = (row: CardRow): Card => {
-  const limit = Number(row.limite_total ?? 0);
-  const used = Number(row.valor_utilizado ?? 0);
-  const availableCalculated = parseNumeric(row.valor_disponivel);
+  const limit = Number(row.total_limit ?? 0);
+  const used = Number(row.used_amount ?? 0);
+  const availableCalculated = parseNumeric(row.available_amount);
   const availableBase = availableCalculated ?? Math.max(limit - used, 0);
-  const percentageCalculated = parseNumeric(row.uso_percentual);
+  const percentageCalculated = parseNumeric(row.usage_percentage);
   const percentageBase =
     percentageCalculated ?? (limit > 0 ? (used / limit) * 100 : 0);
   const percentage = Math.min(percentageBase, 999);
 
   return {
     id: row.id,
-    nome_exibicao: row.nome_exibicao,
-    apelido: row.apelido ?? null,
-    bandeira: row.bandeira ?? null,
-    final_cartao: row.final_cartao ?? null,
-    limite_total: limit,
-    valor_utilizado: used,
-    valor_disponivel: Number(availableBase.toFixed(2)),
-    uso_percentual: Number(percentage.toFixed(2)),
-    is_principal: row.is_principal ?? false,
-    emissor: row.emissor ?? null,
+    display_name: row.display_name,
+    nickname: row.nickname ?? null,
+    flag: row.flag ?? null,
+    card_last_four: row.card_last_four ?? null,
+    total_limit: limit,
+    used_amount: used,
+    available_amount: Number(availableBase.toFixed(2)),
+    usage_percentage: Number(percentage.toFixed(2)),
+    is_primary: row.is_primary ?? false,
+    issuer: row.issuer ?? null,
     imagem_url: resolveImageUrl(row),
-    criado_em: row.criado_em ?? null,
+    created_at: row.created_at ?? null,
   };
 };
 
@@ -102,9 +102,9 @@ export const useCards = () => {
       }
 
       const { data, error } = await supabase
-        .from("cartoes")
+        .from("cards")
         .select("*")
-        .order("criado_em", { ascending: false });
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       return (data as CardRow[]).map(mapCard);
@@ -124,30 +124,30 @@ export const useCreateCard = () => {
         throw new Error("Usuário não autenticado");
       }
 
-      // Get user_id from 'usuarios' table based on auth_user_id
+      // Get user_id from 'users' table based on auth_user_id
       const { data: usuario, error: userError } = await supabase
-        .from("usuarios")
+        .from("users")
         .select("id")
         .eq("auth_user_id", user.id)
         .single();
 
       if (userError) {
-        throw new Error("Usuário não encontrado na tabela usuarios");
+        throw new Error("Usuário não encontrado na tabela users");
       }
 
       const { data, error } = await supabase
-        .from("cartoes")
+        .from("cards")
         .insert({
-          nome_exibicao: card.nome_exibicao || "",
-          apelido: card.apelido ?? null,
-          bandeira: card.bandeira ?? null,
-          final_cartao: card.final_cartao ?? null,
-          limite_total: Number(card.limite_total) || 0,
-          valor_utilizado: Number(card.valor_utilizado) || 0,
-          valor_disponivel: Number(card.valor_disponivel) || 0,
-          uso_percentual: Number(card.uso_percentual) || 0,
-          is_principal: card.is_principal ?? false,
-          emissor: card.emissor ?? null,
+          display_name: card.display_name || "",
+          nickname: card.nickname ?? null,
+          flag: card.flag ?? null,
+          card_last_four: card.card_last_four ?? null,
+          total_limit: Number(card.total_limit) || 0,
+          used_amount: Number(card.used_amount) || 0,
+          available_amount: Number(card.available_amount) || 0,
+          usage_percentage: Number(card.usage_percentage) || 0,
+          is_primary: card.is_primary ?? false,
+          issuer: card.issuer ?? null,
           user_id: usuario.id,
         })
         .select("*")
@@ -180,18 +180,18 @@ export const useUpdateCard = () => {
   return useMutation({
     mutationFn: async (card: Card) => {
       const { data, error } = await supabase
-        .from("cartoes")
+        .from("cards")
         .update({
-          nome_exibicao: card.nome_exibicao || "",
-          apelido: card.apelido ?? null,
-          bandeira: card.bandeira ?? null,
-          final_cartao: card.final_cartao ?? null,
-          limite_total: Number(card.limite_total) || 0,
-          valor_utilizado: Number(card.valor_utilizado) || 0,
-          valor_disponivel: Number(card.valor_disponivel) || 0,
-          uso_percentual: Number(card.uso_percentual) || 0,
-          emissor: card.emissor ?? null,
-          is_principal: card.is_principal ?? false,
+          display_name: card.display_name || "",
+          nickname: card.nickname ?? null,
+          flag: card.flag ?? null,
+          card_last_four: card.card_last_four ?? null,
+          total_limit: Number(card.total_limit) || 0,
+          used_amount: Number(card.used_amount) || 0,
+          available_amount: Number(card.available_amount) || 0,
+          usage_percentage: Number(card.usage_percentage) || 0,
+          issuer: card.issuer ?? null,
+          is_primary: card.is_primary ?? false,
         })
         .eq("id", card.id)
         .select("*")
@@ -223,7 +223,7 @@ export const useDeleteCard = () => {
 
   return useMutation({
     mutationFn: async (id: number) => {
-      const { error } = await supabase.from("cartoes").delete().eq("id", id);
+      const { error } = await supabase.from("cards").delete().eq("id", id);
 
       if (error) throw error;
       return id;
@@ -253,16 +253,16 @@ export const useSetPrimaryCard = () => {
     mutationFn: async (id: number) => {
       // First, set all cards as non-primary
       const { error: error1 } = await supabase
-        .from("cartoes")
-        .update({ is_principal: false })
+        .from("cards")
+        .update({ is_primary: false })
         .neq("id", id);
 
       if (error1) throw error1;
 
       // Then, set the selected card as primary
       const { data, error: error2 } = await supabase
-        .from("cartoes")
-        .update({ is_principal: true })
+        .from("cards")
+        .update({ is_primary: true })
         .eq("id", id)
         .select("*")
         .single();

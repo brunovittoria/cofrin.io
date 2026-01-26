@@ -18,18 +18,18 @@ import { FormActions } from "./components/FormActions";
 
 interface Card {
   id?: string;
-  nome_exibicao: string;
-  apelido?: string;
-  bandeira?: string;
-  final_cartao?: string;
-  limite_total: number | string;
-  valor_utilizado: number | string;
-  valor_disponivel?: number;
-  uso_percentual?: number;
-  emissor?: string;
+  display_name: string;
+  nickname?: string;
+  flag?: string;
+  card_last_four?: string;
+  total_limit: number | string;
+  used_amount: number | string;
+  available_amount?: number;
+  usage_percentage?: number;
+  issuer?: string;
   imagem_url?: string;
-  criado_em?: string;
-  is_principal?: boolean;
+  created_at?: string;
+  is_primary?: boolean;
 }
 
 interface CardModalProps {
@@ -120,36 +120,36 @@ export function CardModal({
         <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-5">
           <div className="flex-1 min-w-0 grid gap-4">
             <CardBasicFields
-              nomeExibicao={formData.nome_exibicao}
-              apelido={formData.apelido || ""}
+              nomeExibicao={formData.display_name}
+              apelido={formData.nickname || ""}
               onNomeExibicaoChange={(value) =>
-                updateField("nome_exibicao", value)
+                updateField("display_name", value)
               }
-              onApelidoChange={(value) => updateField("apelido", value)}
+              onApelidoChange={(value) => updateField("nickname", value)}
             />
 
             <CardProviderFields
-              emissor={formData.emissor || ""}
-              bandeira={formData.bandeira || ""}
-              onEmissorChange={(value) => updateField("emissor", value)}
-              onBandeiraChange={(value) => updateField("bandeira", value)}
+              emissor={formData.issuer || ""}
+              bandeira={formData.flag || ""}
+              onEmissorChange={(value) => updateField("issuer", value)}
+              onBandeiraChange={(value) => updateField("flag", value)}
             />
 
             <CardNumberLimitFields
-              finalCartao={formData.final_cartao || ""}
-              limiteTotal={String(formData.limite_total)}
+              finalCartao={formData.card_last_four || ""}
+              limiteTotal={String(formData.total_limit)}
               onFinalCartaoChange={(value) =>
-                updateField("final_cartao", value)
+                updateField("card_last_four", value)
               }
               onLimiteTotalChange={(value) =>
-                updateField("limite_total", value)
+                updateField("total_limit", value)
               }
             />
 
             <CardUsageFields
-              valorUtilizado={String(formData.valor_utilizado)}
+              valorUtilizado={String(formData.used_amount)}
               onValorUtilizadoChange={(value) =>
-                updateField("valor_utilizado", value)
+                updateField("used_amount", value)
               }
               providerImageUrl={selectedProvider?.imageUrl}
               providerName={selectedProvider?.name}
