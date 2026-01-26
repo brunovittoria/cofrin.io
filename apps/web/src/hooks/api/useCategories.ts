@@ -5,19 +5,19 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export type Category = {
   id: number;
-  nome: string;
-  descricao?: string;
-  tipo?: string;
-  cor_hex?: string;
+  name: string;
+  description?: string;
+  type?: string;
+  hex_color?: string;
   user_id?: string;
   created_at: string;
 };
 
 export type NewCategory = {
-  nome: string;
-  descricao?: string;
-  tipo: string;
-  cor_hex: string;
+  name: string;
+  description?: string;
+  type: string;
+  hex_color: string;
 };
 
 export const useCategories = (tipo?: string) => {
@@ -30,13 +30,13 @@ export const useCategories = (tipo?: string) => {
         return [];
       }
 
-      let query = supabase.from('categorias').select('*');
+      let query = supabase.from('categories').select('*');
       
       if (tipo) {
-        query = query.eq('tipo', tipo);
+        query = query.eq('type', tipo);
       }
       
-      const { data, error } = await query.order('nome');
+      const { data, error } = await query.order('name');
       
       if (error) throw error;
       return data as Category[];
@@ -56,19 +56,19 @@ export const useCreateCategory = () => {
         throw new Error("Usuário não autenticado");
       }
 
-      // Get user_id from 'usuarios' table based on auth_user_id
+      // Get user_id from 'users' table based on auth_user_id
       const { data: usuario, error: userError } = await supabase
-        .from("usuarios")
+        .from("users")
         .select("id")
         .eq("auth_user_id", user.id)
         .single();
 
       if (userError) {
-        throw new Error("Usuário não encontrado na tabela usuarios");
+        throw new Error("Usuário não encontrado na tabela users");
       }
 
       const { data, error } = await supabase
-        .from('categorias')
+        .from('categories')
         .insert({
           ...category,
           user_id: usuario.id,
@@ -103,7 +103,7 @@ export const useUpdateCategory = () => {
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Category> & { id: number }) => {
       const { data, error } = await supabase
-        .from('categorias')
+        .from('categories')
         .update(updates)
         .eq('id', id)
         .select()
@@ -136,7 +136,7 @@ export const useDeleteCategory = () => {
   return useMutation({
     mutationFn: async (id: number) => {
       const { error } = await supabase
-        .from('categorias')
+        .from('categories')
         .delete()
         .eq('id', id);
       

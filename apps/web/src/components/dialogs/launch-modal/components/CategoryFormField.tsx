@@ -84,10 +84,10 @@ export const CategoryFormField = ({ control, categories, tipo }: CategoryFormFie
                       className="h-3.5 w-3.5 rounded-full"
                       style={{
                         backgroundColor:
-                          category.cor_hex || (tipo === "entrada" ? "#16A34A" : "#DC2626"),
+                          category.hex_color || (tipo === "entrada" ? "#16A34A" : "#DC2626"),
                       }}
                     />
-                    {category.nome}
+                    {category.name}
                   </div>
                 </SelectItem>
               ))}

@@ -49,9 +49,9 @@ export const CategoryField = ({
               <div className="flex items-center gap-2">
                 <div
                   className="h-3.5 w-3.5 rounded-full"
-                  style={{ backgroundColor: category.cor_hex || "#DC2626" }}
+                  style={{ backgroundColor: category.hex_color || "#DC2626" }}
                 />
-                {category.nome}
+                {category.name}
               </div>
             </SelectItem>
           ))}

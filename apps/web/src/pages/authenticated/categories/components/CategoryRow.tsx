@@ -26,13 +26,13 @@ export const CategoryRow = ({
         <div className="flex items-center gap-3">
           <span
             className="h-3 w-3 rounded-full"
-            style={colorStyle(category.cor_hex || undefined)}
+            style={colorStyle(category.hex_color || undefined)}
           />
-          {category.nome}
+          {category.name}
         </div>
       </TableCell>
       <TableCell className="text-sm text-[#4B5563]">
-        {category.descricao || "Sem descrição"}
+        {category.description || "Sem descrição"}
       </TableCell>
       <TableCell className="text-center">
         <div className="flex items-center justify-center gap-2">

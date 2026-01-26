@@ -2,10 +2,10 @@ import { useState } from "react";
 import type { Category } from "@/hooks/api/useCategories";
 
 interface CategoryFormData {
-  nome: string;
-  descricao: string;
-  tipo: string;
-  cor_hex: string;
+  name: string;
+  description: string;
+  type: string;
+  hex_color: string;
 }
 
 interface UseCategoryFormProps {
@@ -21,18 +21,18 @@ const getInitialFormState = (
 ): CategoryFormData => {
   if (mode === "edit" && category) {
     return {
-      nome: category.nome || "",
-      descricao: category.descricao || "",
-      tipo: category.tipo || defaultType || "",
-      cor_hex: category.cor_hex || "",
+      name: category.name || "",
+      description: category.description || "",
+      type: category.type || defaultType || "",
+      hex_color: category.hex_color || "",
     };
   }
 
   return {
-    nome: "",
-    descricao: "",
-    tipo: defaultType || "",
-    cor_hex: "",
+    name: "",
+    description: "",
+    type: defaultType || "",
+    hex_color: "",
   };
 };
 
@@ -63,18 +63,18 @@ export const useCategoryForm = ({
     if (mode === "edit" && category?.id) {
       return {
         id: category.id,
-        nome: formData.nome,
-        descricao: formData.descricao || undefined,
-        tipo: formData.tipo,
-        cor_hex: formData.cor_hex,
+        name: formData.name,
+        description: formData.description || undefined,
+        type: formData.type,
+        hex_color: formData.hex_color,
       };
     }
 
     return {
-      nome: formData.nome,
-      descricao: formData.descricao || undefined,
-      tipo: formData.tipo,
-      cor_hex: formData.cor_hex,
+      name: formData.name,
+      description: formData.description || undefined,
+      type: formData.type,
+      hex_color: formData.hex_color,
     };
   };
 

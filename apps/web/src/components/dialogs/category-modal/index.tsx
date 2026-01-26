@@ -102,23 +102,23 @@ export function CategoryModal({
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <CategoryNameField
-            value={formData.nome}
-            onChange={(value) => updateField("nome", value)}
+            value={formData.name}
+            onChange={(value) => updateField("name", value)}
           />
 
           <CategoryDescriptionField
-            value={formData.descricao}
-            onChange={(value) => updateField("descricao", value)}
+            value={formData.description}
+            onChange={(value) => updateField("description", value)}
           />
 
           <CategoryTypeField
-            value={formData.tipo}
-            onChange={(value) => updateField("tipo", value)}
+            value={formData.type}
+            onChange={(value) => updateField("type", value)}
           />
 
           <CategoryColorField
-            value={formData.cor_hex}
-            onChange={(value) => updateField("cor_hex", value)}
+            value={formData.hex_color}
+            onChange={(value) => updateField("hex_color", value)}
           />
 
           <FormActions
