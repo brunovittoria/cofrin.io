@@ -8,24 +8,24 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export type Expense = {
   id: number;
-  data: string;
-  descricao?: string;
-  valor: number;
-  categoria_id?: number;
+  date: string;
+  description?: string;
+  amount: number;
+  category_id?: number;
   user_id?: string;
   created_at: string;
-  categorias?: {
+  categories?: {
     id: number;
-    nome: string;
-    cor_hex: string | null;
+    name: string;
+    hex_color: string | null;
   } | null;
 };
 
 export type NewExpense = {
-  data: string;
-  descricao?: string;
-  valor: number;
-  categoria_id?: number;
+  date: string;
+  description?: string;
+  amount: number;
+  category_id?: number;
 };
 
 export const useExpenses = (dateRange?: DateRange) => {
@@ -44,19 +44,19 @@ export const useExpenses = (dateRange?: DateRange) => {
       }
 
       let query = supabase
-        .from("saidas")
-        .select("*, categorias(id, nome, cor_hex)")
-        .order("data", { ascending: false });
+        .from("expenses")
+        .select("*, categories(id, name, hex_color)")
+        .order("date", { ascending: false });
 
       // Filter by date range if provided
       if (dateRange?.from && dateRange?.to) {
         const startDate = toLocalDateString(dateRange.from);
         const endDate = toLocalDateString(dateRange.to);
-        query = query.gte("data", startDate).lte("data", endDate);
+        query = query.gte("date", startDate).lte("date", endDate);
       } else if (dateRange?.from) {
         // Only from date provided
         const startDate = toLocalDateString(dateRange.from);
-        query = query.gte("data", startDate);
+        query = query.gte("date", startDate);
       }
 
       const { data, error } = await query;
@@ -83,24 +83,24 @@ export const useExpensesSummary = (dateRange?: DateRange) => {
         return { total: 0, count: 0, average: 0 };
       }
 
-      let query = supabase.from("saidas").select("valor");
+      let query = supabase.from("expenses").select("amount");
 
       // Filter by date range if provided
       if (dateRange?.from && dateRange?.to) {
         const startDate = toLocalDateString(dateRange.from);
         const endDate = toLocalDateString(dateRange.to);
-        query = query.gte("data", startDate).lte("data", endDate);
+        query = query.gte("date", startDate).lte("date", endDate);
       } else if (dateRange?.from) {
         // Only from date provided
         const startDate = toLocalDateString(dateRange.from);
-        query = query.gte("data", startDate);
+        query = query.gte("date", startDate);
       }
 
       const { data, error } = await query;
 
       if (error) throw error;
 
-      const total = data.reduce((sum, expense) => sum + Number(expense.valor), 0);
+      const total = data.reduce((sum, expense) => sum + Number(expense.amount), 0);
       const count = data.length;
       const average = count > 0 ? total / count : 0;
 
@@ -130,14 +130,14 @@ export const useExpensesSummaryPreviousMonth = (dateRange?: DateRange) => {
       const endDate = toLocalDateString(previousMonthRange.to);
       
       const { data, error } = await supabase
-        .from("saidas")
-        .select("valor")
-        .gte("data", startDate)
-        .lte("data", endDate);
+        .from("expenses")
+        .select("amount")
+        .gte("date", startDate)
+        .lte("date", endDate);
       
       if (error) throw error;
       
-      const total = data.reduce((sum, expense) => sum + Number(expense.valor), 0);
+      const total = data.reduce((sum, expense) => sum + Number(expense.amount), 0);
       const count = data.length;
       const average = count > 0 ? total / count : 0;
       
@@ -158,19 +158,19 @@ export const useCreateExpense = () => {
         throw new Error("Usuário não autenticado");
       }
 
-      // Get user_id from 'usuarios' table based on auth_user_id
+      // Get user_id from 'users' table based on auth_user_id
       const { data: usuario, error: userError } = await supabase
-        .from("usuarios")
+        .from("users")
         .select("id")
         .eq("auth_user_id", user.id)
         .single();
 
       if (userError) {
-        throw new Error("Usuário não encontrado na tabela usuarios");
+        throw new Error("Usuário não encontrado na tabela users");
       }
 
       const { data, error } = await supabase
-        .from("saidas")
+        .from("expenses")
         .insert({
           ...expense,
           user_id: usuario.id,
@@ -207,7 +207,7 @@ export const useUpdateExpense = () => {
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Expense> & { id: number }) => {
       const { data, error } = await supabase
-        .from("saidas")
+        .from("expenses")
         .update(updates)
         .eq("id", id)
         .select()
@@ -241,7 +241,7 @@ export const useDeleteExpense = () => {
 
   return useMutation({
     mutationFn: async (id: number) => {
-      const { error } = await supabase.from("saidas").delete().eq("id", id);
+      const { error } = await supabase.from("expenses").delete().eq("id", id);
 
       if (error) throw error;
     },

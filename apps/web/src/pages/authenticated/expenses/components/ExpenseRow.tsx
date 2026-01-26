@@ -13,12 +13,12 @@ import {
 interface ExpenseRowProps {
   expense: {
     id: number;
-    data: string;
-    descricao?: string;
-    valor: number;
-    categorias?: {
-      nome?: string;
-      cor_hex?: string;
+    date: string;
+    description?: string;
+    amount: number;
+    categories?: {
+      name?: string;
+      hex_color?: string | null;
     } | null;
   };
   onDelete: (id: number) => void;
@@ -31,18 +31,18 @@ export const ExpenseRow = ({
   isPendingDelete,
 }: ExpenseRowProps) => {
   const { accent: accentColor, style: badgeStyle } = buildCategoryBadgeTokens(
-    expense.categorias?.cor_hex,
+    expense.categories?.hex_color,
     DEFAULT_CATEGORY_COLOR
   );
-  const categoryName = expense.categorias?.nome || "Sem categoria";
+  const categoryName = expense.categories?.name || "Sem categoria";
 
   return (
     <TableRow className="border-b border-[#F1F5F9] last:border-0 hover:bg-[#FEF2F2]">
       <TableCell className="whitespace-nowrap text-sm font-semibold text-[#0F172A]">
-        {formatLocalDate(expense.data)}
+        {formatLocalDate(expense.date)}
       </TableCell>
       <TableCell className="max-w-[280px] text-sm text-[#4B5563]">
-        {expense.descricao}
+        {expense.description}
       </TableCell>
       <TableCell className="w-[220px]">
         <Badge
@@ -63,7 +63,7 @@ export const ExpenseRow = ({
         </Badge>
       </TableCell>
       <TableCell className="whitespace-nowrap text-right text-sm font-semibold text-[#DC2626]">
-        {formatCurrency(expense.valor)}
+        {formatCurrency(expense.amount)}
       </TableCell>
       <TableCell className="text-center">
         <div className="flex items-center justify-center gap-2">
@@ -74,7 +74,7 @@ export const ExpenseRow = ({
               <Button
                 variant="ghost"
                 size="sm"
-                aria-label={`Editar ${expense.descricao || "saída"}`}
+                aria-label={`Editar ${expense.description || "saída"}`}
                 className="h-9 w-9 rounded-xl border border-[#FB923C] bg-[#FFF7ED] p-0 text-[#EA580C] transition-colors hover:bg-[#FFEAD5]"
               >
                 <Edit className="h-4 w-4" />
@@ -83,7 +83,7 @@ export const ExpenseRow = ({
           />
           <DeleteExpenseDialog
             expenseId={expense.id}
-            expenseDescription={expense.descricao}
+            expenseDescription={expense.description}
             onDelete={onDelete}
             isPending={isPendingDelete}
           />

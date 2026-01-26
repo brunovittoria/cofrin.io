@@ -19,8 +19,8 @@ export const useExpensesPage = () => {
 
   const filteredExpenses = expenses.filter(
     (expense) =>
-      expense.descricao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      expense.categorias?.nome?.toLowerCase().includes(searchTerm.toLowerCase())
+      expense.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      expense.categories?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleRefresh = async () => {

@@ -10,12 +10,12 @@ import { formatCurrency, formatLocalDate } from "@/lib/formatters";
 interface EntryRowProps {
   entry: {
     id: number;
-    data: string;
-    descricao?: string;
-    valor: number;
-    categorias?: {
-      nome?: string;
-      cor_hex?: string | null;
+    date: string;
+    description?: string;
+    amount: number;
+    categories?: {
+      name?: string;
+      hex_color?: string | null;
     } | null;
   };
   onDelete: (id: number) => void;
@@ -24,18 +24,18 @@ interface EntryRowProps {
 
 export const EntryRow = ({ entry, onDelete, isPending }: EntryRowProps) => {
   const { accent: accentColor, style: badgeStyle } = buildCategoryBadgeTokens(
-    entry.categorias?.cor_hex,
+    entry.categories?.hex_color,
     DEFAULT_CATEGORY_COLOR
   );
-  const categoryName = entry.categorias?.nome || "Sem categoria";
+  const categoryName = entry.categories?.name || "Sem categoria";
 
   return (
     <TableRow className="border-b border-[#F1F5F9] last:border-0 hover:bg-[#F8FAFC]">
       <TableCell className="whitespace-nowrap text-sm font-semibold text-[#0F172A]">
-        {formatLocalDate(entry.data)}
+        {formatLocalDate(entry.date)}
       </TableCell>
       <TableCell className="max-w-[280px] text-sm text-[#4B5563]">
-        {entry.descricao}
+        {entry.description}
       </TableCell>
       <TableCell className="w-[220px]">
         <Badge
@@ -56,7 +56,7 @@ export const EntryRow = ({ entry, onDelete, isPending }: EntryRowProps) => {
         </Badge>
       </TableCell>
       <TableCell className="whitespace-nowrap text-right text-sm font-semibold text-[#16A34A]">
-        {formatCurrency(entry.valor)}
+        {formatCurrency(entry.amount)}
       </TableCell>
       <TableCell className="text-center">
         <div className="flex items-center justify-center gap-2">
@@ -67,7 +67,7 @@ export const EntryRow = ({ entry, onDelete, isPending }: EntryRowProps) => {
               <Button
                 variant="ghost"
                 size="sm"
-                aria-label={`Editar ${entry.descricao || "entrada"}`}
+                aria-label={`Editar ${entry.description || "entrada"}`}
                 className="h-9 w-9 rounded-xl border border-[#BFDBFE] bg-[#EFF6FF] p-0 text-[#2563EB] transition-colors hover:bg-[#DBEAFE]"
               >
                 <Edit className="h-4 w-4" />
@@ -76,7 +76,7 @@ export const EntryRow = ({ entry, onDelete, isPending }: EntryRowProps) => {
           />
           <DeleteEntryDialog
             entryId={entry.id}
-            entryDescription={entry.descricao}
+            entryDescription={entry.description}
             onDelete={onDelete}
             isPending={isPending}
           />

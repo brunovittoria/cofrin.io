@@ -28,7 +28,7 @@ import { FormActions } from "./components/FormActions";
 interface IncomeModalProps {
   trigger?: React.ReactNode;
   mode?: "create" | "edit";
-  income?: Income & { categorias?: { nome: string; cor_hex?: string } };
+  income?: Income & { categories?: { name: string; hex_color?: string } };
 }
 
 export function IncomeModal({
@@ -76,10 +76,10 @@ export function IncomeModal({
     }
 
     const payload = {
-      data: toLocalDateString(date),
-      descricao: formData.descricao || undefined,
-      valor: parseFloat(formData.valor),
-      categoria_id: parseInt(formData.categoria_id),
+      date: toLocalDateString(date),
+      description: formData.descricao || undefined,
+      amount: parseFloat(formData.valor),
+      category_id: parseInt(formData.categoria_id),
     };
 
     if (mode === "edit" && income?.id) {

@@ -19,8 +19,8 @@ export const useIncomesPage = () => {
 
   const filteredIncomes = incomes.filter(
     (income) =>
-      income.descricao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      income.categorias?.nome?.toLowerCase().includes(searchTerm.toLowerCase())
+      income.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      income.categories?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleRefresh = async () => {

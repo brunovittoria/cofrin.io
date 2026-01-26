@@ -24,7 +24,7 @@ import { FormActions } from "./components/FormActions";
 interface ExpenseModalProps {
   trigger?: React.ReactNode;
   mode?: "create" | "edit";
-  expense?: Expense & { categorias?: { nome: string; cor_hex?: string } };
+  expense?: Expense & { categories?: { name: string; hex_color?: string } };
 }
 
 export function ExpenseModal({ trigger, mode = "create", expense }: ExpenseModalProps) {
@@ -61,10 +61,10 @@ export function ExpenseModal({ trigger, mode = "create", expense }: ExpenseModal
     }
 
     const payload = {
-      data: toLocalDateString(date),
-      descricao: formData.descricao || undefined,
-      valor: parseFloat(formData.valor),
-      categoria_id: parseInt(formData.categoria_id),
+      date: toLocalDateString(date),
+      description: formData.descricao || undefined,
+      amount: parseFloat(formData.valor),
+      category_id: parseInt(formData.categoria_id),
     };
 
     if (mode === "edit" && expense?.id) {

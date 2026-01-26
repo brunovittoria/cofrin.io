@@ -8,19 +8,19 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export type Income = {
   id: number;
-  data: string;
-  descricao?: string;
-  valor: number;
-  categoria_id?: number;
+  date: string;
+  description?: string;
+  amount: number;
+  category_id?: number;
   user_id?: string;
   created_at: string;
 };
 
 export type NewIncome = {
-  data: string;
-  descricao?: string;
-  valor: number;
-  categoria_id?: number;
+  date: string;
+  description?: string;
+  amount: number;
+  category_id?: number;
 };
 
 export const useIncomes = (dateRange?: DateRange) => {
@@ -34,28 +34,28 @@ export const useIncomes = (dateRange?: DateRange) => {
       }
 
       let query = supabase
-        .from('entradas')
+        .from('incomes')
         .select(`
           *,
-          categorias(nome, cor_hex)
+          categories(name, hex_color)
         `)
-        .order('data', { ascending: false });
+        .order('date', { ascending: false });
       
       // Filter by date range if provided
       if (dateRange?.from && dateRange?.to) {
         const startDate = toLocalDateString(dateRange.from);
         const endDate = toLocalDateString(dateRange.to);
-        query = query.gte('data', startDate).lte('data', endDate);
+        query = query.gte('date', startDate).lte('date', endDate);
       } else if (dateRange?.from) {
         // Only from date provided
         const startDate = toLocalDateString(dateRange.from);
-        query = query.gte('data', startDate);
+        query = query.gte('date', startDate);
       }
       
       const { data, error } = await query;
       
       if (error) throw error;
-      return data as (Income & { categorias?: { nome: string; cor_hex?: string } })[];
+      return data as (Income & { categories?: { name: string; hex_color?: string } })[];
     },
     enabled: !!user?.id,
   });
@@ -71,24 +71,24 @@ export const useIncomesSummary = (dateRange?: DateRange) => {
         return { total: 0, count: 0, average: 0 };
       }
 
-      let query = supabase.from('entradas').select('valor');
+      let query = supabase.from('incomes').select('amount');
       
       // Filter by date range if provided
       if (dateRange?.from && dateRange?.to) {
         const startDate = toLocalDateString(dateRange.from);
         const endDate = toLocalDateString(dateRange.to);
-        query = query.gte('data', startDate).lte('data', endDate);
+        query = query.gte('date', startDate).lte('date', endDate);
       } else if (dateRange?.from) {
         // Only from date provided
         const startDate = toLocalDateString(dateRange.from);
-        query = query.gte('data', startDate);
+        query = query.gte('date', startDate);
       }
       
       const { data, error } = await query;
       
       if (error) throw error;
       
-      const total = data.reduce((sum, income) => sum + Number(income.valor), 0);
+      const total = data.reduce((sum, income) => sum + Number(income.amount), 0);
       const count = data.length;
       const average = count > 0 ? total / count : 0;
       
@@ -113,14 +113,14 @@ export const useIncomesSummaryPreviousMonth = (dateRange?: DateRange) => {
       const endDate = toLocalDateString(previousMonthRange.to);
       
       const { data, error } = await supabase
-        .from('entradas')
-        .select('valor')
-        .gte('data', startDate)
-        .lte('data', endDate);
+        .from('incomes')
+        .select('amount')
+        .gte('date', startDate)
+        .lte('date', endDate);
       
       if (error) throw error;
       
-      const total = data.reduce((sum, income) => sum + Number(income.valor), 0);
+      const total = data.reduce((sum, income) => sum + Number(income.amount), 0);
       const count = data.length;
       const average = count > 0 ? total / count : 0;
       
@@ -141,19 +141,19 @@ export const useCreateIncome = () => {
         throw new Error("Usuário não autenticado");
       }
 
-      // Get user_id from 'usuarios' table based on auth_user_id
+      // Get user_id from 'users' table based on auth_user_id
       const { data: usuario, error: userError } = await supabase
-        .from("usuarios")
+        .from("users")
         .select("id")
         .eq("auth_user_id", user.id)
         .single();
 
       if (userError) {
-        throw new Error("Usuário não encontrado na tabela usuarios");
+        throw new Error("Usuário não encontrado na tabela users");
       }
 
       const { data, error } = await supabase
-        .from('entradas')
+        .from('incomes')
         .insert({
           ...income,
           user_id: usuario.id,
@@ -190,7 +190,7 @@ export const useUpdateIncome = () => {
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Income> & { id: number }) => {
       const { data, error } = await supabase
-        .from('entradas')
+        .from('incomes')
         .update(updates)
         .eq('id', id)
         .select()
@@ -225,7 +225,7 @@ export const useDeleteIncome = () => {
   return useMutation({
     mutationFn: async (id: number) => {
       const { error } = await supabase
-        .from('entradas')
+        .from('incomes')
         .delete()
         .eq('id', id);
       

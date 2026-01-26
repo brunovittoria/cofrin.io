@@ -11,18 +11,18 @@ interface IncomeFormData {
 
 interface UseIncomeFormProps {
   mode: "create" | "edit";
-  income?: Income & { categorias?: { nome: string; cor_hex?: string } };
+  income?: Income & { categories?: { name: string; hex_color?: string } };
 }
 
 const getInitialFormState = (
   mode: "create" | "edit",
-  income?: Income & { categorias?: { nome: string; cor_hex?: string } }
+  income?: Income & { categories?: { name: string; hex_color?: string } }
 ): IncomeFormData => {
   if (mode === "edit" && income) {
     return {
-      descricao: income.descricao || "",
-      categoria_id: income.categoria_id ? String(income.categoria_id) : "",
-      valor: income.valor != null ? String(income.valor) : "",
+      descricao: income.description || "",
+      categoria_id: income.category_id ? String(income.category_id) : "",
+      valor: income.amount != null ? String(income.amount) : "",
       tipo: "",
     };
   }
@@ -37,11 +37,11 @@ const getInitialFormState = (
 
 const getInitialDate = (
   mode: "create" | "edit",
-  income?: Income & { categorias?: { nome: string; cor_hex?: string } }
+  income?: Income & { categories?: { name: string; hex_color?: string } }
 ): Date | undefined => {
-  if (mode === "edit" && income?.data) {
+  if (mode === "edit" && income?.date) {
     try {
-      return parseLocalDate(income.data);
+      return parseLocalDate(income.date);
     } catch {
       return undefined;
     }

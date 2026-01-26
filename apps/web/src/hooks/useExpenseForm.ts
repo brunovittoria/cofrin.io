@@ -11,18 +11,18 @@ interface ExpenseFormData {
 
 interface UseExpenseFormProps {
   mode: "create" | "edit";
-  expense?: Expense & { categorias?: { nome: string; cor_hex?: string } };
+  expense?: Expense & { categories?: { name: string; hex_color?: string } };
 }
 
 const getInitialFormState = (
   mode: "create" | "edit",
-  expense?: Expense & { categorias?: { nome: string; cor_hex?: string } }
+  expense?: Expense & { categories?: { name: string; hex_color?: string } }
 ): ExpenseFormData => {
   if (mode === "edit" && expense) {
     return {
-      descricao: expense.descricao || "",
-      categoria_id: expense.categoria_id ? String(expense.categoria_id) : "",
-      valor: expense.valor != null ? String(expense.valor) : "",
+      descricao: expense.description || "",
+      categoria_id: expense.category_id ? String(expense.category_id) : "",
+      valor: expense.amount != null ? String(expense.amount) : "",
       tipo: "",
     };
   }
@@ -37,11 +37,11 @@ const getInitialFormState = (
 
 const getInitialDate = (
   mode: "create" | "edit",
-  expense?: Expense & { categorias?: { nome: string; cor_hex?: string } }
+  expense?: Expense & { categories?: { name: string; hex_color?: string } }
 ): Date | undefined => {
-  if (mode === "edit" && expense?.data) {
+  if (mode === "edit" && expense?.date) {
     try {
-      return parseLocalDate(expense.data);
+      return parseLocalDate(expense.date);
     } catch {
       return undefined;
     }
