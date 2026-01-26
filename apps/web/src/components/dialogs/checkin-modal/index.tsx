@@ -59,11 +59,11 @@ export const CheckInModal = ({
 
     // Create check-in
     await createCheckIn.mutateAsync({
-      meta_id: goalId,
-      humor: data.humor || undefined,
-      obstaculos: data.obstaculos?.trim() || undefined,
-      valor_adicionado: valor,
-      nota: data.nota?.trim() || undefined,
+      goal_id: goalId,
+      mood: data.humor || undefined,
+      obstacles: data.obstaculos?.trim() || undefined,
+      added_value: valor,
+      note: data.nota?.trim() || undefined,
     });
 
     // Update goal progress if value was added

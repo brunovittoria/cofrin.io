@@ -7,23 +7,23 @@ export type CheckInMood = "positivo" | "neutro" | "negativo";
 
 export type CheckIn = {
   id: string;
-  meta_id: string;
+  goal_id: string;
   user_id: string;
-  data: string;
-  humor: CheckInMood | null;
-  obstaculos: string | null;
-  valor_adicionado: number;
-  nota: string | null;
+  date: string;
+  mood: CheckInMood | null;
+  obstacles: string | null;
+  added_value: number;
+  note: string | null;
   created_at: string;
 };
 
 export type NewCheckIn = {
-  meta_id: string;
-  data?: string;
-  humor?: CheckInMood;
-  obstaculos?: string;
-  valor_adicionado?: number;
-  nota?: string;
+  goal_id: string;
+  date?: string;
+  mood?: CheckInMood;
+  obstacles?: string;
+  added_value?: number;
+  note?: string;
 };
 
 export const useCheckIns = (metaId: string) => {
@@ -37,10 +37,10 @@ export const useCheckIns = (metaId: string) => {
       }
 
       const { data, error } = await supabase
-        .from("meta_checkins")
+        .from("goal_checkins")
         .select("*")
-        .eq("meta_id", metaId)
-        .order("data", { ascending: false });
+        .eq("goal_id", metaId)
+        .order("date", { ascending: false });
 
       if (error) throw error;
       return data as CheckIn[];
@@ -60,11 +60,11 @@ export const useRecentCheckIns = (limit: number = 5) => {
       }
 
       const { data, error } = await supabase
-        .from("meta_checkins")
+        .from("goal_checkins")
         .select(
           `
           *,
-          metas(titulo, tipo)
+          goals(title, type)
         `
         )
         .order("created_at", { ascending: false })
@@ -72,7 +72,7 @@ export const useRecentCheckIns = (limit: number = 5) => {
 
       if (error) throw error;
       return data as (CheckIn & {
-        metas?: { titulo: string; tipo: string } | null;
+        goals?: { title: string; type: string } | null;
       })[];
     },
     enabled: !!user?.id,
@@ -90,24 +90,24 @@ export const useCreateCheckIn = () => {
         throw new Error("Usuário não autenticado");
       }
 
-      // Get user_id from 'usuarios' table based on auth_user_id
+      // Get user_id from 'users' table based on auth_user_id
       const { data: usuario, error: userError } = await supabase
-        .from("usuarios")
+        .from("users")
         .select("id")
         .eq("auth_user_id", user.id)
         .single();
 
       if (userError) {
-        throw new Error("Usuário não encontrado na tabela usuarios");
+        throw new Error("Usuário não encontrado na tabela users");
       }
 
       const { data, error } = await supabase
-        .from("meta_checkins")
+        .from("goal_checkins")
         .insert({
           ...checkIn,
           user_id: usuario.id,
-          data: checkIn.data || new Date().toISOString().split("T")[0],
-          valor_adicionado: checkIn.valor_adicionado || 0,
+          date: checkIn.date || new Date().toISOString().split("T")[0],
+          added_value: checkIn.added_value || 0,
         })
         .select()
         .single();
@@ -116,7 +116,7 @@ export const useCreateCheckIn = () => {
       return data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["checkins", variables.meta_id] });
+      queryClient.invalidateQueries({ queryKey: ["checkins", variables.goal_id] });
       queryClient.invalidateQueries({ queryKey: ["checkins-recent"] });
       toast({
         title: "Check-in registrado",
@@ -138,19 +138,19 @@ export const useUpdateCheckIn = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ id, meta_id, ...updates }: Partial<CheckIn> & { id: string; meta_id: string }) => {
+    mutationFn: async ({ id, goal_id, ...updates }: Partial<CheckIn> & { id: string; goal_id: string }) => {
       const { data, error } = await supabase
-        .from("meta_checkins")
+        .from("goal_checkins")
         .update(updates)
         .eq("id", id)
         .select()
         .single();
 
       if (error) throw error;
-      return { data, meta_id };
+      return { data, goal_id };
     },
-    onSuccess: ({ meta_id }) => {
-      queryClient.invalidateQueries({ queryKey: ["checkins", meta_id] });
+    onSuccess: ({ goal_id }) => {
+      queryClient.invalidateQueries({ queryKey: ["checkins", goal_id] });
       queryClient.invalidateQueries({ queryKey: ["checkins-recent"] });
       toast({
         title: "Check-in atualizado",
@@ -172,14 +172,14 @@ export const useDeleteCheckIn = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ id, meta_id }: { id: string; meta_id: string }) => {
-      const { error } = await supabase.from("meta_checkins").delete().eq("id", id);
+    mutationFn: async ({ id, goal_id }: { id: string; goal_id: string }) => {
+      const { error } = await supabase.from("goal_checkins").delete().eq("id", id);
 
       if (error) throw error;
-      return { meta_id };
+      return { goal_id };
     },
-    onSuccess: ({ meta_id }) => {
-      queryClient.invalidateQueries({ queryKey: ["checkins", meta_id] });
+    onSuccess: ({ goal_id }) => {
+      queryClient.invalidateQueries({ queryKey: ["checkins", goal_id] });
       queryClient.invalidateQueries({ queryKey: ["checkins-recent"] });
       toast({
         title: "Check-in excluído",

@@ -152,7 +152,7 @@ export const GoalForm = ({
                     <SelectContent>
                       {expenseCategories.map((cat) => (
                         <SelectItem key={cat.id} value={cat.id.toString()}>
-                          {cat.nome}
+                          {cat.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -180,8 +180,8 @@ export const GoalForm = ({
                     <SelectContent>
                       {cards.map((card) => (
                         <SelectItem key={card.id} value={card.id.toString()}>
-                          {card.nome_exibicao}
-                          {card.final_cartao && ` •••• ${card.final_cartao}`}
+                          {card.display_name}
+                          {card.card_last_four && ` •••• ${card.card_last_four}`}
                         </SelectItem>
                       ))}
                     </SelectContent>

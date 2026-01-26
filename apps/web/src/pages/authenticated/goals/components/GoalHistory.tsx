@@ -31,7 +31,7 @@ export const GoalHistory = ({ checkIns }: GoalHistoryProps) => {
       <CardContent>
         <div className="space-y-4">
           {checkIns.map((checkIn, index) => {
-            const mood = moodOptions.find((m) => m.value === checkIn.humor);
+            const mood = moodOptions.find((m) => m.value === checkIn.mood);
 
             return (
               <div
@@ -50,16 +50,16 @@ export const GoalHistory = ({ checkIns }: GoalHistoryProps) => {
                   </div>
                   <div>
                     <p className="font-medium text-foreground">
-                      {checkIn.nota || "Check-in realizado"}
+                      {checkIn.note || "Check-in realizado"}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {formatDate(checkIn.data)}
+                      {formatDate(checkIn.date)}
                     </p>
                   </div>
                 </div>
-                {checkIn.valor_adicionado > 0 && (
+                {checkIn.added_value > 0 && (
                   <span className="font-medium text-green-600">
-                    + {formatCurrency(checkIn.valor_adicionado)}
+                    + {formatCurrency(checkIn.added_value)}
                   </span>
                 )}
               </div>

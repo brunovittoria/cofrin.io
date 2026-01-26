@@ -9,35 +9,35 @@ export type GoalStatus = "ativa" | "concluida" | "pausada";
 export type Goal = {
   id: string;
   user_id: string | null;
-  titulo: string;
-  tipo: GoalType;
-  descricao: string | null;
-  valor_alvo: number;
-  valor_atual: number;
-  prazo: string;
+  title: string;
+  type: GoalType;
+  description: string | null;
+  target_amount: number;
+  current_amount: number;
+  deadline: string;
   status: GoalStatus;
-  categoria_id: number | null;
-  cartao_id: number | null;
-  reflexao_porque: string | null;
-  reflexao_mudanca: string | null;
-  reflexao_sentimento: string | null;
+  category_id: number | null;
+  card_id: number | null;
+  reflection_why: string | null;
+  reflection_change: string | null;
+  reflection_feeling: string | null;
   created_at: string;
   updated_at: string;
 };
 
 export type NewGoal = {
-  titulo: string;
-  tipo: GoalType;
-  descricao?: string;
-  valor_alvo: number;
-  valor_atual?: number;
-  prazo: string;
+  title: string;
+  type: GoalType;
+  description?: string;
+  target_amount: number;
+  current_amount?: number;
+  deadline: string;
   status?: GoalStatus;
-  categoria_id?: number | null;
-  cartao_id?: number | null;
-  reflexao_porque?: string;
-  reflexao_mudanca?: string;
-  reflexao_sentimento?: string;
+  category_id?: number | null;
+  card_id?: number | null;
+  reflection_why?: string;
+  reflection_change?: string;
+  reflection_feeling?: string;
 };
 
 export const useGoals = (status?: GoalStatus) => {
@@ -51,12 +51,12 @@ export const useGoals = (status?: GoalStatus) => {
       }
 
       let query = supabase
-        .from("metas")
+        .from("goals")
         .select(
           `
           *,
-          categorias(nome, cor_hex),
-          cartoes(nome_exibicao, emissor)
+          categories(name, hex_color),
+          cards(display_name, issuer)
         `
         )
         .order("created_at", { ascending: false });
@@ -69,8 +69,8 @@ export const useGoals = (status?: GoalStatus) => {
 
       if (error) throw error;
       return data as (Goal & {
-        categorias?: { nome: string; cor_hex?: string } | null;
-        cartoes?: { nome_exibicao: string; emissor?: string } | null;
+        categories?: { name: string; hex_color?: string } | null;
+        cards?: { display_name: string; issuer?: string } | null;
       })[];
     },
     enabled: !!user?.id,
@@ -88,12 +88,12 @@ export const useGoal = (id: string) => {
       }
 
       const { data, error } = await supabase
-        .from("metas")
+        .from("goals")
         .select(
           `
           *,
-          categorias(nome, cor_hex),
-          cartoes(nome_exibicao, emissor)
+          categories(name, hex_color),
+          cards(display_name, issuer)
         `
         )
         .eq("id", id)
@@ -101,8 +101,8 @@ export const useGoal = (id: string) => {
 
       if (error) throw error;
       return data as Goal & {
-        categorias?: { nome: string; cor_hex?: string } | null;
-        cartoes?: { nome_exibicao: string; emissor?: string } | null;
+        categories?: { name: string; hex_color?: string } | null;
+        cards?: { display_name: string; issuer?: string } | null;
       };
     },
     enabled: !!user?.id && !!id,
@@ -120,8 +120,8 @@ export const useGoalsSummary = () => {
       }
 
       const { data, error } = await supabase
-        .from("metas")
-        .select("status, valor_alvo, valor_atual");
+        .from("goals")
+        .select("status, target_amount, current_amount");
 
       if (error) throw error;
 
@@ -130,8 +130,8 @@ export const useGoalsSummary = () => {
       const completed = data.filter((g) => g.status === "concluida").length;
       const paused = data.filter((g) => g.status === "pausada").length;
 
-      const totalTarget = data.reduce((sum, g) => sum + Number(g.valor_alvo), 0);
-      const totalCurrent = data.reduce((sum, g) => sum + Number(g.valor_atual), 0);
+      const totalTarget = data.reduce((sum, g) => sum + Number(g.target_amount), 0);
+      const totalCurrent = data.reduce((sum, g) => sum + Number(g.current_amount), 0);
       const totalProgress = totalTarget > 0 ? (totalCurrent / totalTarget) * 100 : 0;
 
       return { total, active, completed, paused, totalProgress };
@@ -151,23 +151,23 @@ export const useCreateGoal = () => {
         throw new Error("Usuário não autenticado");
       }
 
-      // Get user_id from 'usuarios' table based on auth_user_id
+      // Get user_id from 'users' table based on auth_user_id
       const { data: usuario, error: userError } = await supabase
-        .from("usuarios")
+        .from("users")
         .select("id")
         .eq("auth_user_id", user.id)
         .single();
 
       if (userError) {
-        throw new Error("Usuário não encontrado na tabela usuarios");
+        throw new Error("Usuário não encontrado na tabela users");
       }
 
       const { data, error } = await supabase
-        .from("metas")
+        .from("goals")
         .insert({
           ...goal,
           user_id: usuario.id,
-          valor_atual: goal.valor_atual || 0,
+          current_amount: goal.current_amount || 0,
           status: goal.status || "ativa",
         })
         .select()
@@ -201,7 +201,7 @@ export const useUpdateGoal = () => {
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Goal> & { id: string }) => {
       const { data, error } = await supabase
-        .from("metas")
+        .from("goals")
         .update(updates)
         .eq("id", id)
         .select()
@@ -237,20 +237,20 @@ export const useUpdateGoalProgress = () => {
     mutationFn: async ({ id, valor_adicional }: { id: string; valor_adicional: number }) => {
       // First get current value
       const { data: currentGoal, error: fetchError } = await supabase
-        .from("metas")
-        .select("valor_atual, valor_alvo")
+        .from("goals")
+        .select("current_amount, target_amount")
         .eq("id", id)
         .single();
 
       if (fetchError) throw fetchError;
 
-      const newValue = Number(currentGoal.valor_atual) + valor_adicional;
-      const isCompleted = newValue >= Number(currentGoal.valor_alvo);
+      const newValue = Number(currentGoal.current_amount) + valor_adicional;
+      const isCompleted = newValue >= Number(currentGoal.target_amount);
 
       const { data, error } = await supabase
-        .from("metas")
+        .from("goals")
         .update({
-          valor_atual: newValue,
+          current_amount: newValue,
           status: isCompleted ? "concluida" : "ativa",
         })
         .eq("id", id)
@@ -293,7 +293,7 @@ export const useDeleteGoal = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("metas").delete().eq("id", id);
+      const { error } = await supabase.from("goals").delete().eq("id", id);
 
       if (error) throw error;
     },

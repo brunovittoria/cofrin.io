@@ -44,17 +44,17 @@ export const useGoalForm = ({ mode = "create", goal, open }: UseGoalFormProps = 
   useEffect(() => {
     if (open && mode === "edit" && goal) {
       form.reset({
-        porque: goal.reflexao_porque || "",
-        mudanca: goal.reflexao_mudanca || "",
-        sentimento: goal.reflexao_sentimento || "",
-        tipo: goal.tipo,
-        titulo: goal.titulo,
-        descricao: goal.descricao || "",
-        valor_alvo: String(goal.valor_alvo),
-        valor_atual: String(goal.valor_atual),
-        prazo: goal.prazo,
-        categoria_id: goal.categoria_id?.toString() || "",
-        cartao_id: goal.cartao_id?.toString() || "",
+        porque: goal.reflection_why || "",
+        mudanca: goal.reflection_change || "",
+        sentimento: goal.reflection_feeling || "",
+        tipo: goal.type,
+        titulo: goal.title,
+        descricao: goal.description || "",
+        valor_alvo: String(goal.target_amount),
+        valor_atual: String(goal.current_amount),
+        prazo: goal.deadline,
+        categoria_id: goal.category_id?.toString() || "",
+        cartao_id: goal.card_id?.toString() || "",
       });
     }
   }, [open, mode, goal, form]);
@@ -98,17 +98,17 @@ export const useGoalForm = ({ mode = "create", goal, open }: UseGoalFormProps = 
   const getSubmitData = () => {
     const values = form.getValues();
     return {
-      titulo: values.titulo.trim(),
-      tipo: values.tipo as GoalType,
-      descricao: values.descricao?.trim() || undefined,
-      valor_alvo: parseFloat(values.valor_alvo.replace(",", ".")),
-      valor_atual: parseFloat(values.valor_atual?.replace(",", ".") || "0"),
-      prazo: values.prazo,
-      categoria_id: values.categoria_id ? parseInt(values.categoria_id, 10) : null,
-      cartao_id: values.cartao_id ? parseInt(values.cartao_id, 10) : null,
-      reflexao_porque: values.porque.trim(),
-      reflexao_mudanca: values.mudanca.trim(),
-      reflexao_sentimento: values.sentimento?.trim() || undefined,
+      title: values.titulo.trim(),
+      type: values.tipo as GoalType,
+      description: values.descricao?.trim() || undefined,
+      target_amount: parseFloat(values.valor_alvo.replace(",", ".")),
+      current_amount: parseFloat(values.valor_atual?.replace(",", ".") || "0"),
+      deadline: values.prazo,
+      category_id: values.categoria_id ? parseInt(values.categoria_id, 10) : null,
+      card_id: values.cartao_id ? parseInt(values.cartao_id, 10) : null,
+      reflection_why: values.porque.trim(),
+      reflection_change: values.mudanca.trim(),
+      reflection_feeling: values.sentimento?.trim() || undefined,
     };
   };
 

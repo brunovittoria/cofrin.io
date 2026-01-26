@@ -13,8 +13,8 @@ import { Goal, GoalType } from "@/hooks/api/useGoals";
 
 interface GoalCardProps {
   goal: Goal & {
-    categorias?: { nome: string; cor_hex?: string } | null;
-    cartoes?: { nome_exibicao: string; emissor?: string } | null;
+    categories?: { name: string; hex_color?: string } | null;
+    cards?: { display_name: string; issuer?: string } | null;
   };
   onClick: (id: string) => void;
 }
@@ -30,9 +30,9 @@ const getGoalIcon = (tipo: GoalType) => {
 };
 
 export const GoalCard = ({ goal, onClick }: GoalCardProps) => {
-  const Icon = getGoalIcon(goal.tipo);
-  const colors = getGoalTypeColors(goal.tipo);
-  const daysRemaining = calculateDaysRemaining(goal.prazo);
+  const Icon = getGoalIcon(goal.type);
+  const colors = getGoalTypeColors(goal.type) || { bg: "bg-gray-50", icon: "text-gray-600", text: "text-gray-700", border: "border-gray-200" };
+  const daysRemaining = calculateDaysRemaining(goal.deadline);
 
   const handleClick = () => {
     onClick(goal.id);
@@ -46,7 +46,7 @@ export const GoalCard = ({ goal, onClick }: GoalCardProps) => {
   };
 
   const getProgressColor = () => {
-    switch (goal.tipo) {
+    switch (goal.type) {
       case "economizar":
         return "bg-blue-600";
       case "reduzir":
@@ -78,7 +78,7 @@ export const GoalCard = ({ goal, onClick }: GoalCardProps) => {
       onKeyDown={handleKeyDown}
       tabIndex={0}
       role="button"
-      aria-label={`Ver detalhes da meta: ${goal.titulo}`}
+      aria-label={`Ver detalhes da meta: ${goal.title}`}
     >
       <CardContent className="p-6">
         <div className="mb-4 flex items-start justify-between">
@@ -88,10 +88,10 @@ export const GoalCard = ({ goal, onClick }: GoalCardProps) => {
             </div>
             <div>
               <h3 className="font-semibold text-foreground transition-colors group-hover:text-primary">
-                {goal.titulo}
+                {goal.title}
               </h3>
               <span className="text-xs text-muted-foreground">
-                {getGoalTypeLabel(goal.tipo)}
+                {getGoalTypeLabel(goal.type)}
               </span>
             </div>
           </div>
@@ -100,8 +100,8 @@ export const GoalCard = ({ goal, onClick }: GoalCardProps) => {
 
         <div className="mb-4">
           <GoalProgress
-            current={Number(goal.valor_atual)}
-            target={Number(goal.valor_alvo)}
+            current={Number(goal.current_amount)}
+            target={Number(goal.target_amount)}
             color={getProgressColor()}
           />
         </div>

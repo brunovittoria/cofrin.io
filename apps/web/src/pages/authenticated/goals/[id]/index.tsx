@@ -91,26 +91,26 @@ export default function GoalDetailPage() {
     );
   }
 
-  const colors = getGoalTypeColors(goal.tipo);
+  const colors = getGoalTypeColors(goal.type);
   const health = calculateGoalHealth(
-    Number(goal.valor_atual),
-    Number(goal.valor_alvo),
+    Number(goal.current_amount),
+    Number(goal.target_amount),
     goal.created_at,
-    goal.prazo
+    goal.deadline
   );
   const feedback = getProgressFeedback(health);
   const monthlySuggestion = calculateMonthlySuggestion(
-    Number(goal.valor_alvo),
-    Number(goal.valor_atual),
-    goal.prazo
+    Number(goal.target_amount),
+    Number(goal.current_amount),
+    goal.deadline
   );
   const percentage = Math.min(
-    Math.round((Number(goal.valor_atual) / Number(goal.valor_alvo)) * 100),
+    Math.round((Number(goal.current_amount) / Number(goal.target_amount)) * 100),
     100
   );
 
   const getProgressColor = () => {
-    switch (goal.tipo) {
+    switch (goal.type) {
       case "economizar":
         return "bg-blue-600";
       case "reduzir":
@@ -132,14 +132,14 @@ export default function GoalDetailPage() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">{goal.titulo}</h1>
+              <h1 className="text-2xl font-bold text-foreground">{goal.title}</h1>
               <p className="text-sm text-muted-foreground">
                 Meta de{" "}
-                {goal.tipo === "economizar"
+                {goal.type === "economizar"
                   ? "Economia"
-                  : goal.tipo === "reduzir"
+                  : goal.type === "reduzir"
                     ? "Redução de Gastos"
-                    : goal.tipo === "quitar"
+                    : goal.type === "quitar"
                       ? "Quitação de Dívida"
                       : "Personalizada"}{" "}
                 • Criada em {formatDate(goal.created_at)}
@@ -163,15 +163,15 @@ export default function GoalDetailPage() {
                   <span className="text-2xl font-bold text-primary">{percentage}%</span>
                 </div>
                 <GoalProgress
-                  current={Number(goal.valor_atual)}
-                  target={Number(goal.valor_alvo)}
+                  current={Number(goal.current_amount)}
+                  target={Number(goal.target_amount)}
                   showLabel={false}
                   color={getProgressColor()}
                   size="lg"
                 />
                 <div className="mt-2 flex justify-between text-sm text-muted-foreground">
-                  <span>{formatCurrency(Number(goal.valor_atual))} guardados</span>
-                  <span>Meta: {formatCurrency(Number(goal.valor_alvo))}</span>
+                  <span>{formatCurrency(Number(goal.current_amount))} guardados</span>
+                  <span>Meta: {formatCurrency(Number(goal.target_amount))}</span>
                 </div>
               </div>
 
@@ -183,7 +183,7 @@ export default function GoalDetailPage() {
                   <div className="mt-1 flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
                     <span className="font-medium text-foreground">
-                      {formatDate(goal.prazo)}
+                      {formatDate(goal.deadline)}
                     </span>
                   </div>
                 </div>
@@ -252,7 +252,7 @@ export default function GoalDetailPage() {
             <CardContent className="p-6">
               <h3 className={`mb-2 font-semibold ${colors.text}`}>Por que comecei?</h3>
               <p className={`mb-4 text-sm italic ${colors.text} opacity-90`}>
-                "{goal.reflexao_porque || "Nenhuma reflexão registrada."}"
+                "{goal.reflection_why || "Nenhuma reflexão registrada."}"
               </p>
               <div className={`text-xs font-medium uppercase tracking-wide ${colors.text} opacity-70`}>
                 Sua motivação inicial
@@ -323,7 +323,7 @@ export default function GoalDetailPage() {
         isOpen={showCheckIn}
         onClose={() => setShowCheckIn(false)}
         goalId={goal.id}
-        goalTitle={goal.titulo}
+        goalTitle={goal.title}
       />
     </div>
   );

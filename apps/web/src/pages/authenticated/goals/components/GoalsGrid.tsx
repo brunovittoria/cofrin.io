@@ -4,8 +4,8 @@ import { Goal } from "@/hooks/api/useGoals";
 
 interface GoalsGridProps {
   goals: (Goal & {
-    categorias?: { nome: string; cor_hex?: string } | null;
-    cartoes?: { nome_exibicao: string; emissor?: string } | null;
+    categories?: { name: string; hex_color?: string } | null;
+    cards?: { display_name: string; issuer?: string } | null;
   })[];
 }
 
