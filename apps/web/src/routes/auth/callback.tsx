@@ -12,7 +12,8 @@ function AuthCallback() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Handle the OAuth callback - Supabase automatically parses the URL hash
+        // Handle OAuth and Magic Link callbacks
+        // Supabase automatically parses the URL hash for both OAuth and magic links
         const { data: { session }, error } = await supabase.auth.getSession();
 
         if (error) {
