@@ -13,6 +13,7 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LoginMagicLinkRouteImport } from './routes/login/magic-link'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as AuthenticatedTransactionsRouteImport } from './routes/_authenticated/transactions'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -44,6 +45,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const LoginMagicLinkRoute = LoginMagicLinkRouteImport.update({
+  id: '/magic-link',
+  path: '/magic-link',
+  getParentRoute: () => LoginRoute,
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
@@ -111,7 +117,7 @@ const AuthenticatedGoalsIdRoute = AuthenticatedGoalsIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
+  '/login': typeof LoginRouteWithChildren
   '/register': typeof RegisterRoute
   '/cards': typeof AuthenticatedCardsRoute
   '/categories': typeof AuthenticatedCategoriesRoute
@@ -122,13 +128,14 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/login/magic-link': typeof LoginMagicLinkRoute
   '/goals/$id': typeof AuthenticatedGoalsIdRoute
   '/goals/create': typeof AuthenticatedGoalsCreateRoute
   '/goals': typeof AuthenticatedGoalsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
+  '/login': typeof LoginRouteWithChildren
   '/register': typeof RegisterRoute
   '/cards': typeof AuthenticatedCardsRoute
   '/categories': typeof AuthenticatedCategoriesRoute
@@ -139,6 +146,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/login/magic-link': typeof LoginMagicLinkRoute
   '/goals/$id': typeof AuthenticatedGoalsIdRoute
   '/goals/create': typeof AuthenticatedGoalsCreateRoute
   '/goals': typeof AuthenticatedGoalsIndexRoute
@@ -147,7 +155,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/login': typeof LoginRoute
+  '/login': typeof LoginRouteWithChildren
   '/register': typeof RegisterRoute
   '/_authenticated/cards': typeof AuthenticatedCardsRoute
   '/_authenticated/categories': typeof AuthenticatedCategoriesRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/transactions': typeof AuthenticatedTransactionsRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/login/magic-link': typeof LoginMagicLinkRoute
   '/_authenticated/goals/$id': typeof AuthenticatedGoalsIdRoute
   '/_authenticated/goals/create': typeof AuthenticatedGoalsCreateRoute
   '/_authenticated/goals/': typeof AuthenticatedGoalsIndexRoute
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/transactions'
     | '/auth/callback'
+    | '/login/magic-link'
     | '/goals/$id'
     | '/goals/create'
     | '/goals'
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/transactions'
     | '/auth/callback'
+    | '/login/magic-link'
     | '/goals/$id'
     | '/goals/create'
     | '/goals'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/transactions'
     | '/auth/callback'
+    | '/login/magic-link'
     | '/_authenticated/goals/$id'
     | '/_authenticated/goals/create'
     | '/_authenticated/goals/'
@@ -220,7 +232,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  LoginRoute: typeof LoginRoute
+  LoginRoute: typeof LoginRouteWithChildren
   RegisterRoute: typeof RegisterRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
 }
@@ -254,6 +266,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/login/magic-link': {
+      id: '/login/magic-link'
+      path: '/magic-link'
+      fullPath: '/login/magic-link'
+      preLoaderRoute: typeof LoginMagicLinkRouteImport
+      parentRoute: typeof LoginRoute
     }
     '/auth/callback': {
       id: '/auth/callback'
@@ -374,10 +393,20 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface LoginRouteChildren {
+  LoginMagicLinkRoute: typeof LoginMagicLinkRoute
+}
+
+const LoginRouteChildren: LoginRouteChildren = {
+  LoginMagicLinkRoute: LoginMagicLinkRoute,
+}
+
+const LoginRouteWithChildren = LoginRoute._addFileChildren(LoginRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  LoginRoute: LoginRoute,
+  LoginRoute: LoginRouteWithChildren,
   RegisterRoute: RegisterRoute,
   AuthCallbackRoute: AuthCallbackRoute,
 }
