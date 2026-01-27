@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, Outlet, useLocation } from "@tanstack/react-router";
 import { LoginPage } from "@/pages/authenticated/auth/login";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -10,5 +10,18 @@ export const Route = createFileRoute("/login")({
       throw redirect({ to: "/dashboard" });
     }
   },
-  component: LoginPage,
+  component: LoginLayout,
 });
+
+function LoginLayout() {
+  const location = useLocation();
+  const isMagicLinkRoute = location.pathname === "/login/magic-link";
+  
+  // If we're on the magic link route, render the outlet (child route)
+  // Otherwise, render the LoginPage
+  if (isMagicLinkRoute) {
+    return <Outlet />;
+  }
+  
+  return <LoginPage />;
+}
