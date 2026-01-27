@@ -31,3 +31,16 @@ export const toLocalDateString = (date: Date): string => {
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
+
+/**
+ * Validates if a string is a valid email address
+ * @param email - The email string to validate
+ * @returns true if the email is valid, false otherwise
+ */
+export const isValidEmail = (email: string | null | undefined): boolean => {
+  if (!email) {
+    return false;
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
