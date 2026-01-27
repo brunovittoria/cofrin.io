@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { GoogleLoginButton } from "@/components/GoogleLoginButton";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Mail } from "lucide-react";
 
 interface LoginActionsProps {
   isValid: boolean;
@@ -14,6 +15,12 @@ export const LoginActions = ({
   isLoading,
   isLoaded,
 }: LoginActionsProps) => {
+  const navigate = useNavigate();
+
+  const handleMagicLinkClick = () => {
+    navigate({ to: "/login/magic-link" });
+  };
+
   return (
     <>
       <Button
@@ -22,6 +29,23 @@ export const LoginActions = ({
         disabled={!isValid || isLoading || !isLoaded}
       >
         {isLoading ? "Signing In..." : "Sign In with Email"}
+      </Button>
+
+      <div className="flex items-center gap-2 my-4">
+        <Separator className="flex-1" />
+        <span className="text-xs text-muted-foreground">OR</span>
+        <Separator className="flex-1" />
+      </div>
+
+      <Button
+        type="button"
+        variant="outline"
+        onClick={handleMagicLinkClick}
+        disabled={isLoading}
+        className="w-full flex items-center justify-center gap-2"
+      >
+        <Mail className="h-4 w-4" />
+        Sign in with Magic Link
       </Button>
 
       <div className="flex items-center my-6">
