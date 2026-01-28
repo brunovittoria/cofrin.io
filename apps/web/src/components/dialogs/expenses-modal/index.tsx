@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCategories } from "@/hooks/api/useCategories";
 import { useCreateExpense, useUpdateExpense, type Expense } from "@/hooks/api/useExpenses";
 import { toLocalDateString } from "@/lib/formatters";
-import { useExpenseForm } from "@/hooks/useExpenseForm";
+import { useExpenseForm } from "@/hooks/expenses/useExpenseForm";
 import { DateField } from "./components/DateField";
 import { DescriptionField } from "./components/DescriptionField";
 import { CategoryField } from "./components/CategoryField";

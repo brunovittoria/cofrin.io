@@ -17,7 +17,7 @@ import {
   type Income,
 } from "@/hooks/api/useIncomes";
 import { toLocalDateString } from "@/lib/formatters";
-import { useIncomeForm } from "@/hooks/useIncomeForm";
+import { useIncomeForm } from "@/hooks/incomes/useIncomeForm";
 import { DateField } from "./components/DateField";
 import { DescriptionField } from "./components/DescriptionField";
 import { CategoryField } from "./components/CategoryField";

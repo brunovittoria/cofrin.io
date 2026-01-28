@@ -16,7 +16,7 @@ import {
   useUpdateFutureLaunch,
   type FutureLaunch,
 } from "@/hooks/api/useFutureLaunches";
-import { useFutureLaunchForm } from "@/hooks/useFutureLaunchForm";
+import { useFutureLaunchForm } from "@/hooks/future-launches/useFutureLaunchForm";
 import type { FutureLaunchFormData } from "@/lib/validations";
 import { DateFormField } from "./components/DateFormField";
 import { TypeFormField } from "./components/TypeFormField";

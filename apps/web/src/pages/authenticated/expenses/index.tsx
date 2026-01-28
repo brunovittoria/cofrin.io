@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
-import { useExpensesPage } from "@/hooks/useExpensesPage";
+import { useExpensesPage } from "@/hooks/expenses/useExpensesPage";
 import { PageHeader } from "./components/PageHeader";
 import { SummaryCards } from "./components/SummaryCards";
 import { FilterBar } from "./components/FilterBar";

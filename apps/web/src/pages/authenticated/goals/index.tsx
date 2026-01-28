@@ -1,4 +1,4 @@
-import { useGoalsPage } from "@/hooks/useGoalsPage";
+import { useGoalsPage } from "@/hooks/goals/useGoalsPage";
 import { PageSkeleton } from "@/components/PageSkeleton";
 import { PaginationButton } from "@/components/PaginationButton";
 import {

@@ -1,6 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import { MonthPicker } from "@/components/MonthPicker";
-import { useFutureLaunchesPage } from "@/hooks/useFutureLaunchesPage";
+import { useFutureLaunchesPage } from "@/hooks/future-launches/useFutureLaunchesPage";
 import { PageHeader } from "./components/PageHeader";
 import { SummaryCards } from "./components/SummaryCards";
 import { PendingLaunchesTable } from "./components/PendingLaunchesTable";

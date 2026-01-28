@@ -1,5 +1,5 @@
 import { CardModal } from "@/components/dialogs/card-modal";
-import { useCardsPage } from "@/hooks/useCardsPage";
+import { useCardsPage } from "@/hooks/cards/useCardsPage";
 import { PageHeader } from "./components/PageHeader";
 import { CardsGrid } from "./components/CardsGrid";
 import { LoadingSkeleton } from "./components/LoadingSkeleton";

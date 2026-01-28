@@ -1,4 +1,4 @@
-import { useResetPasswordForm } from "@/hooks/useResetPasswordForm";
+import { useResetPasswordForm } from "@/hooks/auth/useResetPasswordForm";
 import { Logo } from "../login/components/Logo";
 import { PasswordField } from "./components/PasswordField";
 import { ConfirmPasswordField } from "./components/ConfirmPasswordField";

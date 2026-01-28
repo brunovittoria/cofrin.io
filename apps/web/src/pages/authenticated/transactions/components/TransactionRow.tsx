@@ -11,7 +11,7 @@ import {
   DEFAULT_CATEGORY_COLOR as INCOME_COLOR,
 } from "@/lib/entryUtils";
 import { DEFAULT_CATEGORY_COLOR as EXPENSE_COLOR } from "@/lib/expenseUtils";
-import type { Transaction } from "@/hooks/useTransactionsPage";
+import type { Transaction } from "@/hooks/transactions/useTransactionsPage";
 
 interface TransactionRowProps {
   transaction: Transaction;

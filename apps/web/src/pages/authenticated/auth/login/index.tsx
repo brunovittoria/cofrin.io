@@ -1,4 +1,4 @@
-import { useLoginForm } from "@/hooks/useLoginForm";
+import { useLoginForm } from "@/hooks/auth/useLoginForm";
 import { Logo } from "./components/Logo";
 import { EmailField } from "./components/EmailField";
 import { PasswordField } from "./components/PasswordField";

@@ -1,4 +1,4 @@
-import { useRegisterForm } from "@/hooks/useRegisterForm";
+import { useRegisterForm } from "@/hooks/auth/useRegisterForm";
 import { Logo } from "./components/Logo";
 import { NameFields } from "./components/NameFields";
 import { EmailField } from "./components/EmailField";

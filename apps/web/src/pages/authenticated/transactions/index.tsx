@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
-import { useTransactionsPage } from "@/hooks/useTransactionsPage";
+import { useTransactionsPage } from "@/hooks/transactions/useTransactionsPage";
 import { PageHeader } from "./components/PageHeader";
 import { TransactionMetrics } from "./components/TransactionMetrics";
 import { FilterBar } from "./components/FilterBar";

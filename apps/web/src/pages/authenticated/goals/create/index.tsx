@@ -3,7 +3,7 @@ import { ArrowLeft, Check } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { useGoalForm, GoalFormStep } from "@/hooks/useGoalForm";
+import { useGoalForm, GoalFormStep } from "@/hooks/goals/useGoalForm";
 import { useCreateGoal } from "@/hooks/api/useGoals";
 import { ReflectionStep, GoalTypeSelector, GoalForm } from "../components";
 

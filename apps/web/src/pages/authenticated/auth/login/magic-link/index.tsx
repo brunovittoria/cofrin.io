@@ -1,4 +1,4 @@
-import { useMagicLinkForm } from "@/hooks/useMagicLinkForm";
+import { useMagicLinkForm } from "@/hooks/auth/useMagicLinkForm";
 import { Logo } from "../components/Logo";
 import { EmailField } from "../components/EmailField";
 import { Button } from "@/components/ui/button";

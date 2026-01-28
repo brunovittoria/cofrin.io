@@ -1,4 +1,4 @@
-import { useForgotPasswordForm } from "@/hooks/useForgotPasswordForm";
+import { useForgotPasswordForm } from "@/hooks/auth/useForgotPasswordForm";
 import { Logo } from "../login/components/Logo";
 import { EmailField } from "../login/components/EmailField";
 import { Button } from "@/components/ui/button";

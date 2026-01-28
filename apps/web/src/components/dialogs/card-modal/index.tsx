@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useCardForm } from "@/hooks/useCardForm";
+import { useCardForm } from "@/hooks/cards/useCardForm";
 import { CardBasicFields } from "./components/CardBasicFields";
 import { CardProviderFields } from "./components/CardProviderFields";
 import { CardNumberLimitFields } from "./components/CardNumberLimitFields";

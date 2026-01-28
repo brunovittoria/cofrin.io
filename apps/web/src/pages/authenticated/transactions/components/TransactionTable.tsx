@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TransactionRow } from "./TransactionRow";
-import type { Transaction } from "@/hooks/useTransactionsPage";
+import type { Transaction } from "@/hooks/transactions/useTransactionsPage";
 
 interface TransactionTableProps {
   transactions: Transaction[];

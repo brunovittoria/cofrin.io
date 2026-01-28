@@ -1,7 +1,7 @@
 import { Search, LayoutList, ArrowUpCircle, ArrowDownCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import type { TransactionType } from "@/hooks/useTransactionsPage";
+import type { TransactionType } from "@/hooks/transactions/useTransactionsPage";
 
 interface FilterBarProps {
   searchTerm: string;

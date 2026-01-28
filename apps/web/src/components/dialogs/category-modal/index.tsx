@@ -14,7 +14,7 @@ import {
   useUpdateCategory,
   type Category,
 } from "@/hooks/api/useCategories";
-import { useCategoryForm } from "@/hooks/useCategoryForm";
+import { useCategoryForm } from "@/hooks/categories/useCategoryForm";
 import { CategoryNameField } from "./components/CategoryNameField";
 import { CategoryDescriptionField } from "./components/CategoryDescriptionField";
 import { CategoryTypeField } from "./components/CategoryTypeField";
