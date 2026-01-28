@@ -9,11 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginMagicLinkRouteImport } from './routes/login/magic-link'
+import { Route as LoginForgotPasswordRouteImport } from './routes/login/forgot-password'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as AuthenticatedTransactionsRouteImport } from './routes/_authenticated/transactions'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -27,6 +29,11 @@ import { Route as AuthenticatedGoalsIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedGoalsCreateRouteImport } from './routes/_authenticated/goals/create'
 import { Route as AuthenticatedGoalsIdRouteImport } from './routes/_authenticated/goals/$id'
 
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -49,6 +56,11 @@ const IndexRoute = IndexRouteImport.update({
 const LoginMagicLinkRoute = LoginMagicLinkRouteImport.update({
   id: '/magic-link',
   path: '/magic-link',
+  getParentRoute: () => LoginRoute,
+} as any)
+const LoginForgotPasswordRoute = LoginForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => LoginRoute,
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
@@ -119,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRouteWithChildren
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/cards': typeof AuthenticatedCardsRoute
   '/categories': typeof AuthenticatedCategoriesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -128,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/login/forgot-password': typeof LoginForgotPasswordRoute
   '/login/magic-link': typeof LoginMagicLinkRoute
   '/goals/$id': typeof AuthenticatedGoalsIdRoute
   '/goals/create': typeof AuthenticatedGoalsCreateRoute
@@ -137,6 +151,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRouteWithChildren
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/cards': typeof AuthenticatedCardsRoute
   '/categories': typeof AuthenticatedCategoriesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -146,6 +161,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/login/forgot-password': typeof LoginForgotPasswordRoute
   '/login/magic-link': typeof LoginMagicLinkRoute
   '/goals/$id': typeof AuthenticatedGoalsIdRoute
   '/goals/create': typeof AuthenticatedGoalsCreateRoute
@@ -157,6 +173,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRouteWithChildren
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/cards': typeof AuthenticatedCardsRoute
   '/_authenticated/categories': typeof AuthenticatedCategoriesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -166,6 +183,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/transactions': typeof AuthenticatedTransactionsRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/login/forgot-password': typeof LoginForgotPasswordRoute
   '/login/magic-link': typeof LoginMagicLinkRoute
   '/_authenticated/goals/$id': typeof AuthenticatedGoalsIdRoute
   '/_authenticated/goals/create': typeof AuthenticatedGoalsCreateRoute
@@ -177,6 +195,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/register'
+    | '/reset-password'
     | '/cards'
     | '/categories'
     | '/dashboard'
@@ -186,6 +205,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/transactions'
     | '/auth/callback'
+    | '/login/forgot-password'
     | '/login/magic-link'
     | '/goals/$id'
     | '/goals/create'
@@ -195,6 +215,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/register'
+    | '/reset-password'
     | '/cards'
     | '/categories'
     | '/dashboard'
@@ -204,6 +225,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/transactions'
     | '/auth/callback'
+    | '/login/forgot-password'
     | '/login/magic-link'
     | '/goals/$id'
     | '/goals/create'
@@ -214,6 +236,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/login'
     | '/register'
+    | '/reset-password'
     | '/_authenticated/cards'
     | '/_authenticated/categories'
     | '/_authenticated/dashboard'
@@ -223,6 +246,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/transactions'
     | '/auth/callback'
+    | '/login/forgot-password'
     | '/login/magic-link'
     | '/_authenticated/goals/$id'
     | '/_authenticated/goals/create'
@@ -234,11 +258,19 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRouteWithChildren
   RegisterRoute: typeof RegisterRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -272,6 +304,13 @@ declare module '@tanstack/react-router' {
       path: '/magic-link'
       fullPath: '/login/magic-link'
       preLoaderRoute: typeof LoginMagicLinkRouteImport
+      parentRoute: typeof LoginRoute
+    }
+    '/login/forgot-password': {
+      id: '/login/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/login/forgot-password'
+      preLoaderRoute: typeof LoginForgotPasswordRouteImport
       parentRoute: typeof LoginRoute
     }
     '/auth/callback': {
@@ -394,10 +433,12 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 )
 
 interface LoginRouteChildren {
+  LoginForgotPasswordRoute: typeof LoginForgotPasswordRoute
   LoginMagicLinkRoute: typeof LoginMagicLinkRoute
 }
 
 const LoginRouteChildren: LoginRouteChildren = {
+  LoginForgotPasswordRoute: LoginForgotPasswordRoute,
   LoginMagicLinkRoute: LoginMagicLinkRoute,
 }
 
@@ -408,6 +449,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRouteWithChildren,
   RegisterRoute: RegisterRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   AuthCallbackRoute: AuthCallbackRoute,
 }
 export const routeTree = rootRouteImport
