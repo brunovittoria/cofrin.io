@@ -16,10 +16,11 @@ export const Route = createFileRoute("/login")({
 function LoginLayout() {
   const location = useLocation();
   const isMagicLinkRoute = location.pathname === "/login/magic-link";
+  const isForgotPasswordRoute = location.pathname === "/login/forgot-password";
   
-  // If we're on the magic link route, render the outlet (child route)
+  // If we're on a child route, render the outlet
   // Otherwise, render the LoginPage
-  if (isMagicLinkRoute) {
+  if (isMagicLinkRoute || isForgotPasswordRoute) {
     return <Outlet />;
   }
   
