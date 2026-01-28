@@ -12,6 +12,18 @@ function AuthCallback() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        // Check if this is a password reset flow
+        // Password reset tokens come in the URL hash with type=recovery
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const type = hashParams.get("type");
+        
+        if (type === "recovery") {
+          // This is a password reset flow, redirect to reset password page
+          // Supabase will create a session when the user lands on /reset-password
+          navigate({ to: "/reset-password" });
+          return;
+        }
+
         // Handle OAuth and Magic Link callbacks
         // Supabase automatically parses the URL hash for both OAuth and magic links
         const { data: { session }, error } = await supabase.auth.getSession();
