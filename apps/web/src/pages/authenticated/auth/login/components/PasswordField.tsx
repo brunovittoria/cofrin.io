@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { UseFormRegister, FieldErrors } from "react-hook-form";
+import { Link } from "@tanstack/react-router";
 import { type LoginFormData } from "@/lib/validations";
 
 interface PasswordFieldProps {
@@ -17,12 +18,12 @@ export const PasswordField = ({ register, errors }: PasswordFieldProps) => {
     <div className="space-y-2">
       <div className="flex justify-between">
         <Label htmlFor="password">Password</Label>
-        <a
-          href="#"
+        <Link
+          to="/login/forgot-password"
           className="text-sm font-medium text-primary hover:text-primary/80"
         >
           Forgot Your Password?
-        </a>
+        </Link>
       </div>
       <div className="relative">
         <Input
