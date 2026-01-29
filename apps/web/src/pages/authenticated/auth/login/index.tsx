@@ -1,3 +1,4 @@
+import { Form } from "@/components/ui/form";
 import { useLoginForm } from "@/hooks/auth/useLoginForm";
 import { Logo } from "./components/Logo";
 import { EmailField } from "./components/EmailField";
@@ -7,10 +8,9 @@ import { DashboardPreview } from "./components/DashboardPreview";
 
 export function LoginPage() {
   const {
-    register,
+    form,
     handleSubmit,
     onSubmit,
-    errors,
     isValid,
     isLoading,
     isLoaded,
@@ -22,15 +22,17 @@ export function LoginPage() {
         <div className="max-w-lg mx-auto w-full px-4 sm:px-0 min-h-screen">
           <Logo />
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <EmailField register={register} errors={errors} />
-            <PasswordField register={register} errors={errors} />
-            <LoginActions
-              isValid={isValid}
-              isLoading={isLoading}
-              isLoaded={isLoaded}
-            />
-          </form>
+          <Form {...form}>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <EmailField control={form.control} />
+              <PasswordField control={form.control} />
+              <LoginActions
+                isValid={isValid}
+                isLoading={isLoading}
+                isLoaded={isLoaded}
+              />
+            </form>
+          </Form>
         </div>
       </section>
 

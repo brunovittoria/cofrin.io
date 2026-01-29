@@ -10,11 +10,7 @@ export const useLoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid },
-  } = useForm<LoginFormData>({
+  const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     mode: "onChange",
   });
@@ -43,11 +39,10 @@ export const useLoginForm = () => {
   };
 
   return {
-    register,
-    handleSubmit,
+    form,
+    handleSubmit: form.handleSubmit,
     onSubmit,
-    errors,
-    isValid,
+    isValid: form.formState.isValid,
     isLoading,
     isLoaded: true, // Always loaded for Supabase Auth
   };

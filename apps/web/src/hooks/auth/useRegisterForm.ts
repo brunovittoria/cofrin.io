@@ -12,18 +12,13 @@ export const useRegisterForm = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors, isValid },
-  } = useForm<RegisterFormData>({
+  const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     mode: "onChange",
   });
 
-  const watchedPassword = watch("password");
-  const watchedConfirmPassword = watch("confirmPassword");
+  const watchedPassword = form.watch("password");
+  const watchedConfirmPassword = form.watch("confirmPassword");
 
   const passwordRequirements = {
     minLength: watchedPassword ? watchedPassword.length >= 8 : false,
@@ -80,11 +75,10 @@ export const useRegisterForm = () => {
   };
 
   return {
-    register,
-    handleSubmit,
+    form,
+    handleSubmit: form.handleSubmit,
     onSubmit,
-    errors,
-    isValid,
+    isValid: form.formState.isValid,
     isLoading,
     isLoaded: true, // Always loaded for Supabase Auth
     showPassword,

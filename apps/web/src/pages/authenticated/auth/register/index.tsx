@@ -1,3 +1,4 @@
+import { Form } from "@/components/ui/form";
 import { useRegisterForm } from "@/hooks/auth/useRegisterForm";
 import { Logo } from "./components/Logo";
 import { NameFields } from "./components/NameFields";
@@ -10,10 +11,9 @@ import { DashboardPreview } from "./components/DashboardPreview";
 
 export function RegisterPage() {
   const {
-    register,
+    form,
     handleSubmit,
     onSubmit,
-    errors,
     isValid,
     isLoading,
     isLoaded,
@@ -31,35 +31,35 @@ export function RegisterPage() {
         <div className="max-w-lg mx-auto w-full px-4 sm:px-0 min-h-screen">
           <Logo />
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <NameFields register={register} errors={errors} />
-            <EmailField register={register} errors={errors} />
-            
-            <div className="space-y-2">
-              <PasswordField
-                register={register}
-                errors={errors}
-                showPassword={showPassword}
-                setShowPassword={setShowPassword}
+          <Form {...form}>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <NameFields control={form.control} />
+              <EmailField control={form.control} />
+              
+              <div className="space-y-2">
+                <PasswordField
+                  control={form.control}
+                  showPassword={showPassword}
+                  setShowPassword={setShowPassword}
+                />
+                {watchedPassword && (
+                  <PasswordRequirements passwordRequirements={passwordRequirements} />
+                )}
+              </div>
+
+              <ConfirmPasswordField
+                control={form.control}
+                showConfirmPassword={showConfirmPassword}
+                setShowConfirmPassword={setShowConfirmPassword}
               />
-              {watchedPassword && (
-                <PasswordRequirements passwordRequirements={passwordRequirements} />
-              )}
-            </div>
 
-            <ConfirmPasswordField
-              register={register}
-              errors={errors}
-              showConfirmPassword={showConfirmPassword}
-              setShowConfirmPassword={setShowConfirmPassword}
-            />
-
-            <RegisterActions
-              isValid={isValid}
-              isLoading={isLoading}
-              isLoaded={isLoaded}
-            />
-          </form>
+              <RegisterActions
+                isValid={isValid}
+                isLoading={isLoading}
+                isLoaded={isLoaded}
+              />
+            </form>
+          </Form>
         </div>
       </section>
 

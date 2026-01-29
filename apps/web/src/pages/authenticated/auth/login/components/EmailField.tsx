@@ -1,27 +1,37 @@
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { UseFormRegister, FieldErrors, FieldValues } from "react-hook-form";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import type { Control } from "react-hook-form";
+import type { LoginFormData } from "@/lib/validations";
 
-interface EmailFieldProps<T extends FieldValues> {
-  register: UseFormRegister<T>;
-  errors: FieldErrors<T>;
+interface EmailFieldProps {
+  control: Control<LoginFormData>;
 }
 
-export const EmailField = <T extends FieldValues>({ register, errors }: EmailFieldProps<T>) => {
+export const EmailField = ({ control }: EmailFieldProps) => {
   return (
-    <div className="space-y-2">
-      <Label htmlFor="email">Email</Label>
-      <Input
-        id="email"
-        type="email"
-        placeholder="Enter your email address"
-        {...register("email" as any)}
-        className={`w-full ${errors.email ? "border-red-500" : ""}`}
-      />
-      {errors.email && (
-        <p className="text-xs text-red-500">{(errors.email as any)?.message}</p>
+    <FormField
+      control={control}
+      name="email"
+      render={({ field }) => (
+        <FormItem className="space-y-2">
+          <FormLabel>Email</FormLabel>
+          <FormControl>
+            <Input
+              type="email"
+              placeholder="Enter your email address"
+              {...field}
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
       )}
-    </div>
+    />
   );
 };
 
