@@ -38,13 +38,13 @@ export const Header = () => {
 
         <nav className="hidden gap-8 md:flex">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.href}
-              href={link.href}
+              to={link.href}
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -135,14 +135,14 @@ const MobileMenu = ({ navLinks, onClose }: MobileMenuProps) => (
   >
     <div className="container flex flex-col gap-4 py-4">
       {navLinks.map((link) => (
-        <a
+        <Link
           key={link.href}
-          href={link.href}
+          to={link.href}
           className="py-2 text-sm font-medium"
           onClick={onClose}
         >
           {link.label}
-        </a>
+        </Link>
       ))}
       <div className="flex flex-col gap-2 border-t pt-2">
         <Link to="/login" className="py-2 text-sm font-medium" onClick={onClose}>

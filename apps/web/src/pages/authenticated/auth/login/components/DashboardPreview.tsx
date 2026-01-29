@@ -1,3 +1,6 @@
+import { Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
+
 export const DashboardPreview = () => {
   return (
     <section className="hidden lg:flex lg:w-1/2 bg-muted/30 p-8">
@@ -14,12 +17,12 @@ export const DashboardPreview = () => {
               <h3 className="text-xl font-semibold text-foreground">
                 Financial Dashboard
               </h3>
-              <a
-                href="#"
+              <Link
+                to="/features"
                 className="text-sm text-primary flex items-center hover:text-primary/80 transition duration-200"
               >
-                View All Features <span className="ml-1">→</span>
-              </a>
+                View All Features <ArrowRight className="ml-1" />
+              </Link>
             </div>
             <p className="text-sm text-muted-foreground mt-1">
               Track expenses, income, and manage your finances in real-time.
