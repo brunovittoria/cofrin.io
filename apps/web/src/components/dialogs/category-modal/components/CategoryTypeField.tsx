@@ -1,5 +1,13 @@
-import { Label } from "@/components/ui/label";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { Control } from "react-hook-form";
+import type { CategoryFormData } from "@/lib/validations";
 
 const fieldWrapper =
   "group rounded-2xl border border-[#E4E8F4] bg-[rgba(249,250,255,0.9)] p-4 transition-all duration-200 hover:border-[#C6D4FF] hover:bg-white focus-within:border-[#0A84FF] focus-within:bg-white shadow-[0_24px_48px_-30px_rgba(10,132,255,0.22)]";
@@ -11,30 +19,36 @@ const selectContentClass =
 const selectItemClass = "text-sm text-[#0F172A] focus:bg-[#EEF2FF] focus:text-[#0F172A]";
 
 interface CategoryTypeFieldProps {
-  value: string;
-  onChange: (value: string) => void;
+  control: Control<CategoryFormData>;
 }
 
-export const CategoryTypeField = ({ value, onChange }: CategoryTypeFieldProps) => {
+export const CategoryTypeField = ({ control }: CategoryTypeFieldProps) => {
   return (
-    <div className={fieldWrapper}>
-      <Label htmlFor="tipo" className={labelClass}>
-        Tipo
-      </Label>
-      <Select value={value} onValueChange={onChange} required>
-        <SelectTrigger className={controlClass}>
-          <SelectValue placeholder="Selecione o tipo" />
-        </SelectTrigger>
-        <SelectContent className={selectContentClass}>
-          <SelectItem value="entrada" className={selectItemClass}>
-            Entrada
-          </SelectItem>
-          <SelectItem value="saida" className={selectItemClass}>
-            Saída
-          </SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
+    <FormField
+      control={control}
+      name="type"
+      render={({ field }) => (
+        <FormItem className={fieldWrapper}>
+          <FormLabel className={labelClass}>Tipo</FormLabel>
+          <Select onValueChange={field.onChange} value={field.value} required>
+            <FormControl>
+              <SelectTrigger className={controlClass}>
+                <SelectValue placeholder="Selecione o tipo" />
+              </SelectTrigger>
+            </FormControl>
+            <SelectContent className={selectContentClass}>
+              <SelectItem value="entrada" className={selectItemClass}>
+                Entrada
+              </SelectItem>
+              <SelectItem value="saida" className={selectItemClass}>
+                Saída
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
   );
 };
 

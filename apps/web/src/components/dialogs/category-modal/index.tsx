@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
   DialogContent,
@@ -9,12 +11,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Form } from "@/components/ui/form";
 import {
   useCreateCategory,
   useUpdateCategory,
   type Category,
 } from "@/hooks/api/useCategories";
-import { useCategoryForm } from "@/hooks/categories/useCategoryForm";
+import {
+  categorySchema,
+  type CategoryFormData,
+} from "@/lib/validations";
 import { CategoryNameField } from "./components/CategoryNameField";
 import { CategoryDescriptionField } from "./components/CategoryDescriptionField";
 import { CategoryTypeField } from "./components/CategoryTypeField";
@@ -38,43 +44,68 @@ export function CategoryModal({
   const createCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
 
-  const {
-    formData,
-    updateField,
-    resetForm,
-    initializeEditMode,
-    getSubmitData,
-  } = useCategoryForm({
-    mode,
-    category,
-    defaultType,
+  const form = useForm<CategoryFormData>({
+    resolver: zodResolver(categorySchema),
+    mode: "onChange",
+    defaultValues: {
+      name: "",
+      description: "",
+      type: defaultType as "entrada" | "saida" | undefined,
+      hex_color: "",
+    },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const submitData = getSubmitData();
-
-    if (mode === "edit") {
-      updateCategory.mutate(submitData, {
-        onSuccess: () => {
-          setOpen(false);
-        },
+  // Reset form when category changes (for edit mode)
+  useEffect(() => {
+    if (open && mode === "edit" && category) {
+      form.reset({
+        name: category.name || "",
+        description: category.description || "",
+        type: (category.type as "entrada" | "saida") || defaultType as "entrada" | "saida" | undefined,
+        hex_color: category.hex_color || "",
       });
+    } else if (open && mode === "create") {
+      form.reset({
+        name: "",
+        description: "",
+        type: defaultType as "entrada" | "saida" | undefined,
+        hex_color: "",
+      });
+    }
+  }, [open, mode, category, form, defaultType]);
+
+  const handleSubmit = (data: CategoryFormData) => {
+    const submitData = {
+      name: data.name,
+      description: data.description || undefined,
+      type: data.type,
+      hex_color: data.hex_color,
+    };
+
+    if (mode === "edit" && category?.id) {
+      updateCategory.mutate(
+        { id: category.id, ...submitData },
+        {
+          onSuccess: () => {
+            setOpen(false);
+            form.reset();
+          },
+        }
+      );
       return;
     }
 
     createCategory.mutate(submitData, {
       onSuccess: () => {
         setOpen(false);
-        resetForm();
+        form.reset();
       },
     });
   };
 
   const handleOpenChange = (next: boolean) => {
-    if (next && mode === "edit") {
-      initializeEditMode();
+    if (!next) {
+      form.reset();
     }
     setOpen(next);
   };
@@ -100,34 +131,24 @@ export function CategoryModal({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <CategoryNameField
-            value={formData.name}
-            onChange={(value) => updateField("name", value)}
-          />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5">
+            <CategoryNameField control={form.control} />
 
-          <CategoryDescriptionField
-            value={formData.description}
-            onChange={(value) => updateField("description", value)}
-          />
+            <CategoryDescriptionField control={form.control} />
 
-          <CategoryTypeField
-            value={formData.type}
-            onChange={(value) => updateField("type", value)}
-          />
+            <CategoryTypeField control={form.control} />
 
-          <CategoryColorField
-            value={formData.hex_color}
-            onChange={(value) => updateField("hex_color", value)}
-          />
+            <CategoryColorField control={form.control} />
 
-          <FormActions
-            mode={mode}
-            isCreating={createCategory.isPending}
-            isUpdating={updateCategory.isPending}
-            onCancel={() => setOpen(false)}
-          />
-        </form>
+            <FormActions
+              mode={mode}
+              isCreating={createCategory.isPending}
+              isUpdating={updateCategory.isPending}
+              onCancel={() => setOpen(false)}
+            />
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
