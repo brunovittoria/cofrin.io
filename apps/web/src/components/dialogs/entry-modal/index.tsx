@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
   DialogContent,
@@ -9,15 +11,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { Form } from "@/components/ui/form";
 import { useCategories } from "@/hooks/api/useCategories";
 import {
   useCreateIncome,
   useUpdateIncome,
   type Income,
 } from "@/hooks/api/useIncomes";
-import { toLocalDateString } from "@/lib/formatters";
-import { useIncomeForm } from "@/hooks/incomes/useIncomeForm";
+import { toLocalDateString, parseLocalDate } from "@/lib/formatters";
+import { incomeSchema, type IncomeFormData } from "@/lib/validations";
 import { DateField } from "./components/DateField";
 import { DescriptionField } from "./components/DescriptionField";
 import { CategoryField } from "./components/CategoryField";
@@ -37,49 +39,60 @@ export function IncomeModal({
   income,
 }: IncomeModalProps) {
   const [open, setOpen] = useState(false);
-  const { toast } = useToast();
   const { data: categories = [] } = useCategories("entrada");
   const createIncome = useCreateIncome();
   const updateIncome = useUpdateIncome();
 
-  const {
-    formData,
-    date,
-    setDate,
-    updateField,
-    resetForm,
-    initializeEditMode,
-  } = useIncomeForm({
-    mode,
-    income,
+  const form = useForm<IncomeFormData>({
+    resolver: zodResolver(incomeSchema),
+    mode: "onChange",
+    defaultValues: {
+      date: undefined,
+      descricao: "",
+      categoria_id: "",
+      valor: "",
+      tipo: "",
+    },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!date) {
-      toast({
-        title: "Erro",
-        description: "Por favor, selecione uma data.",
-        variant: "destructive",
+  // Reset form when income changes (for edit mode)
+  useEffect(() => {
+    if (open && mode === "edit" && income) {
+      try {
+        const incomeDate = income.date ? parseLocalDate(income.date) : undefined;
+        form.reset({
+          date: incomeDate,
+          descricao: income.description || "",
+          categoria_id: income.category_id ? String(income.category_id) : "",
+          valor: income.amount != null ? String(income.amount) : "",
+          tipo: "",
+        });
+      } catch {
+        form.reset({
+          date: undefined,
+          descricao: income.description || "",
+          categoria_id: income.category_id ? String(income.category_id) : "",
+          valor: income.amount != null ? String(income.amount) : "",
+          tipo: "",
+        });
+      }
+    } else if (open && mode === "create") {
+      form.reset({
+        date: undefined,
+        descricao: "",
+        categoria_id: "",
+        valor: "",
+        tipo: "",
       });
-      return;
     }
+  }, [open, mode, income, form]);
 
-    if (!formData.categoria_id) {
-      toast({
-        title: "Erro",
-        description: "Por favor, selecione uma categoria.",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  const handleSubmit = (data: IncomeFormData) => {
     const payload = {
-      date: toLocalDateString(date),
-      description: formData.descricao || undefined,
-      amount: parseFloat(formData.valor),
-      category_id: parseInt(formData.categoria_id),
+      date: toLocalDateString(data.date),
+      description: data.descricao || undefined,
+      amount: parseFloat(data.valor.replace(",", ".")),
+      category_id: parseInt(data.categoria_id, 10),
     };
 
     if (mode === "edit" && income?.id) {
@@ -88,6 +101,7 @@ export function IncomeModal({
         {
           onSuccess: () => {
             setOpen(false);
+            form.reset();
           },
         }
       );
@@ -95,15 +109,15 @@ export function IncomeModal({
       createIncome.mutate(payload, {
         onSuccess: () => {
           setOpen(false);
-          resetForm();
+          form.reset();
         },
       });
     }
   };
 
   const handleOpenChange = (next: boolean) => {
-    if (next && mode === "edit") {
-      initializeEditMode();
+    if (!next) {
+      form.reset();
     }
     setOpen(next);
   };
@@ -129,37 +143,26 @@ export function IncomeModal({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <DateField value={date} onChange={setDate} />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5">
+            <DateField control={form.control} />
 
-          <DescriptionField
-            value={formData.descricao}
-            onChange={(value) => updateField("descricao", value)}
-          />
+            <DescriptionField control={form.control} />
 
-          <CategoryField
-            value={formData.categoria_id}
-            onChange={(value) => updateField("categoria_id", value)}
-            categories={categories}
-          />
+            <CategoryField control={form.control} categories={categories} />
 
-          <ValueField
-            value={formData.valor}
-            onChange={(value) => updateField("valor", value)}
-          />
+            <ValueField control={form.control} />
 
-          <TypeField
-            value={formData.tipo}
-            onChange={(value) => updateField("tipo", value)}
-          />
+            <TypeField control={form.control} />
 
-          <FormActions
-            mode={mode}
-            isCreating={createIncome.isPending}
-            isUpdating={updateIncome.isPending}
-            onCancel={() => setOpen(false)}
-          />
-        </form>
+            <FormActions
+              mode={mode}
+              isCreating={createIncome.isPending}
+              isUpdating={updateIncome.isPending}
+              onCancel={() => setOpen(false)}
+            />
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
