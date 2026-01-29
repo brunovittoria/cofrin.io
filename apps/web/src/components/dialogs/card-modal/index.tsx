@@ -1,5 +1,7 @@
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useState, useEffect, useMemo } from "react";
 import { PlusCircle } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +11,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useCardForm } from "@/hooks/cards/useCardForm";
+import { Form } from "@/components/ui/form";
+import { cardSchema, type CardFormData } from "@/lib/validations";
+import { cardProvidersMap } from "@/mocks/cardProviders";
 import { CardBasicFields } from "./components/CardBasicFields";
 import { CardProviderFields } from "./components/CardProviderFields";
 import { CardNumberLimitFields } from "./components/CardNumberLimitFields";
@@ -56,26 +60,102 @@ export function CardModal({
   const setOpen =
     controlledSetOpen !== undefined ? controlledSetOpen : setLocalOpen;
 
-  const {
-    formData,
-    updateField,
-    selectedProvider,
-    availableValue,
-    usagePercentage,
-    getSubmitData,
-    resetForm,
-  } = useCardForm({ mode, initialCard: card });
+  const form = useForm<CardFormData>({
+    resolver: zodResolver(cardSchema),
+    mode: "onChange",
+    defaultValues: {
+      display_name: "",
+      nickname: "",
+      flag: "",
+      issuer: "",
+      card_last_four: "",
+      total_limit: "",
+      used_amount: "",
+    },
+  });
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    onSave(getSubmitData());
+  // Reset form when card changes (for edit mode)
+  useEffect(() => {
+    if (isOpen && mode === "edit" && card) {
+      form.reset({
+        display_name: card.display_name || "",
+        nickname: card.nickname || "",
+        flag: card.flag || "",
+        issuer: card.issuer || "",
+        card_last_four: card.card_last_four || "",
+        total_limit: String(card.total_limit || ""),
+        used_amount: String(card.used_amount || ""),
+      });
+    } else if (isOpen && mode === "add") {
+      form.reset({
+        display_name: "",
+        nickname: "",
+        flag: "",
+        issuer: "",
+        card_last_four: "",
+        total_limit: "",
+        used_amount: "",
+      });
+    }
+  }, [isOpen, mode, card, form]);
+
+  // Computed values
+  const watchedTotalLimit = form.watch("total_limit");
+  const watchedUsedAmount = form.watch("used_amount");
+  const watchedIssuer = form.watch("issuer");
+
+  const limitNumber = useMemo(
+    () => parseFloat(watchedTotalLimit?.replace(",", ".") || "0") || 0,
+    [watchedTotalLimit]
+  );
+  const usedNumber = useMemo(
+    () => parseFloat(watchedUsedAmount?.replace(",", ".") || "0") || 0,
+    [watchedUsedAmount]
+  );
+  const selectedProvider = watchedIssuer
+    ? cardProvidersMap[watchedIssuer]
+    : undefined;
+
+  const availableValue = Math.max(limitNumber - usedNumber, 0);
+  const usagePercentage =
+    limitNumber > 0
+      ? Math.min((usedNumber / limitNumber) * 100, 999)
+      : 0;
+
+  const handleSubmit = (data: CardFormData) => {
+    const submitData = {
+      display_name: data.display_name,
+      nickname: data.nickname?.trim() ? data.nickname : null,
+      flag: data.flag || null,
+      card_last_four: data.card_last_four?.trim() || null,
+      total_limit: limitNumber,
+      used_amount: usedNumber,
+      available_amount: availableValue,
+      usage_percentage: usagePercentage,
+      issuer: data.issuer || null,
+    };
+
+    if (mode === "edit" && card?.id) {
+      onSave({
+        ...submitData,
+        id: card.id,
+        imagem_url: card.imagem_url || null,
+        created_at: card.created_at || null,
+        is_primary: card.is_primary || false,
+      });
+    } else {
+      onSave({
+        ...submitData,
+        is_primary: false,
+      });
+    }
   };
 
-  const handleSuccess = () => {
-    setOpen(false);
-    if (mode === "add") {
-      resetForm();
+  const handleOpenChange = (next: boolean) => {
+    if (!next) {
+      form.reset();
     }
+    setOpen(next);
   };
 
   const config = {
@@ -102,7 +182,7 @@ export function CardModal({
   const currentConfig = config[mode];
 
   return (
-    <Dialog open={isOpen} onOpenChange={setOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       {!trigger && mode === "add" && currentConfig.defaultTrigger && (
         <DialogTrigger asChild>{currentConfig.defaultTrigger}</DialogTrigger>
@@ -117,53 +197,31 @@ export function CardModal({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-5">
-          <div className="flex-1 min-w-0 grid gap-4">
-            <CardBasicFields
-              nomeExibicao={formData.display_name}
-              apelido={formData.nickname || ""}
-              onNomeExibicaoChange={(value) =>
-                updateField("display_name", value)
-              }
-              onApelidoChange={(value) => updateField("nickname", value)}
-            />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-5 flex flex-col gap-5">
+            <div className="flex-1 min-w-0 grid gap-4">
+              <CardBasicFields control={form.control} />
 
-            <CardProviderFields
-              emissor={formData.issuer || ""}
-              bandeira={formData.flag || ""}
-              onEmissorChange={(value) => updateField("issuer", value)}
-              onBandeiraChange={(value) => updateField("flag", value)}
-            />
+              <CardProviderFields control={form.control} />
 
-            <CardNumberLimitFields
-              finalCartao={formData.card_last_four || ""}
-              limiteTotal={String(formData.total_limit)}
-              onFinalCartaoChange={(value) =>
-                updateField("card_last_four", value)
-              }
-              onLimiteTotalChange={(value) =>
-                updateField("total_limit", value)
-              }
-            />
+              <CardNumberLimitFields control={form.control} />
 
-            <CardUsageFields
-              valorUtilizado={String(formData.used_amount)}
-              onValorUtilizadoChange={(value) =>
-                updateField("used_amount", value)
-              }
-              providerImageUrl={selectedProvider?.imageUrl}
-              providerName={selectedProvider?.name}
-              availableValue={availableValue}
-              usagePercentage={usagePercentage}
-            />
+              <CardUsageFields
+                control={form.control}
+                providerImageUrl={selectedProvider?.imageUrl}
+                providerName={selectedProvider?.name}
+                availableValue={availableValue}
+                usagePercentage={usagePercentage}
+              />
 
-            <FormActions
-              isSaving={isSaving}
-              onCancel={() => setOpen(false)}
-              submitLabel={currentConfig.submitLabel}
-            />
-          </div>
-        </form>
+              <FormActions
+                isSaving={isSaving}
+                onCancel={() => setOpen(false)}
+                submitLabel={currentConfig.submitLabel}
+              />
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
