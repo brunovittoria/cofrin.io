@@ -252,6 +252,126 @@ export const resetPasswordSchema = z
     path: ["confirmPassword"],
   });
 
+// Category validation schema
+export const categorySchema = z.object({
+  name: z
+    .string()
+    .min(1, "O nome é obrigatório.")
+    .max(100, "O nome deve ter no máximo 100 caracteres."),
+  description: z
+    .string()
+    .max(500, "A descrição deve ter no máximo 500 caracteres.")
+    .optional(),
+  type: z.enum(["entrada", "saida"], {
+    required_error: "Por favor, selecione um tipo.",
+  }),
+  hex_color: z
+    .string()
+    .min(1, "A cor é obrigatória.")
+    .regex(/^#[0-9A-Fa-f]{6}$/, "A cor deve ser um código hexadecimal válido (ex: #FF5733)."),
+});
+
+// Card validation schema
+export const cardSchema = z.object({
+  display_name: z
+    .string()
+    .min(1, "O nome de exibição é obrigatório.")
+    .max(100, "O nome de exibição deve ter no máximo 100 caracteres."),
+  nickname: z
+    .string()
+    .max(50, "O apelido deve ter no máximo 50 caracteres.")
+    .optional(),
+  flag: z
+    .string()
+    .max(50, "A bandeira deve ter no máximo 50 caracteres.")
+    .optional(),
+  issuer: z
+    .string()
+    .max(50, "O emissor deve ter no máximo 50 caracteres.")
+    .optional(),
+  card_last_four: z
+    .string()
+    .optional()
+    .refine((val) => {
+      if (!val || val === "") return true;
+      return /^\d{4}$/.test(val);
+    }, {
+      message: "Os últimos 4 dígitos devem ser números.",
+    }),
+  total_limit: z
+    .string()
+    .min(1, "O limite total é obrigatório.")
+    .refine((val) => {
+      const num = parseFloat(val.replace(",", "."));
+      return !isNaN(num) && num > 0;
+    }, {
+      message: "O limite total deve ser um número positivo.",
+    }),
+  used_amount: z
+    .string()
+    .min(1, "O valor utilizado é obrigatório.")
+    .refine((val) => {
+      const num = parseFloat(val.replace(",", "."));
+      return !isNaN(num) && num >= 0;
+    }, {
+      message: "O valor utilizado deve ser um número não negativo.",
+    }),
+});
+
+// Expense validation schema
+export const expenseSchema = z.object({
+  date: z.date({
+    required_error: "Por favor, selecione uma data.",
+  }),
+  descricao: z
+    .string()
+    .min(1, "A descrição é obrigatória.")
+    .max(200, "A descrição deve ter no máximo 200 caracteres."),
+  categoria_id: z
+    .string()
+    .min(1, "Por favor, selecione uma categoria.")
+    .refine((val) => !isNaN(parseInt(val, 10)), {
+      message: "Categoria inválida.",
+    }),
+  valor: z
+    .string()
+    .min(1, "O valor é obrigatório.")
+    .refine((val) => {
+      const num = parseFloat(val.replace(",", "."));
+      return !isNaN(num) && num > 0;
+    }, {
+      message: "O valor deve ser um número positivo.",
+    }),
+  tipo: z.string().optional(),
+});
+
+// Income validation schema
+export const incomeSchema = z.object({
+  date: z.date({
+    required_error: "Por favor, selecione uma data.",
+  }),
+  descricao: z
+    .string()
+    .min(1, "A descrição é obrigatória.")
+    .max(200, "A descrição deve ter no máximo 200 caracteres."),
+  categoria_id: z
+    .string()
+    .min(1, "Por favor, selecione uma categoria.")
+    .refine((val) => !isNaN(parseInt(val, 10)), {
+      message: "Categoria inválida.",
+    }),
+  valor: z
+    .string()
+    .min(1, "O valor é obrigatório.")
+    .refine((val) => {
+      const num = parseFloat(val.replace(",", "."));
+      return !isNaN(num) && num > 0;
+    }, {
+      message: "O valor deve ser um número positivo.",
+    }),
+  tipo: z.string().optional(),
+});
+
 // Type inference for TypeScript
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type RegisterFormData = z.infer<typeof registerSchema>;
@@ -267,3 +387,7 @@ export type AddressFormData = z.infer<typeof addressSchema>;
 export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
 export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
+export type CategoryFormData = z.infer<typeof categorySchema>;
+export type CardFormData = z.infer<typeof cardSchema>;
+export type ExpenseFormData = z.infer<typeof expenseSchema>;
+export type IncomeFormData = z.infer<typeof incomeSchema>;
