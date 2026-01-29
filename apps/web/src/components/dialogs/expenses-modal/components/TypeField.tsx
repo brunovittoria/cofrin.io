@@ -1,5 +1,13 @@
-import { Label } from "@/components/ui/label";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { Control } from "react-hook-form";
+import type { ExpenseFormData } from "@/lib/validations";
 
 const fieldWrapper =
   "group rounded-2xl border border-[#F2D7D9] bg-[rgba(252,244,244,0.92)] p-4 transition-all duration-200 hover:border-[#FECACA] hover:bg-white focus-within:border-[#DC2626] focus-within:bg-white shadow-[0_24px_48px_-30px_rgba(220,38,38,0.2)]";
@@ -11,30 +19,36 @@ const selectContentClass =
 const selectItemClass = "text-sm text-[#0F172A] focus:bg-[#FEE2E2] focus:text-[#0F172A]";
 
 interface TypeFieldProps {
-  value: string;
-  onChange: (value: string) => void;
+  control: Control<ExpenseFormData>;
 }
 
-export const TypeField = ({ value, onChange }: TypeFieldProps) => {
+export const TypeField = ({ control }: TypeFieldProps) => {
   return (
-    <div className={fieldWrapper}>
-      <Label htmlFor="tipo" className={labelClass}>
-        Tipo
-      </Label>
-      <Select value={value} onValueChange={onChange} required>
-        <SelectTrigger className={controlClass}>
-          <SelectValue placeholder="Selecione o tipo" />
-        </SelectTrigger>
-        <SelectContent className={selectContentClass}>
-          <SelectItem value="fixo" className={selectItemClass}>
-            Fixo
-          </SelectItem>
-          <SelectItem value="variavel" className={selectItemClass}>
-            Variável
-          </SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
+    <FormField
+      control={control}
+      name="tipo"
+      render={({ field }) => (
+        <FormItem className={fieldWrapper}>
+          <FormLabel className={labelClass}>Tipo</FormLabel>
+          <Select onValueChange={field.onChange} value={field.value} required>
+            <FormControl>
+              <SelectTrigger className={controlClass}>
+                <SelectValue placeholder="Selecione o tipo" />
+              </SelectTrigger>
+            </FormControl>
+            <SelectContent className={selectContentClass}>
+              <SelectItem value="fixo" className={selectItemClass}>
+                Fixo
+              </SelectItem>
+              <SelectItem value="variavel" className={selectItemClass}>
+                Variável
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
   );
 };
 
