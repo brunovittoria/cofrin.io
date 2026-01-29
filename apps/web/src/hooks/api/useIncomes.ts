@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { toLocalDateString } from '@/lib/formatters';
 import { getPreviousMonthRange } from '@/lib/trendUtils';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/stores/auth.store';
 
 export type Income = {
   id: number;

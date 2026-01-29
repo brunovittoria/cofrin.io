@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/stores/auth.store";
 
 export type GoalType = "economizar" | "reduzir" | "quitar" | "personalizada";
 export type GoalStatus = "ativa" | "concluida" | "pausada";

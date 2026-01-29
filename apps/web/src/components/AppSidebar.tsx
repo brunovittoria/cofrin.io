@@ -27,7 +27,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useThemeStore } from "@/stores/ui-store";
 import { Switch } from "@/components/ui/switch";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/stores/auth.store";
 import { useNavigate } from "@tanstack/react-router";
 
 const navItems = [
