@@ -1,4 +1,4 @@
-import { useCategoriesPage } from "@/hooks/useCategoriesPage";
+import { useCategoriesPage } from "@/hooks/categories/useCategoriesPage";
 import { PageHeader } from "./components/PageHeader";
 import { SummaryCards } from "./components/SummaryCards";
 import { CategoryTable } from "./components/CategoryTable";
