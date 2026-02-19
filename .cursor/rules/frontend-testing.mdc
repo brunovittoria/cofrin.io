@@ -1,0 +1,183 @@
+---
+description: Comprehensive frontend testing guidelines using Vitest (Unit + Integration) and Playwright (E2E).
+globs: 
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+  - "**/*.spec.ts"
+  - "**/*.spec.tsx"
+alwaysApply: false
+---
+
+# Frontend Testing Rules (Vitest + RTL + Playwright)
+
+###########################################################
+# 🧪 UNIT & INTEGRATION TESTS (Vitest + RTL)
+###########################################################
+
+## Framework Rules
+
+- Use `vitest` as the test runner.
+- Tests must be colocated next to the tested file.
+- Use `@testing-library/react` for component testing.
+- Follow the Arrange-Act-Assert (AAA) pattern.
+- Tests must be deterministic, isolated, and fast.
+
+###########################################################
+# 🔹 STRUCTURE & AAA PATTERN
+###########################################################
+
+rules:
+
+  - id: "test/aaa-pattern"
+    description: All tests must follow Arrange-Act-Assert structure.
+    patterns:
+      - "it\\("
+    message: "Tests must follow Arrange → Act → Assert structure with clear separation."
+
+  - id: "test/single-responsibility"
+    description: Each test should validate a single behavior.
+    patterns:
+      - "expect\\([\\s\\S]*expect\\("
+    warning: "Avoid multiple behavioral assertions in one test. Consider splitting."
+
+###########################################################
+# 🔹 MOCKING & ISOLATION
+###########################################################
+
+  - id: "test/no-real-services"
+    description: Never call real external services (DB, API, Supabase, etc).
+    patterns:
+      - "supabase\\.from"
+      - "fetch\\("
+      - "axios\\("
+    error: "External services must always be mocked using vi.mock()."
+
+  - id: "test/require-mock-usage"
+    description: External modules must be mocked.
+    patterns:
+      - "vi\\.mock\\("
+    warning: "Ensure all external dependencies are mocked for isolation."
+
+  - id: "test/clear-mocks"
+    description: Mocks must be cleared between tests.
+    patterns:
+      - "beforeEach\\("
+    message: "Use vi.clearAllMocks() in beforeEach for test isolation."
+
+###########################################################
+# 🔹 SUCCESS + ERROR + EDGE CASE COVERAGE
+###########################################################
+
+  - id: "test/success-error-cases"
+    description: Both success and error scenarios must be tested.
+    patterns:
+      - "rejects\\.toThrow"
+    warning: "Ensure both success and failure paths are tested."
+
+  - id: "test/edge-cases"
+    description: Edge cases must be validated.
+    patterns:
+      - "null"
+      - "undefined"
+    warning: "Ensure edge cases (null, undefined, boundary values) are tested."
+
+###########################################################
+# 🔹 RTL BEST PRACTICES
+###########################################################
+
+  - id: "rtl/no-implementation-testing"
+    description: Avoid testing implementation details.
+    patterns:
+      - "container\\.querySelector"
+      - "querySelector"
+    error: "Test behavior via user-facing queries, not DOM structure."
+
+  - id: "rtl/prefer-accessible-queries"
+    description: Prefer accessible queries.
+    patterns:
+      - "getByTestId"
+      - "queryByTestId"
+    warning: "Prefer getByRole, getByLabelText, or getByText."
+
+  - id: "rtl/prefer-user-event"
+    description: Use userEvent instead of fireEvent.
+    patterns:
+      - "fireEvent\\("
+    error: "Use userEvent to simulate real user interactions."
+
+  - id: "rtl/async-best-practice"
+    description: Use findBy* or waitFor for async updates.
+    patterns:
+      - "await\\s+screen\\.getBy"
+    error: "Use findBy* for async UI updates."
+
+###########################################################
+# 🔹 HOOK TESTING
+###########################################################
+
+  - id: "hook/use-renderhook"
+    description: Hooks must be tested with renderHook.
+    patterns:
+      - "use[A-Z]"
+    warning: "Custom hooks should be tested using renderHook from Testing Library."
+
+###########################################################
+# 🔹 CLEANUP & MODULE RESET
+###########################################################
+
+  - id: "test/reset-modules"
+    description: Reset modules when shared state exists.
+    patterns:
+      - "vi\\.resetModules"
+    message: "Use vi.resetModules() when module state must be reset."
+
+###########################################################
+# 🔹 COVERAGE REQUIREMENTS
+###########################################################
+
+  - id: "test/coverage-awareness"
+    description: Ensure adequate coverage for business logic.
+    message: "Critical business logic must have ≥80% coverage, including success and error paths."
+
+###########################################################
+# 🌍 E2E TESTS (Playwright)
+###########################################################
+
+globs:
+  - "**/*.e2e.ts"
+  - "**/e2e/**/*.ts"
+  - "**/playwright/**/*.ts"
+
+rules:
+
+  - id: "e2e/no-hard-waits"
+    description: Avoid hardcoded timeouts.
+    patterns:
+      - "waitForTimeout"
+      - "setTimeout"
+    error: "Avoid hard waits in E2E tests. Use Playwright expect() or locator waiting."
+
+  - id: "e2e/prefer-accessible-selectors"
+    description: Use resilient selectors.
+    patterns:
+      - "page\\.locator\\('\\."
+      - "page\\.locator\\(\"\\."
+    warning: "Prefer getByRole or stable data attributes over brittle CSS selectors."
+
+  - id: "e2e/test-critical-flows"
+    description: E2E tests should validate complete user flows.
+    message: "E2E tests must validate real user workflows (login, navigation, checkout, etc), not implementation details."
+
+###########################################################
+# 🔹 QUALITY STANDARDS
+###########################################################
+
+All tests must be:
+
+- Independent
+- Deterministic
+- Fast (no real I/O)
+- Readable
+- Focused
+- Behavior-driven
+- CI-friendly
